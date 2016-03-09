@@ -1,0 +1,63 @@
+.listBox{
+  width: 20%;
+  float: left;
+  height: 500px;
+  overflow-x: scroll;
+  overflow-y: scroll;
+}
+
+ul#sequenceList li{
+  display: inline;
+}
+
+.sequenceBox{
+  width: 80%;
+  float: right;
+  overflow-x: scroll;
+}
+
+.spectrumBox{
+  width: 60%;
+  float: left;
+} 
+
+#spectrumBox{
+  height: 500px;
+}
+
+.precursorSpectrumBox{
+  width: 20%;
+  float: right;
+}
+
+#precursorSpectrumBox{
+  height: 250px;
+}
+
+.quantSpectrumBox{
+  width: 20%;
+  float: right;
+}
+
+#quantSpectrumBox{
+  height: 250px;
+}
+
+#aminoAcid{
+  width: 100px;
+  text-align: center;
+}
+
+#mzTable{
+  border: 1px;
+  border-spacing: 5px;
+}
+
+.selectedListItem{
+  cursor: pointer;
+  background-color: LightGray;
+}
+
+.unselectedListItem{
+  cursor: pointer;
+}
