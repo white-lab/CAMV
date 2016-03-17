@@ -50,7 +50,7 @@ var PrecursorSpectrumBox = React.createClass({
       tooltip: {trigger: 'none'}
     };
 
-    var chart = new google.visualization.LineChart(document.getElementById('precursorSpectrumBox'));
+    var chart = new google.visualization.LineChart(document.getElementById('precursorGoogleChart'));
 
     chart.draw(data, options);
   },
@@ -83,7 +83,7 @@ var PrecursorSpectrumBox = React.createClass({
   render: function(){
     return (
       <div>
-        <div id="precursorSpectrumBox"></div>
+        <div id="precursorGoogleChart"></div>
       </div>
     );
   } 

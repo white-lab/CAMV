@@ -13,6 +13,8 @@ var ViewBox = React.createClass({
             fragmentSelectionModalIsOpen: false,
             fragmentMatches: [],
             maxPPM: 100,
+            minMZ: 0,
+            maxMZ: null,
             data: allData.fullTestData,
             peptideData: allData.peptideData}
   },
@@ -23,21 +25,29 @@ var ViewBox = React.createClass({
     this.setState({selectedPeptide: peptideId})
   },
   updateSelectedScan: function(scanId){
-    this.setState({selectedScan: scanId})
+    this.setState({selectedScan: scanId, minMZ: 0, maxMZ: null})
   },
   updateSelectedPTMPlacement: function(modsId){
-    console.log("updateSelectedPTMPlacement", modsId)
     this.setState({selectedPTMPlacement: modsId})
+  },
+  updateMinMZ: function(newMinMZ){
+    if (newMinMZ > 0){
+      this.setState({minMZ: newMinMZ})
+    } else {
+      this.setState({minMZ: 0})
+    }
+  },
+  updateMaxMZ: function(newMaxMZ){
+    if (newMaxMZ > this.state.minMZ){
+      this.setState({maxMZ: newMaxMZ})
+    }
   },
 
   updateSelectedMz: function(mz){
     data = this.state.data[this.state.selectedProtein].peptides[this.state.selectedPeptide].scans[this.state.selectedScan].scanData
-    
     peptide = this.state.data[this.state.selectedProtein].peptides[this.state.selectedPeptide]
-    
     peptideDataId = peptide.peptideDataId
     modificationStateId = peptide.modificationStateId
-
     scan = peptide.scans[this.state.selectedScan]
 
     matchData = this.state.peptideData[peptideDataId]
@@ -62,6 +72,8 @@ var ViewBox = React.createClass({
                    fragmentMatches: matches,
                    currentLabel: currentLabel})
   },
+
+
   closeFragmentSelectionModal: function(){
     this.setState({fragmentSelectionModalIsOpen: false,
                    fragmentMatches: [],
@@ -75,7 +87,9 @@ var ViewBox = React.createClass({
         this.state.selectedMz != null) {
       data = _.cloneDeep(this.state.data)
       
-      scan = data[this.state.selectedProtein].peptides[this.state.selectedPeptide].scans[this.state.selectedScan]
+      scan = data[this.state.selectedProtein]
+              .peptides[this.state.selectedPeptide]
+              .scans[this.state.selectedScan]
       scanData = scan.scanData
       
       matchData = this.state.peptideData[peptide.peptideDataId]
@@ -92,6 +106,14 @@ var ViewBox = React.createClass({
       }.bind(this))
       this.setState({data: data})
     }
+  },
+
+  updateChoice: function(choice){
+    data = _.cloneDeep(this.state.data)
+    scan = data[this.state.selectedProtein].peptides[this.state.selectedPeptide].scans[this.state.selectedScan]
+    choiceData = scan.choiceData
+    choiceData[this.state.selectedPTMPlacement].state = choice
+    this.setState({data: data})
   },
 
   componentDidUpdate: function(prevProps, prevState){
@@ -119,7 +141,9 @@ var ViewBox = React.createClass({
     var protein = null
     var peptide = null
     var scan = null
+    var choice = null
     var peptideSequence = null
+    var inputDisabled = true
     if (this.state.selectedProtein != null) {
       protein = this.state.data[this.state.selectedProtein]
       if (this.state.selectedPeptide != null) {
@@ -133,7 +157,7 @@ var ViewBox = React.createClass({
           quantSpectrumData = scan.quantScanData
           quantMz = scan.quantMz
           if (this.state.selectedPTMPlacement != null){
-
+            inputDisabled = false
             mod = this.state.peptideData[peptide.peptideDataId]
                     .modificationStates[peptide.modificationStateId]
                     .mods[this.state.selectedPTMPlacement]
@@ -158,7 +182,7 @@ var ViewBox = React.createClass({
 //    console.log("selectedProtein:", this.state.selectedProtein, "selectedPeptide:", this.state.selectedPeptide, "selectedScan:", this.state.selectedScan, "selecedPTMPlacement:", this.state.selectedPTMPlacement)
 
     return (
-      <div className="ViewBox">
+      <div className="panel panel-default" id="viewBox">
         <ModalFragmentBox showModal={this.state.fragmentSelectionModalIsOpen}
                           closeCallback={this.closeFragmentSelectionModal}
                           updateCallback={this.updateSelectedFragment}
@@ -166,10 +190,7 @@ var ViewBox = React.createClass({
                           fragmentMatches={this.state.fragmentMatches} 
                           currentLabel={this.state.currentLabel}/>
 
-        <div className="listBox">
-          Run: {this.state.selectedRun}
-          <br/>
-          Search: {this.state.selectedSearch}
+        <div className="panel panel-default" id="scanSelectionList">
           <ScanSelectionList data={this.state.data}
                              peptideData={this.state.peptideData}
                              updateSelectedProteinCallback={this.updateSelectedProtein}
@@ -179,35 +200,39 @@ var ViewBox = React.createClass({
                              selectedProtein={this.state.selectedProtein}
                              selectedPeptide={this.state.selectedPeptide}
                              selectedScan={this.state.selectedScan}
-                             selectedPTMPlacement={this.state.selectedPTMPlacement}
-          />
+                             selectedPTMPlacement={this.state.selectedPTMPlacement}/>
         </div>
 
-        <div className="sequenceBox">
+        <div className="panel panel-default" id="sequenceBox">
           <SequenceBox sequence={peptideSequence}
                        bFound={bFound}
                        yFound={yFound}/>
         </div>
-
-        <div className="spectrumBox">
-          <SpectrumBox spectrumData={spectrumData}
-                       matchData={matchData}
-                       selectedPTMPlacement={this.state.selectedPTMPlacement}
-                       pointChosenCallback={this.updateSelectedMz}/>
+        <div className="panel panel-default" id="spectra">
+          <div id="fragmentSpectrumBox">
+            <SpectrumBox spectrumData={spectrumData}
+                         minMZ={this.state.minMZ}
+                         maxMZ = {this.state.maxMZ}
+                         updateMinMZ={this.updateMinMZ}
+                         updateMaxMZ={this.updateMaxMZ}
+                         inputDisabled={inputDisabled}
+                         matchData={matchData}
+                         selectedPTMPlacement={this.state.selectedPTMPlacement}
+                         updateChoice={this.updateChoice}
+                         pointChosenCallback={this.updateSelectedMz}/>
+          </div>
+          <div id="precursorSpectrumBox">
+            <PrecursorSpectrumBox spectrumData={precursorSpectrumData}
+                                  precursorMz={precursorMz}
+                                  chargeState={chargeState}
+                                  ppm={50}/>                     
+          </div>
+          <div id="quantSpectrumBox">
+            <QuantSpectrumBox spectrumData={quantSpectrumData}
+                                  quantMz={quantMz}
+                                  ppm={50}/>                     
+          </div>
         </div>
-        <div className="precursorSpectrumBox">
-          <PrecursorSpectrumBox spectrumData={precursorSpectrumData}
-                                precursorMz={precursorMz}
-                                chargeState={chargeState}
-                                ppm={50}/>                     
-        </div>
-        <div className="QuantSpectrumBox">
-          <QuantSpectrumBox spectrumData={quantSpectrumData}
-                                quantMz={quantMz}
-                                ppm={50}/>                     
-        </div>
-
-
       </div>
     )
   }

@@ -2,9 +2,9 @@
 var YIonElement = React.createClass({
   render: function(){
     if (this.props.found){
-      return <td style={{color:"red"}}>&lceil;</td>
+      return <td className="yIon" style={{color:"red"}}>&lceil;</td>
     } else {
-      return <td style={{color:"lightgray"}}>&lceil;</td>
+      return <td className="yIon" style={{color:"lightgray"}}>&lceil;</td>
     }
   }
 });
@@ -12,16 +12,16 @@ var YIonElement = React.createClass({
 var BIonElement = React.createClass({
   render: function(){
     if (this.props.found){
-      return <td style={{color:"red"}}>&rfloor;</td>
+      return <td className="bIon" style={{color:"red"}}>&rfloor;</td>
     } else{
-      return <td style={{color:"lightgray"}}>&rfloor;</td>
+      return <td className="bIon" style={{color:"lightgray"}}>&rfloor;</td>
     }
   }
 });
 
 var SequenceElement = React.createClass({
   render: function(){
-    return <td className="aminoAcid" width="15px">{this.props.AA}</td>
+    return <td className="aminoAcid">{this.props.AA}</td>
   }
 });
 
@@ -44,11 +44,13 @@ var SequenceBox = React.createClass({
                                      return <BIonElement key={i} found={found}/>
                                    }.bind(this)))
       return ( 
-        <table><tbody>
-        {rows.map(function(row){
-          return <tr>{row}</tr>
-        })}
-        </tbody></table>
+        <div id="sequence">
+          <table><tbody>
+          {rows.map(function(row){
+            return <tr>{row}</tr>
+          })}
+          </tbody></table>
+        </div>
       );
     } else {
       return <table><tbody></tbody></table>

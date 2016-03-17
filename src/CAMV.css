@@ -1,50 +1,85 @@
-.listBox{
-  width: 20%;
+#viewBox {
+  height: 95%;
+  width: 95%;
+  margin: 2.5% 2.5% 2.5% 2.5%;
+  position: relative; 
+}
+
+#scanSelectionList{
+  width: 18%;
   float: left;
-  height: 500px;
+  height: 94.5%;
   overflow-x: scroll;
   overflow-y: scroll;
+  margin: 1% 1% 1% 1%;
+  padding: 0;
 }
 
-ul#sequenceList li{
-  display: inline;
-}
-
-.sequenceBox{
-  width: 80%;
+#sequenceBox{
+  width: 79%;
+  height: 12%;
   float: right;
   overflow-x: scroll;
+  margin-top: 1%;
+  margin-bottom: 0;
+  margin-right: 1%;
+  padding-left: 20px;
 }
 
-.spectrumBox{
-  width: 60%;
+#sequence{
+  margin: auto, 0;
+}
+
+#spectra{
+  margin-top: 1%;
+  margin-bottom: 1%;
+  height: 80%;
+  width: 79%;
   float: left;
+}
+
+#updateBox{
+  padding: 0 10% 0 10%;
+  height: 10%; 
+  width: 100%;
 } 
 
-#spectrumBox{
-  height: 500px;
+#fragmentSpectrumBox{
+  height: 100%;
+  width: 75%;
+  float: left;
 }
 
-.precursorSpectrumBox{
-  width: 20%;
-  float: right;
+#fragmentGoogleChart{
+  height: 90%;
 }
 
 #precursorSpectrumBox{
-  height: 250px;
-}
-
-.quantSpectrumBox{
-  width: 20%;
+  height: 50%;
+  width: 25%;
   float: right;
 }
 
-#quantSpectrumBox{
-  height: 250px;
+#precursorGoogleChart{
+  height: 100%;
 }
 
-#aminoAcid{
-  width: 100px;
+#quantSpectrumBox{
+  height: 50%;
+  width: 25%;
+  float: right;
+}
+
+#quantGoogleChart{
+  height: 100%;
+}
+
+.aminoAcid{
+  width: 15px;
+  text-align: center;
+}
+
+.yIon, .bIon{
   text-align: center;
 }
 
@@ -61,3 +96,80 @@ ul#sequenceList li{
 .unselectedListItem{
   cursor: pointer;
 }
+
+.choiceButton{
+  float: right;
+}
+
+#acceptButton:enabled {
+  background-color: green;
+}
+
+#acceptButton:disabled {
+  background-color: LightGray;
+}
+
+#maybeButton:enabled {
+  background-color: yellow;
+}
+
+#maybeButton:disabled {
+  background-color: LightGray;
+}
+
+#rejectButton:enabled {
+  background-color: red;
+}
+
+#rejectButton:disabled {
+  background-color: LightGray;
+}
+
+#setMinMZ{
+  float: left;
+  margin-right: 1%;
+}
+
+#setMaxMZ{
+  float: left;
+}
+
+.numInput{
+  width: 50px;
+}
+
+input:disabled {
+  background-color: LightGray;
+}
+
+li[class=accept] > span{
+  color: green;
+}
+
+li[class=maybe] > span{
+  color: yellow;
+}
+
+li[class=reject] > span{
+  color: red;
+}
+
+li[class=undecided] > span{
+  color: black;
+}
+
+ul {
+  list-style-type: none;
+  padding: 0;
+  margin-left: 10px;
+  border-left: 1px solid #333;
+}
+
+li::before {
+  content: "\00a0\00a0";
+  bottom: 8;
+  position: relative;
+  border-bottom: 1px solid #333;
+}
+
+

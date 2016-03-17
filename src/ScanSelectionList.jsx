@@ -11,9 +11,15 @@ var PTMPlacementListItem = React.createClass({
                     this.props.selectedPeptide == this.props.peptideId &&
                     this.props.selectedScan == this.props.scanId &&
                     this.props.selectedPTMPlacement == this.props.ptmPlacement.id)
-    return (
-      <li onClick={this.update}><span className={selected ? 'selectedListItem' : 'unselectedListItem'}>{this.props.ptmPlacement.name}</span></li>
-    )
+    if (this.props.choice == 'accept'){
+      return <li className='accept' onClick={this.update}><span className={selected ? 'selectedListItem' : 'unselectedListItem'}>{this.props.ptmPlacement.name}</span></li>
+    } else if (this.props.choice == 'maybe'){
+      return <li className='maybe' onClick={this.update}><span className={selected ? 'selectedListItem' : 'unselectedListItem'}>{this.props.ptmPlacement.name}</span></li>
+    } else if (this.props.choice == 'reject'){
+      return <li className='reject' onClick={this.update}><span className={selected ? 'selectedListItem' : 'unselectedListItem'}>{this.props.ptmPlacement.name}</span></li>
+    } else {
+      return <li className='undecided' onClick={this.update}><span className={selected ? 'selectedListItem' : 'unselectedListItem'}>{this.props.ptmPlacement.name}</span></li>
+    }
   }
 });
 
@@ -33,10 +39,11 @@ var ScanNumberListItem = React.createClass({
     if (this.state.open){
       return (
         <div>
-          <li onClick={this.toggle}><span className={selected ? 'selectedListItem' : 'unselectedListItem'}>Scan: {this.props.scan.scanNumber}</span></li>
+          <li className="scan" onClick={this.toggle}><span className={selected ? 'selectedListItem' : 'unselectedListItem'}>Scan: {this.props.scan.scanNumber}</span></li>
           <ul>
-            {this.props.ptmPlacements.map(function(ptmPlacement){
+            {this.props.ptmPlacements.map(function(ptmPlacement, i){
               return ( <PTMPlacementListItem key={ptmPlacement.id}
+                                             choice={this.props.scan.choiceData[i].state}
                                              proteinId={this.props.proteinId}
                                              peptideId={this.props.peptideId}
                                              scanId={this.props.scan.scanId}
@@ -55,7 +62,7 @@ var ScanNumberListItem = React.createClass({
       )
     } else { 
       return ( 
-        <li onClick={this.toggle}><span className={selected ? 'selectedListItem' : 'unselectedListItem'}>Scan: {this.props.scan.scanNumber}</span></li>
+        <li className="scan" onClick={this.toggle}><span className={selected ? 'selectedListItem' : 'unselectedListItem'}>Scan: {this.props.scan.scanNumber}</span></li>
       )
     }
   }
@@ -80,7 +87,7 @@ var PeptideListItem = React.createClass({
     if (this.state.open){
       return (
         <div>
-        <li onClick={this.toggle}><span className={selected ? 'selectedListItem' : 'unselectedListItem'}>{sequenceName}</span></li>
+        <li className="peptide" onClick={this.toggle}><span className={selected ? 'selectedListItem' : 'unselectedListItem'}>{sequenceName}</span></li>
         <ul>
           {this.props.scans.map(function(scan){
             return ( <ScanNumberListItem key={scan.scanId}
@@ -100,7 +107,7 @@ var PeptideListItem = React.createClass({
       )
     } else {
       return (
-        <li onClick={this.toggle}><span className={selected ? 'selectedListItem' : 'unselectedListItem'}>{sequenceName}</span></li>
+        <li className="peptide" onClick={this.toggle}><span className={selected ? 'selectedListItem' : 'unselectedListItem'}>{sequenceName}</span></li>
       )
     }
   }
@@ -130,7 +137,7 @@ var ProteinListItem = React.createClass({
     if (this.state.open){
       return (
         <div>
-        <li onClick={this.toggle}><span className={selected ? 'selectedListItem' : 'unselectedListItem'}>{this.props.protein.proteinName}</span></li>
+        <li className="protein" onClick={this.toggle}><span className={selected ? 'selectedListItem' : 'unselectedListItem'}>{this.props.protein.proteinName}</span></li>
         <ul>
           { this.props.protein.peptides.map(function(peptide){
             return ( <PeptideListItem key={[peptide.peptideId, peptide.modificationStateId]}
@@ -151,7 +158,7 @@ var ProteinListItem = React.createClass({
       );
     } else {
       return (
-        <li onClick={this.toggle}><span className={selected ? 'selectedListItem' : 'unselectedListItem'}>{this.props.protein.proteinName}</span></li>
+        <li className="protein" onClick={this.toggle}><span className={selected ? 'selectedListItem' : 'unselectedListItem'}>{this.props.protein.proteinName}</span></li>
       );
     }
   }
@@ -166,7 +173,7 @@ var ScanSelectionList = React.createClass({
     this.props.updateSelectedPTMPlacementCallback(modsId)
   },
   render: function() {
-    return ( <ul>
+    return ( <ul className="tree">
                {this.props.data.map(function(protein) {
                   return ( <ProteinListItem key={protein.proteinId}
                                            protein={protein}

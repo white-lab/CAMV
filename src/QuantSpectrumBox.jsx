@@ -45,7 +45,7 @@ var QuantSpectrumBox = React.createClass({
       tooltip: {trigger: 'none'}
     };
 
-    var chart = new google.visualization.LineChart(document.getElementById('quantSpectrumBox'));
+    var chart = new google.visualization.LineChart(document.getElementById('quantGoogleChart'));
 
     chart.draw(data, options);
   },
@@ -78,7 +78,7 @@ var QuantSpectrumBox = React.createClass({
   render: function(){
     return (
       <div>
-        <div id="quantSpectrumBox"></div>
+        <div id="quantGoogleChart"></div>
       </div>
     );
   } 
