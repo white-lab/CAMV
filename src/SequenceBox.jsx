@@ -46,8 +46,8 @@ var SequenceBox = React.createClass({
       return ( 
         <div id="sequence">
           <table><tbody>
-          {rows.map(function(row){
-            return <tr>{row}</tr>
+          {rows.map(function(row, i){
+            return <tr key={i}>{row}</tr>
           })}
           </tbody></table>
         </div>

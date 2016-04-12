@@ -1,9 +1,12 @@
+const fs = require('fs');
+const util = require('util');
+// const jsonfile = require('jsonfile');
 
 var ViewBox = React.createClass({
   getInitialState: function(){
     return {selectedRun: null, 
             selectedSearch:null,
-            submitted: true, 
+            submitted: false, 
             selectedProtein: null,
             selectedPeptide: null,
             selectedScan: null,
@@ -15,9 +18,13 @@ var ViewBox = React.createClass({
             maxPPM: 100,
             minMZ: 0,
             maxMZ: null,
-            data: allData.fullTestData,
-            peptideData: allData.peptideData}
+            //data: allData.fullTestData,
+            data: [],
+            //peptideData: allData.peptideData
+            peptideData: []
+    }
   },
+
   updateSelectedProtein: function(proteinId){
     this.setState({selectedProtein: proteinId})
   },
@@ -118,14 +125,44 @@ var ViewBox = React.createClass({
 
   componentDidUpdate: function(prevProps, prevState){
     if (prevState.selectedRun != this.state.selectedRun){
-      console.log('New run: ' + this.state.selectedRun)
+      // console.log('New run: ' + this.state.selectedRun)
     }
     if (prevState.selectedSearch != this.state.selectedSearch){
-      console.log('New search: ' + this.state.selectedSearch)
+      // console.log('New search: ' + this.state.selectedSearch)
     }
   },
   goButtonClicked: function(){
     this.setState({submitted: true})
+  },
+  setData: function(data){
+    this.setState({data: data})
+  },
+  setPeptideData: function(peptideData){
+    this.setState({peptideData: peptideData})
+  },
+  setSubmitted: function(submitted){
+    this.setState({submitted: submitted})
+  },
+  save: function(){
+    // console.log('saving...')
+
+    var dataToSave = JSON.stringify({scanData: this.state.data, peptideData: this.state.peptideData}, null, 2)
+    dialog.showSaveDialog({filters: [{name: 'text', extensions: ['camv']}]},function(fileName) {
+      if (fileName === undefined) return;
+      var dataToSave = JSON.stringify({scanData: this.state.data, peptideData: this.state.peptideData}, null, 2)
+      var ws = fs.createWriteStream('testDataOut.camv');
+      ws.on('error', function(err){
+        dialog.showErrorBox("File Save Error", err.message);
+      });
+      ws.on('finish', function(){
+          dialog.showMessageBox({ message: "The file has been saved!", buttons: ["OK"]});
+      });
+      var lines = dataToSave.split("\n");
+      for (i = 0; i < lines.length; i++){
+        ws.write(lines[i] + "\n")
+      }
+      ws.end();
+    }.bind(this));
   },
 
   render: function() {
@@ -181,6 +218,7 @@ var ViewBox = React.createClass({
     
 //    console.log("selectedProtein:", this.state.selectedProtein, "selectedPeptide:", this.state.selectedPeptide, "selectedScan:", this.state.selectedScan, "selecedPTMPlacement:", this.state.selectedPTMPlacement)
 
+
     return (
       <div className="panel panel-default" id="viewBox">
         <ModalFragmentBox showModal={this.state.fragmentSelectionModalIsOpen}
@@ -189,6 +227,10 @@ var ViewBox = React.createClass({
                           mz={this.state.selectedMz}
                           fragmentMatches={this.state.fragmentMatches} 
                           currentLabel={this.state.currentLabel}/>
+        <ModalFileSelectionBox showModal={!this.state.submitted} 
+                               setPeptideData={this.setPeptideData}
+                               setData={this.setData}
+                               setSubmitted={this.setSubmitted}/>
 
         <div className="panel panel-default" id="scanSelectionList">
           <ScanSelectionList data={this.state.data}
@@ -233,8 +275,10 @@ var ViewBox = React.createClass({
                                   ppm={50}/>                     
           </div>
         </div>
+        <button id="save" onClick={this.save}>Save</button>
       </div>
-    )
+    )     
+    
   }
 });
 

@@ -3,7 +3,8 @@
   <head>
     <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.min.css">
     <script type="text/javascript" src="bower_components/react/react-with-addons.js"></script>
-    <script type="text/javascript" src="bower_components/jquery/dist/jquery.min.js"></script>
+    <!--<script type="text/javascript" src="bower_components/jquery/dist/jquery.min.js"></script> -->
+    <script> window.$ = window.jQuery = require('./bower_components/jquery/dist/jquery.min.js'); </script>
     <script type="text/javascript" src="bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
     <script type="text/javascript" src="bower_components/react-bootstrap/react-bootstrap.js"></script>
     <script type="text/javascript" src="bower_components/lodash/lodash.js"></script>
@@ -30,6 +31,7 @@
     <script type="text/jsx" src="QuantSpectrumBox.jsx"></script>
     <script type="text/jsx" src="SequenceBox.jsx"></script>
     <script type="text/jsx" src="ModalFragmentBox.jsx"></script>
+    <script type="text/jsx" src="ModalFileSelectionBox.jsx"></script>
     <script type="text/jsx" src="ScanSelectionList.jsx"></script>
   </head>
   <body>

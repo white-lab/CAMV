@@ -1,4 +1,7 @@
 var QuantSpectrumBox = React.createClass({
+  getInitialState: function(){
+    return {chartLoaded: false}
+  }, 
 
   drawChart: function() {
 
@@ -64,15 +67,18 @@ var QuantSpectrumBox = React.createClass({
           packages:["corechart"],
           callback: function () {
             component.drawChart();
+            component.setState({chartLoaded: true})
           },
         });
       }); 
   },
   
   componentDidUpdate: function (prevProps, prevState) {
-    if (prevProps.spectrumData != this.props.spectrumData) {
-      this.drawChart();
-    } 
+    if (this.state.chartLoaded){
+      if (prevProps.spectrumData != this.props.spectrumData) {
+        this.drawChart();
+      } 
+    }
   },
 
   render: function(){

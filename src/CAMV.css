@@ -5,6 +5,12 @@
   position: relative; 
 }
 
+#save {
+  position: relative;
+  float: right;
+  margin: 1% 1% 1% 1%;
+}
+
 #scanSelectionList{
   width: 18%;
   float: left;
@@ -17,7 +23,7 @@
 
 #sequenceBox{
   width: 79%;
-  height: 12%;
+  height: 15%;
   float: right;
   overflow-x: scroll;
   margin-top: 1%;
@@ -33,7 +39,7 @@
 #spectra{
   margin-top: 1%;
   margin-bottom: 1%;
-  height: 80%;
+  height: 77%;
   width: 79%;
   float: left;
 }

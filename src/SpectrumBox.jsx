@@ -73,6 +73,9 @@ var SetMaxMZ = React.createClass({
 });
 
 var SpectrumBox = React.createClass({
+  getInitialState: function(){
+    return {chartLoaded: false}
+  },
 
   drawChart: function() {
 
@@ -165,6 +168,7 @@ var SpectrumBox = React.createClass({
         google.load("visualization", "1", {
           packages:["corechart"],
           callback: function () {
+            component.setState({chartLoaded: true})
             component.drawChart();
           },
         });
@@ -172,12 +176,14 @@ var SpectrumBox = React.createClass({
   },
   
   componentDidUpdate: function (prevProps, prevState) {
-    if (prevProps.spectrumData != this.props.spectrumData) {
-      this.drawChart();
-    } else if (prevProps.selectedPTMPlacement != this.props.selectedPTMPlacement){
-      this.drawChart();
-    } else if (prevProps.minMZ != this.props.minMZ || prevProps.maxMZ != this.props.maxMZ) {
-      this.drawChart();
+    if (this.state.chartLoaded){
+      if (prevProps.spectrumData != this.props.spectrumData) {
+        this.drawChart();
+      } else if (prevProps.selectedPTMPlacement != this.props.selectedPTMPlacement){
+        this.drawChart();
+      } else if (prevProps.minMZ != this.props.minMZ || prevProps.maxMZ != this.props.maxMZ) {
+        this.drawChart();
+      }
     }
   },
 
