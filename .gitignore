@@ -1,0 +1,9 @@
+node_modules/
+bower_components/
+bower_components_old/
+src/index-old.html
+src/package.json-old
+src/testData.camv
+src/testDataOut.camv
+src/testData.json
+.DS_Store
