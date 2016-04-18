@@ -1,5 +1,7 @@
   
-var ReactCSSTransitionGroup = React.addons.CSSTransitionGroup;
+// var ReactCSSTransitionGroup = React.addons.CSSTransitionGroup;
+
+var ReactCSSTransitionGroup = require('react-addons-css-transition-group');
 
 var ModalFragmentBox = React.createClass({
   getInitialState(){

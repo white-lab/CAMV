@@ -2,7 +2,9 @@ var remote = require('remote');
 var dialog = remote.require('dialog');
 
  
-var ReactCSSTransitionGroup = React.addons.CSSTransitionGroup;
+// var ReactCSSTransitionGroup = React.addons.CSSTransitionGroup;
+
+var ReactCSSTransitionGroup = require('react-addons-css-transition-group');
 
 var ModalFileSelectionBox = React.createClass({
   getInitialState: function() {

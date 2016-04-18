@@ -1,6 +1,5 @@
 const fs = require('fs');
 const util = require('util');
-// const jsonfile = require('jsonfile');
 
 var ViewBox = React.createClass({
   getInitialState: function(){
@@ -282,7 +281,7 @@ var ViewBox = React.createClass({
   }
 });
 
-React.render(
+ReactDOM.render(
   <ViewBox />, 
   document.getElementById('content')
 );

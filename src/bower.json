@@ -1,0 +1,23 @@
+{
+  "name": "camv",
+  "description": "",
+  "main": "main.js",
+  "authors": [
+    "Tim Curran <tim@ginkgobioworks.com>"
+  ],
+  "license": "MIT",
+  "homepage": "",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "bootstrap": "^3.3.6",
+    "react": "^15.0.1",
+    "lodash": "^4.11.0",
+    "react-bootstrap": "^0.28.5"
+  }
+}
