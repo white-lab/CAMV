@@ -7,3 +7,4 @@ src/testData.camv
 src/testDataOut.camv
 src/testData.json
 .DS_Store
+src/CAMV-*-*/
