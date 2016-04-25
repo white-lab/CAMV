@@ -1,15 +1,31 @@
 # CAMV
-Tool for validation proteomic mass spectrometry peptide assignments
+
+Tool for validation proteomic mass spectrometry peptide assignments.
 
 # Installation
-```npm install```
 
-```npm install electron```
+From `src/` run:
 
-```bower install```
+```
+npm install
+npm install electron
+bower install
+```
 
 # Usage
+
 `electron .` from src/
 
+# Deployment
+
+From this directory, run:
+
+```
+electron-packager src/ --all
+```
+
+This will generate fully-independent packages for Linux, Windows, and OS X.
+
 # Testing
+
 Choose `examples/testData.camv`
