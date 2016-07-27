@@ -87,7 +87,8 @@ var SpectrumBox = React.createClass({
       var scanMax = this.props.spectrumData[this.props.spectrumData.length - 1].mz + 1
       maxMZ = this.props.maxMZ == null ? scanMax : Math.min(scanMax, this.props.maxMZ)
 
-      max_y = Math.max(
+      max_y = Math.max.apply(
+        null,
         this.props.spectrumData.filter(
           function(element) { return element.mz >= minMZ && element.mz <= maxMZ }
         ).map(
@@ -109,15 +110,18 @@ var SpectrumBox = React.createClass({
       ppm = null
 
       if (mz > minMZ && mz < maxMZ){
-        if (this.props.selectedPTMPlacement != null && into >= max_y / 10){
+        if (this.props.selectedPTMPlacement != null){
           style = 'point {size: 5; fill-color: red; visible: true}'
         } else {
           style = 'point {size: 5; fill-color: red; visible: false}'
         }
+
         var matchInfo = peak.matchInfo[this.props.selectedPTMPlacement]
-        if (matchInfo != null){
+
+        if (matchInfo != null) {
           var matchId = matchInfo.matchId
-          if (matchId){
+
+          if (matchId != null) {
             var match = this.props.matchData[matchId]
             ppm = Math.abs(match.mz - mz) / mz * 1000000
             name = match.name
@@ -128,8 +132,10 @@ var SpectrumBox = React.createClass({
             } else if (ppm < 10){
               style = 'point {size: 5; fill-color: green; visible: true}'
             }
+          } else if (into < max_y / 10) {
+            style = null
           }
-        }
+      }
 
         data.addRows([[mz, 0, null, null],
                       [mz, into, style, name],
