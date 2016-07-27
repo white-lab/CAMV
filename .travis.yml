@@ -18,12 +18,12 @@ install:
 
 script:
   - electron-packager src/ --all
-  - zip -r CAMV-darwin-x64.zip CAMV-darwin-x64
-  - zip -r CAMV-linux-ia32.zip CAMV-linux-ia32
-  - zip -r CAMV-linux-x64.zip  CAMV-linux-x64
-  - zip -r CAMV-mas-x64.zip    CAMV-mas-x64
-  - zip -r CAMV-win32-ia32.zip CAMV-win32-ia32
-  - zip -r CAMV-win32-x64.zip  CAMV-win32-x64
+  - zip -qr CAMV-darwin-x64.zip CAMV-darwin-x64
+  - zip -qr CAMV-linux-ia32.zip CAMV-linux-ia32
+  - zip -qr CAMV-linux-x64.zip  CAMV-linux-x64
+  - zip -qr CAMV-mas-x64.zip    CAMV-mas-x64
+  - zip -qr CAMV-win32-ia32.zip CAMV-win32-ia32
+  - zip -qr CAMV-win32-x64.zip  CAMV-win32-x64
 
 deploy:
   provider: releases
