@@ -2,9 +2,9 @@
 var YIonElement = React.createClass({
   render: function(){
     if (this.props.found){
-      return <td className="yIon" style={{color:"red"}}>&lceil;</td>
+      return <td className="yIon" style={{color:"red"}}>&lfloor;</td>
     } else {
-      return <td className="yIon" style={{color:"lightgray"}}>&lceil;</td>
+      return <td className="yIon" style={{color:"lightgray"}}>&lfloor;</td>
     }
   }
 });
@@ -12,9 +12,9 @@ var YIonElement = React.createClass({
 var BIonElement = React.createClass({
   render: function(){
     if (this.props.found){
-      return <td className="bIon" style={{color:"red"}}>&rfloor;</td>
+      return <td className="bIon" style={{color:"red"}}>&rceil;</td>
     } else{
-      return <td className="bIon" style={{color:"lightgray"}}>&rfloor;</td>
+      return <td className="bIon" style={{color:"lightgray"}}>&rceil;</td>
     }
   }
 });
@@ -30,20 +30,21 @@ var SequenceBox = React.createClass({
     if (this.props.sequence != null){
       var sequence = this.props.sequence.split('')
       var rows = []
+
       rows.push(sequence.map(function(item, i){
-                               found = this.props.yFound.indexOf(this.props.sequence.length - i - 1) > -1
-                               return <YIonElement key={i} found={found}/>
-                             }.bind(this)))
+                                     found = this.props.bFound.indexOf(i + 1) > -1
+                                     return <BIonElement key={i} found={found}/>
+                                   }.bind(this)))
 
       rows.push(sequence.map(function(item, i){
                                   return <SequenceElement AA={item} key={i}/>
                                 }.bind(this)))
 
       rows.push(sequence.map(function(item, i){
-                                     found = this.props.bFound.indexOf(i + 1) > -1
-                                     return <BIonElement key={i} found={found}/>
+                                     found = this.props.yFound.indexOf(this.props.sequence.length - i - 1) > -1
+                                     return <YIonElement key={i} found={found}/>
                                    }.bind(this)))
-      return ( 
+      return (
         <div id="sequence">
           <table><tbody>
           {rows.map(function(row, i){
