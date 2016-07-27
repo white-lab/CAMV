@@ -1,7 +1,7 @@
 var QuantSpectrumBox = React.createClass({
   getInitialState: function(){
     return {chartLoaded: false}
-  }, 
+  },
 
   drawChart: function() {
 
@@ -10,7 +10,7 @@ var QuantSpectrumBox = React.createClass({
     data.addColumn('number', 'Intensity');
     data.addColumn({'type': 'string', 'role': 'style'})
     data.addColumn({'type': 'string', 'role': 'annotation'})
-  
+
     var quantMz = this.props.quantMz
     var ppm = this.props.ppm
 
@@ -22,26 +22,28 @@ var QuantSpectrumBox = React.createClass({
       var found = false
 
       quantMz.forEach(function(val){
-        var currPPM = 1000000 * Math.abs(mz - val) / val  
+        var currPPM = 1000000 * Math.abs(mz - val) / val
         if (currPPM < ppm){
           found = true
-        } 
-      }) 
+        }
+      })
 
       if (found){
         style = 'point {size: 5; fill-color: green; visible: true}'
       } else {
         style = 'point {size: 5; fill-color: green; visible: false}'
       }
-           
-      data.addRows([[mz, 0, null, null], 
-                    [mz, into, style, name], 
+
+      data.addRows([[mz, 0, null, null],
+                    [mz, into, style, name],
                     [mz, 0, null, null]])
     })
 
     var options = {
       title: 'Quantification',
-      hAxis: {title: 'mz'},
+      hAxis: {title: 'mz',
+              minValue: Math.floor(Math.min(quantMz)) - 1,
+              maxValue: Math.ceil(Math.max(quantMz)) + 1},
       vAxis: {title: 'Intensity'},
       annotations: { textStyle: { }},
       legend: 'none',
@@ -70,14 +72,14 @@ var QuantSpectrumBox = React.createClass({
             component.setState({chartLoaded: true})
           },
         });
-      }); 
+      });
   },
-  
+
   componentDidUpdate: function (prevProps, prevState) {
     if (this.state.chartLoaded){
       if (prevProps.spectrumData != this.props.spectrumData) {
         this.drawChart();
-      } 
+      }
     }
   },
 
@@ -87,5 +89,5 @@ var QuantSpectrumBox = React.createClass({
         <div id="quantGoogleChart"></div>
       </div>
     );
-  } 
+  }
 });
