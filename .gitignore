@@ -8,3 +8,5 @@ src/testDataOut.camv
 src/testData.json
 .DS_Store
 CAMV-*-*/
+*.zip
+

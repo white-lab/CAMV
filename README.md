@@ -1,5 +1,7 @@
 # CAMV
 
+[![Build Status](https://img.shields.io/travis/naderm/CAMV.svg)](https://travis-ci.org/naderm/CAMV)
+
 Tool for validation proteomic mass spectrometry peptide assignments.
 
 # Installation
