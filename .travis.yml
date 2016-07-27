@@ -27,6 +27,8 @@ script:
 
 deploy:
   provider: releases
+  api_key:
+    secure: fswpyJ2p6xuRT1t2OlYCND/sKmgkc4eiyqjZSaImFDuNeNaFVWQEY+6pNzrOND8fd1nf+MhhaXcGROJDxbMjiRdSdsIkALRPmdytYADUTgQUX/Da0jbwnaoNKeSohCq2jZOe6iR4+CeGuiBdJxLt9JMDu7TkDWMuzC6/PO/SIP7wKkSLhpOdmSp0p+fPzhM3qKflcll3kT/mv9GfjRDCQe8B8akhuT41Y31rn2F2G8NGawLgmO4rsYVRPmvnZdddWiIOO4vrscybMlLJbs79Kiwb6LaIrmwhTV7bndTJ8gb7qreRg5e22hMHz3L8/lp+8nGrxbeJi/5CtgtBm0XO49uwceUzv7fEAYyk/xIdH4z/wAfFmPIrZOpQiQEr2pBKf0kg47Gsezl8xbyqhJzzWC0F5J70OS/sBVoHTuebHQJsTUsjCUe5oSlRu4z9PZ7BZfzP3v173Ec/HpZXf3d/ne8zLAyAKJ0oiWwRoJ7hJTR5et7L27/wt3xZMmxUOSr1+utY7Q1x9Z8N9KnE7sNZYSw0QIuLlyYJ3m5pHO1I7Hocz1Nr3sngHgB2pWKNonCh7kwGnf0UoGPliD7poo0iC8FIV6Svnd+TuE94dpkuPKBu6MfJLrjhNlmOBqhgQAL7RlHYKvrwDdH+ka9aX+R5ZpLTiowvxuhNasjpVfTiC8U=
   file:
     - "CAMV-darwin-x64.zip"
     - "CAMV-linux-ia32.zip"
