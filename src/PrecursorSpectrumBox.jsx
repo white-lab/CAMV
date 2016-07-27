@@ -9,7 +9,7 @@ var PrecursorSpectrumBox = React.createClass({
     data.addColumn('number', 'Intensity');
     data.addColumn({'type': 'string', 'role': 'style'})
     data.addColumn({'type': 'string', 'role': 'annotation'})
-  
+
     var precursorMz = this.props.precursorMz
     var chargeState = this.props.chargeState
     var ppm = this.props.ppm
@@ -24,28 +24,28 @@ var PrecursorSpectrumBox = React.createClass({
       var ionSeries = [0,1,2,3,4,5]
 
       ionSeries.forEach(function(val){
-        var currPPM = 1000000 * (mz - precursorMz - 1.0079 * val / chargeState) / mz 
+        var currPPM = 1000000 * (mz - precursorMz - 1.0079 * val / chargeState) / mz
         if (Math.abs(currPPM) < ppm){
           found = true
-        } 
-      }) 
+        }
+      })
 
       if (found){
         style = 'point {size: 5; fill-color: green; visible: true}'
       } else {
         style = 'point {size: 5; fill-color: green; visible: false}'
       }
-           
-      data.addRows([[mz, 0, null, null], 
-                    [mz, into, style, name], 
+
+      data.addRows([[mz, 0, null, null],
+                    [mz, into, style, name],
                     [mz, 0, null, null]])
     })
 
     var options = {
       title: 'Precursor',
-      hAxis: {title: 'mz', 
-              minValue: this.props.precursorMz - 1, 
-              maxValue: this.props.precursorMz + 5
+      hAxis: {title: 'mz',
+              minValue: this.props.precursorMz - 1,
+              maxValue: this.props.precursorMz + 1
              },
       vAxis: {title: 'Intensity'},
       annotations: { textStyle: { }},
@@ -75,14 +75,14 @@ var PrecursorSpectrumBox = React.createClass({
             component.setState({chartLoaded: true})
           },
         });
-      }); 
+      });
   },
-  
+
   componentDidUpdate: function (prevProps, prevState) {
     if (this.state.chartLoaded){
       if (prevProps.spectrumData != this.props.spectrumData) {
         this.drawChart();
-      } 
+      }
     }
   },
 
@@ -92,5 +92,5 @@ var PrecursorSpectrumBox = React.createClass({
         <div id="precursorGoogleChart"></div>
       </div>
     );
-  } 
+  }
 });
