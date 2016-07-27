@@ -42,8 +42,8 @@ var QuantSpectrumBox = React.createClass({
     var options = {
       title: 'Quantification',
       hAxis: {title: 'mz',
-              minValue: Math.floor(Math.min(quantMz)) - 1,
-              maxValue: Math.ceil(Math.max(quantMz)) + 1},
+              minValue: Math.round(2 * Math.min.apply(null, quantMz)) / 2 - 1,
+              maxValue: Math.round(2 * Math.max.apply(null, quantMz)) / 2 + 1},
       vAxis: {title: 'Intensity'},
       annotations: { textStyle: { }},
       legend: 'none',
