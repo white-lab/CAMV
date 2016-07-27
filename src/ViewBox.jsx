@@ -65,7 +65,7 @@ var ViewBox = React.createClass({
 
     matchId = data.find(function(peak){return (peak.mz === mz)}).matchInfo[this.state.selectedPTMPlacement].matchId
     
-    if (matchId){ currentLabel = matchData[matchId].name }
+    if (matchId !== null){ currentLabel = matchData[matchId].name }
 
     matches = matchData.filter(function(item){
       ppm = (item.mz - mz) / mz * 1000000
