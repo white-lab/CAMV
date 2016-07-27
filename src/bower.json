@@ -15,9 +15,9 @@
     "tests"
   ],
   "dependencies": {
-    "bootstrap": "^3.3.6",
-    "react": "^15.0.1",
-    "lodash": "^4.11.0",
-    "react-bootstrap": "^0.28.5"
+    "bootstrap": "^3.3.7",
+    "react": "^15.2.1",
+    "lodash": "^4.14.0",
+    "react-bootstrap": "^0.30.0"
   }
 }

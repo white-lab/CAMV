@@ -1,7 +1,5 @@
-var remote = require('remote');
-var dialog = remote.require('dialog');
+var {dialog} = require('electron').remote;
 
- 
 // var ReactCSSTransitionGroup = React.addons.CSSTransitionGroup;
 
 var ReactCSSTransitionGroup = require('react-addons-css-transition-group');
@@ -52,7 +50,7 @@ var ModalFileSelectionBox = React.createClass({
         <ReactBootstrap.Modal.Footer>
           <ReactBootstrap.Button onClick={this.submit} disabled={!this.state.fileChosen}>Done</ReactBootstrap.Button>
         </ReactBootstrap.Modal.Footer>
-      </ReactBootstrap.Modal>    
-    ) 
+      </ReactBootstrap.Modal>
+    )
   }
 });
