@@ -3,11 +3,11 @@ var AcceptButton = React.createClass({
     this.props.callback('accept')
   },
   render: function(){
-    return (<input id="acceptButton" 
+    return (<input id="acceptButton"
                    className="choiceButton"
-                   type="button" 
-                   value="Accept" 
-                   disabled={this.props.disabled} 
+                   type="button"
+                   value="Accept"
+                   disabled={this.props.disabled}
                    onClick={this.onChange}/>)
   }
 });
@@ -17,11 +17,11 @@ var MaybeButton = React.createClass({
     this.props.callback('maybe')
   },
   render: function(){
-    return (<input id="maybeButton" 
+    return (<input id="maybeButton"
                    className="choiceButton"
-                   type="button" 
-                   value="Maybe" 
-                   disabled={this.props.disabled} 
+                   type="button"
+                   value="Maybe"
+                   disabled={this.props.disabled}
                    onClick={this.onChange}/>)
   }
 });
@@ -31,11 +31,11 @@ var RejectButton = React.createClass({
     this.props.callback('reject')
   },
   render: function(){
-    return (<input id="rejectButton" 
+    return (<input id="rejectButton"
                    className="choiceButton"
-                   type="button" 
-                   value="Reject" 
-                   disabled={this.props.disabled} 
+                   type="button"
+                   value="Reject"
+                   disabled={this.props.disabled}
                    onClick={this.onChange}/>)
   }
 });
@@ -46,11 +46,11 @@ var SetMinMZ = React.createClass({
   },
   render: function(){
     return (<div id="setMinMZ">
-              Min. m/z: 
-              <input className="numInput" 
-                     type="number" 
-                     value={this.props.minMZ} 
-                     disabled={this.props.disabled} 
+              Min. m/z:
+              <input className="numInput"
+                     type="number"
+                     value={this.props.minMZ}
+                     disabled={this.props.disabled}
                      onChange={this.handleChange}/>
             </div>)
   }
@@ -62,11 +62,11 @@ var SetMaxMZ = React.createClass({
   },
   render: function(){
     return (<div id="setMaxMZ">
-              Max. m/z: 
-              <input className="numInput" 
-                     type="number" 
-                     value={this.props.maxMZ == null ? this.props.scanMaxMZ : this.props.maxMZ} 
-                     disabled={this.props.disabled} 
+              Max. m/z:
+              <input className="numInput"
+                     type="number"
+                     value={this.props.maxMZ == null ? this.props.scanMaxMZ : this.props.maxMZ}
+                     disabled={this.props.disabled}
                      onChange={this.handleChange}/>
             </div>)
   }
@@ -81,11 +81,21 @@ var SpectrumBox = React.createClass({
 
     var minMZ = Math.max(0, this.props.minMZ == null ? 0 : this.props.minMZ)
     var maxMZ = 1
+    var max_y = 15
+
     if (this.props.spectrumData.length > 0){
       var scanMax = this.props.spectrumData[this.props.spectrumData.length - 1].mz + 1
       maxMZ = this.props.maxMZ == null ? scanMax : Math.min(scanMax, this.props.maxMZ)
+
+      max_y = Math.max(
+        this.props.spectrumData.filter(
+          function(element) { return element.mz >= minMZ && element.mz <= maxMZ }
+        ).map(
+          function(element) { return element.into }
+        )
+      )
     }
-    
+
     var data = new google.visualization.DataTable();
     data.addColumn('number', 'mz');
     data.addColumn('number', 'Intensity');
@@ -99,7 +109,7 @@ var SpectrumBox = React.createClass({
       ppm = null
 
       if (mz > minMZ && mz < maxMZ){
-        if (this.props.selectedPTMPlacement != null){
+        if (this.props.selectedPTMPlacement != null && into >= max_y / 10){
           style = 'point {size: 5; fill-color: red; visible: true}'
         } else {
           style = 'point {size: 5; fill-color: red; visible: false}'
@@ -109,7 +119,7 @@ var SpectrumBox = React.createClass({
           var matchId = matchInfo.matchId
           if (matchId){
             var match = this.props.matchData[matchId]
-            ppm = Math.abs(match.mz - mz) / mz * 1000000 
+            ppm = Math.abs(match.mz - mz) / mz * 1000000
             name = match.name
             // TO DO: change these conditions to match color coding
             if (into == 0) {
@@ -120,22 +130,22 @@ var SpectrumBox = React.createClass({
             }
           }
         }
-             
-        data.addRows([[mz, 0, null, null], 
-                      [mz, into, style, name], 
+
+        data.addRows([[mz, 0, null, null],
+                      [mz, into, style, name],
                       [mz, 0, null, null]])
       }
     }.bind(this))
 
     var options = {
       // title: 'Age vs. Weight comparison',
-      hAxis: {title: 'mz', 
-              minValue: minMZ, 
+      hAxis: {title: 'mz',
+              minValue: minMZ,
               maxValue: maxMZ
              },
-      vAxis: {title: 'Intensity', 
-              minValue: 0, 
-              maxValue: 15},
+      vAxis: {title: 'Intensity',
+              minValue: 0,
+              maxValue: max_y},
       annotations: { textStyle: { }},
       legend: 'none',
       tooltip: {trigger: 'none'}
@@ -172,9 +182,9 @@ var SpectrumBox = React.createClass({
             component.drawChart();
           },
         });
-      }); 
+      });
   },
-  
+
   componentDidUpdate: function (prevProps, prevState) {
     if (this.state.chartLoaded){
       if (prevProps.spectrumData != this.props.spectrumData) {
@@ -222,5 +232,5 @@ var SpectrumBox = React.createClass({
         </div>
       </div>
     );
-  } 
+  }
 });
