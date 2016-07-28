@@ -37,23 +37,23 @@ var SequenceBox = React.createClass({
       sequence.slice(0, -1).forEach(
         function (item, i) {
           found = this.props.bFound.indexOf(i + 1) > -1
-          bs.push(<BIonElement key={i} found={found}/>)
-          bs.push(<td></td>)
+          bs.push(<BIonElement key={i * 2} found={found}/>)
+          bs.push(<td key={i * 2 + 1}></td>)
         }.bind(this)
       )
 
       sequence.forEach(
         function (item, i) {
-          seq.push(<SequenceElement AA={item} key={i}/>)
-          seq.push(<td></td>)
+          seq.push(<SequenceElement AA={item} key={i * 2}/>)
+          seq.push(<td key={i * 2 + 1}></td>)
         }.bind(this)
       )
 
       sequence.slice(0, -1).forEach(
         function (item, i) {
           found = this.props.yFound.indexOf(this.props.sequence.length - i - 1) > -1
-          ys.push(<YIonElement key={i} found={found}/>)
-          ys.push(<td></td>)
+          ys.push(<YIonElement key={i * 2} found={found}/>)
+          ys.push(<td key={i * 2 + 1}></td>)
         }.bind(this)
       )
 
