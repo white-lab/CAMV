@@ -103,45 +103,51 @@ var SpectrumBox = React.createClass({
     data.addColumn({'type': 'string', 'role': 'style'})
     data.addColumn({'type': 'string', 'role': 'annotation'})
 
-    this.props.spectrumData.forEach(function(peak){
-      mz = peak.mz
-      into = peak.into
-      name = ''
-      ppm = null
+    if (this.props.spectrumData.length > 0) {
+      data.addRows([[0, 0, null, null]])
 
-      if (mz > minMZ && mz < maxMZ){
-        if (this.props.selectedPTMPlacement != null){
-          style = 'point {size: 5; fill-color: red; visible: true}'
-        } else {
-          style = 'point {size: 5; fill-color: red; visible: false}'
+      this.props.spectrumData.forEach(function(peak){
+        mz = peak.mz
+        into = peak.into
+        name = ''
+        ppm = null
+
+        if (mz > minMZ && mz < maxMZ){
+          if (this.props.selectedPTMPlacement != null){
+            style = 'point {size: 3; fill-color: red; visible: true}'
+          } else {
+            style = 'point {size: 3; fill-color: red; visible: false}'
+          }
+
+          var matchInfo = peak.matchInfo[this.props.selectedPTMPlacement]
+
+          if (matchInfo != null) {
+            var matchId = matchInfo.matchId
+
+            if (matchId != null) {
+              var match = this.props.matchData[matchId]
+              ppm = Math.abs(match.mz - mz) / mz * 1000000
+              name = match.name
+              // TO DO: change these conditions to match color coding
+              if (into == 0) {
+                // Plot intermediate line-plot points along x-axis
+                style = null
+              } else if (ppm < 10){
+                style = 'point {size: 3; fill-color: green; visible: true}'
+              }
+            } else if (into < max_y / 10) {
+              style = null
+            }
         }
 
-        var matchInfo = peak.matchInfo[this.props.selectedPTMPlacement]
+          data.addRows([[mz, 0, null, null],
+                        [mz, into, style, name],
+                        [mz, 0, null, null]])
+        }
+      }.bind(this))
 
-        if (matchInfo != null) {
-          var matchId = matchInfo.matchId
-
-          if (matchId != null) {
-            var match = this.props.matchData[matchId]
-            ppm = Math.abs(match.mz - mz) / mz * 1000000
-            name = match.name
-            // TO DO: change these conditions to match color coding
-            if (into == 0) {
-              // Plot intermediate line-plot points along x-axis
-              style = null
-            } else if (ppm < 10){
-              style = 'point {size: 5; fill-color: green; visible: true}'
-            }
-          } else if (into < max_y / 10) {
-            style = null
-          }
-      }
-
-        data.addRows([[mz, 0, null, null],
-                      [mz, into, style, name],
-                      [mz, 0, null, null]])
-      }
-    }.bind(this))
+      data.addRows([[maxMZ, 0, null, null]])
+    }
 
     var options = {
       // title: 'Age vs. Weight comparison',
@@ -152,7 +158,7 @@ var SpectrumBox = React.createClass({
       vAxis: {title: 'Intensity',
               minValue: 0,
               maxValue: max_y},
-      annotations: { textStyle: { }},
+      annotations: { style: 'line' },
       legend: 'none',
       tooltip: {trigger: 'none'}
     };

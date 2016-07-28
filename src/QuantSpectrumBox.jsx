@@ -12,38 +12,46 @@ var QuantSpectrumBox = React.createClass({
     data.addColumn({'type': 'string', 'role': 'annotation'})
 
     var quantMz = this.props.quantMz
+    var minMZ = Math.round(2 * Math.max.apply(null, quantMz)) / 2 - 1
+    var maxMZ = Math.round(2 * Math.max.apply(null, quantMz)) / 2 + 1
     var ppm = this.props.ppm
 
-    this.props.spectrumData.forEach(function(peak){
-      var mz = peak.mz
-      var into = peak.into
-      var name = ''
+    if (this.props.spectrumData.length > 0) {
+      data.addRows([[minMZ, 0, null, null]])
 
-      var found = false
+      this.props.spectrumData.forEach(function(peak){
+        var mz = peak.mz
+        var into = peak.into
+        var name = ''
 
-      quantMz.forEach(function(val){
-        var currPPM = 1000000 * Math.abs(mz - val) / val
-        if (currPPM < ppm){
-          found = true
+        var found = false
+
+        quantMz.forEach(function(val){
+          var currPPM = 1000000 * Math.abs(mz - val) / val
+          if (currPPM < ppm){
+            found = true
+          }
+        })
+
+        if (found){
+          style = 'point {size: 5; fill-color: green; visible: true}'
+        } else {
+          style = 'point {size: 5; fill-color: green; visible: false}'
         }
+
+        data.addRows([[mz, 0, null, null],
+                      [mz, into, style, name],
+                      [mz, 0, null, null]])
       })
 
-      if (found){
-        style = 'point {size: 5; fill-color: green; visible: true}'
-      } else {
-        style = 'point {size: 5; fill-color: green; visible: false}'
-      }
-
-      data.addRows([[mz, 0, null, null],
-                    [mz, into, style, name],
-                    [mz, 0, null, null]])
-    })
+      data.addRows([[maxMZ, 0, null, null]])
+    }
 
     var options = {
       title: 'Quantification',
       hAxis: {title: 'mz',
-              minValue: Math.round(2 * Math.min.apply(null, quantMz)) / 2 - 1,
-              maxValue: Math.round(2 * Math.max.apply(null, quantMz)) / 2 + 1},
+              minValue: minMZ,
+              maxValue: maxMZ},
       vAxis: {title: 'Intensity'},
       annotations: { textStyle: { }},
       legend: 'none',

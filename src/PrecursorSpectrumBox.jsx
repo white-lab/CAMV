@@ -11,41 +11,49 @@ var PrecursorSpectrumBox = React.createClass({
     data.addColumn({'type': 'string', 'role': 'annotation'})
 
     var precursorMz = this.props.precursorMz
+    var minMZ = precursorMz - 1
+    var maxMZ = precursorMz + 1
     var chargeState = this.props.chargeState
     var ppm = this.props.ppm
 
-    this.props.spectrumData.forEach(function(peak){
-      var mz = peak.mz
-      var into = peak.into
-      var name = ''
+    if (this.props.spectrumData.length > 0) {
+      data.addRows([[minMZ, 0, null, null]])
 
-      var found = false
+      this.props.spectrumData.forEach(function(peak){
+        var mz = peak.mz
+        var into = peak.into
+        var name = ''
 
-      var ionSeries = [0,1,2,3,4,5]
+        var found = false
 
-      ionSeries.forEach(function(val){
-        var currPPM = 1000000 * (mz - precursorMz - 1.0079 * val / chargeState) / mz
-        if (Math.abs(currPPM) < ppm){
-          found = true
+        var ionSeries = [0,1,2,3,4,5]
+
+        ionSeries.forEach(function(val){
+          var currPPM = 1000000 * (mz - precursorMz - 1.0079 * val / chargeState) / mz
+          if (Math.abs(currPPM) < ppm){
+            found = true
+          }
+        })
+
+        if (found){
+          style = 'point {size: 5; fill-color: green; visible: true}'
+        } else {
+          style = 'point {size: 5; fill-color: green; visible: false}'
         }
+
+        data.addRows([[mz, 0, null, null],
+                      [mz, into, style, name],
+                      [mz, 0, null, null]])
       })
 
-      if (found){
-        style = 'point {size: 5; fill-color: green; visible: true}'
-      } else {
-        style = 'point {size: 5; fill-color: green; visible: false}'
-      }
-
-      data.addRows([[mz, 0, null, null],
-                    [mz, into, style, name],
-                    [mz, 0, null, null]])
-    })
+      data.addRows([[maxMZ, 0, null, null]])
+    }
 
     var options = {
       title: 'Precursor',
       hAxis: {title: 'mz',
-              minValue: this.props.precursorMz - 1,
-              maxValue: this.props.precursorMz + 1
+              minValue: minMZ,
+              maxValue: maxMZ
              },
       vAxis: {title: 'Intensity'},
       annotations: { textStyle: { }},
