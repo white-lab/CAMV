@@ -29,21 +29,36 @@ var SequenceBox = React.createClass({
   render: function(){
     if (this.props.sequence != null){
       var sequence = this.props.sequence.split('')
-      var rows = []
 
-      rows.push(sequence.map(function(item, i){
-                                     found = this.props.bFound.indexOf(i + 1) > -1
-                                     return <BIonElement key={i} found={found}/>
-                                   }.bind(this)))
+      var bs = [<td></td>]
+      var seq = []
+      var ys = [<td></td>]
 
-      rows.push(sequence.map(function(item, i){
-                                  return <SequenceElement AA={item} key={i}/>
-                                }.bind(this)))
+      sequence.slice(0, -1).forEach(
+        function (item, i) {
+          found = this.props.bFound.indexOf(i + 1) > -1
+          bs.push(<BIonElement key={i} found={found}/>)
+          bs.push(<td></td>)
+        }.bind(this)
+      )
 
-      rows.push(sequence.map(function(item, i){
-                                     found = this.props.yFound.indexOf(this.props.sequence.length - i - 1) > -1
-                                     return <YIonElement key={i} found={found}/>
-                                   }.bind(this)))
+      sequence.forEach(
+        function (item, i) {
+          seq.push(<SequenceElement AA={item} key={i}/>)
+          seq.push(<td></td>)
+        }.bind(this)
+      )
+
+      sequence.slice(0, -1).forEach(
+        function (item, i) {
+          found = this.props.yFound.indexOf(this.props.sequence.length - i - 1) > -1
+          ys.push(<YIonElement key={i} found={found}/>)
+          ys.push(<td></td>)
+        }.bind(this)
+      )
+
+      var rows = [bs, seq, ys]
+
       return (
         <div id="sequence">
           <table><tbody>
