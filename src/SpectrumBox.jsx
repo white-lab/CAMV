@@ -104,7 +104,7 @@ var SpectrumBox = React.createClass({
     data.addColumn({'type': 'string', 'role': 'annotation'})
 
     if (this.props.spectrumData.length > 0) {
-      data.addRows([[0, 0, null, null]])
+      data.addRows([[minMZ, 0, null, null]])
 
       this.props.spectrumData.forEach(function(peak){
         mz = peak.mz
