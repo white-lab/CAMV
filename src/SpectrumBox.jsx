@@ -158,7 +158,8 @@ var SpectrumBox = React.createClass({
       vAxis: {title: 'Intensity',
               minValue: 0,
               maxValue: max_y},
-      annotations: { style: 'line' },
+      annotations: { style: 'line', stemColor: 'none' },
+      chartArea: { width: "80%", height: "80%" },
       legend: 'none',
       tooltip: {trigger: 'none'}
     };
@@ -178,6 +179,8 @@ var SpectrumBox = React.createClass({
   },
 
   componentDidMount: function(){
+    window.addEventListener('resize', this.handleResize);
+
     var component = this;
 
     // Load the chart API
@@ -197,8 +200,18 @@ var SpectrumBox = React.createClass({
       });
   },
 
+  componentWillUnmount: function() {
+    window.removeEventListener('resize', this.handleResize);
+  },
+
+  handleResize: function(e) {
+    if (this.state.chartLoaded) {
+      this.drawChart();
+    }
+  },
+
   componentDidUpdate: function (prevProps, prevState) {
-    if (this.state.chartLoaded){
+    if (this.state.chartLoaded) {
       if (prevProps.spectrumData != this.props.spectrumData) {
         this.drawChart();
       } else if (prevProps.selectedPTMPlacement != this.props.selectedPTMPlacement){

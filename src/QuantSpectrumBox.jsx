@@ -12,7 +12,7 @@ var QuantSpectrumBox = React.createClass({
     data.addColumn({'type': 'string', 'role': 'annotation'})
 
     var quantMz = this.props.quantMz
-    var minMZ = Math.round(2 * Math.max.apply(null, quantMz)) / 2 - 1
+    var minMZ = Math.round(2 * Math.min.apply(null, quantMz)) / 2 - 1
     var maxMZ = Math.round(2 * Math.max.apply(null, quantMz)) / 2 + 1
     var ppm = this.props.ppm
 
@@ -49,11 +49,15 @@ var QuantSpectrumBox = React.createClass({
 
     var options = {
       title: 'Quantification',
-      hAxis: {title: 'mz',
-              minValue: minMZ,
-              maxValue: maxMZ},
-      vAxis: {title: 'Intensity'},
-      annotations: { textStyle: { }},
+      hAxis: {
+        // title: 'mz',
+        minValue: minMZ,
+        maxValue: maxMZ
+      },
+      vAxis: {
+        // title: 'Intensity'
+      },
+      annotations: { textStyle: { }, stemColor: 'none' },
       legend: 'none',
       tooltip: {trigger: 'none'}
     };
@@ -64,6 +68,8 @@ var QuantSpectrumBox = React.createClass({
   },
 
   componentDidMount: function(){
+    window.addEventListener('resize', this.handleResize);
+
     var component = this;
 
     // Load the chart API
@@ -84,10 +90,20 @@ var QuantSpectrumBox = React.createClass({
   },
 
   componentDidUpdate: function (prevProps, prevState) {
-    if (this.state.chartLoaded){
+    if (this.state.chartLoaded) {
       if (prevProps.spectrumData != this.props.spectrumData) {
         this.drawChart();
       }
+    }
+  },
+
+  componentWillUnmount: function() {
+    window.removeEventListener('resize', this.handleResize);
+  },
+
+  handleResize: function(e) {
+    if (this.state.chartLoaded) {
+      this.drawChart();
     }
   },
 

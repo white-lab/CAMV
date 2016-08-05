@@ -51,12 +51,15 @@ var PrecursorSpectrumBox = React.createClass({
 
     var options = {
       title: 'Precursor',
-      hAxis: {title: 'mz',
-              minValue: minMZ,
-              maxValue: maxMZ
-             },
-      vAxis: {title: 'Intensity'},
-      annotations: { textStyle: { }},
+      hAxis: {
+        // title: 'mz',
+        minValue: minMZ,
+        maxValue: maxMZ
+      },
+      vAxis: {
+        // title: 'Intensity'
+      },
+      annotations: { textStyle: { }, stemColor: 'none' },
       legend: 'none',
       tooltip: {trigger: 'none'}
     };
@@ -67,6 +70,8 @@ var PrecursorSpectrumBox = React.createClass({
   },
 
   componentDidMount: function(){
+    window.addEventListener('resize', this.handleResize);
+
     var component = this;
 
     // Load the chart API
@@ -87,10 +92,20 @@ var PrecursorSpectrumBox = React.createClass({
   },
 
   componentDidUpdate: function (prevProps, prevState) {
-    if (this.state.chartLoaded){
+    if (this.state.chartLoaded) {
       if (prevProps.spectrumData != this.props.spectrumData) {
         this.drawChart();
       }
+    }
+  },
+
+  componentWillUnmount: function() {
+    window.removeEventListener('resize', this.handleResize);
+  },
+
+  handleResize: function(e) {
+    if (this.state.chartLoaded) {
+      this.drawChart();
     }
   },
 
