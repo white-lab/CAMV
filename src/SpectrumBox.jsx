@@ -1,3 +1,6 @@
+const hotkey = require('react-hotkey')
+hotkey.activate();
+
 var AcceptButton = React.createClass({
   onChange: function(){
     this.props.callback('accept')
@@ -75,6 +78,24 @@ var SetMaxMZ = React.createClass({
 var SpectrumBox = React.createClass({
   getInitialState: function(){
     return {chartLoaded: false}
+  },
+
+  mixins: [hotkey.Mixin('handleHotkey')],
+
+  handleHotkey: function(e) {
+    if (!this.props.inputDisabled) {
+      switch (e.key) {
+        case 'a':
+          this.props.updateChoice('accept');
+          break;
+        case 's':
+          this.props.updateChoice('maybe');
+          break;
+        case 'd':
+          this.props.updateChoice('reject');
+          break;
+      }
+    }
   },
 
   drawChart: function() {
