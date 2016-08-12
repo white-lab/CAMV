@@ -1,4 +1,4 @@
-const hotkey = require('react-hotkey')
+var hotkey = require('react-hotkey');
 hotkey.activate();
 
 var AcceptButton = React.createClass({

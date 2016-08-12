@@ -3,9 +3,9 @@ const util = require('util');
 
 var ViewBox = React.createClass({
   getInitialState: function(){
-    return {selectedRun: null, 
+    return {selectedRun: null,
             selectedSearch:null,
-            submitted: false, 
+            submitted: false,
             selectedProtein: null,
             selectedPeptide: null,
             selectedScan: null,
@@ -36,6 +36,16 @@ var ViewBox = React.createClass({
   updateSelectedPTMPlacement: function(modsId){
     this.setState({selectedPTMPlacement: modsId})
   },
+  updateAll: function(proteinId, peptideId, scanId, modsId) {
+    this.setState({
+      selectedProtein: proteinId,
+      selectedPeptide: peptideId,
+      selectedScan: scanId,
+      minMZ: 0,
+      maxMZ: null,
+      selectedPTMPlacement: modsId
+    })
+  },
   updateMinMZ: function(newMinMZ){
     if (newMinMZ > 0){
       this.setState({minMZ: newMinMZ})
@@ -64,16 +74,16 @@ var ViewBox = React.createClass({
     currentLabel = ''
 
     matchId = data.find(function(peak){return (peak.mz === mz)}).matchInfo[this.state.selectedPTMPlacement].matchId
-    
+
     if (matchId !== null){ currentLabel = matchData[matchId].name }
 
     matches = matchData.filter(function(item){
       ppm = (item.mz - mz) / mz * 1000000
       item.ppm = ppm
       return Math.abs(ppm) < this.state.maxPPM
-    }.bind(this))  
-    
-    this.setState({selectedMz: mz, 
+    }.bind(this))
+
+    this.setState({selectedMz: mz,
                    fragmentSelectionModalIsOpen: true,
                    fragmentMatches: matches,
                    currentLabel: currentLabel})
@@ -87,17 +97,17 @@ var ViewBox = React.createClass({
                    currentLabel: ''})
   },
   updateSelectedFragment: function(matchId){
-    if (this.state.selectedProtein != null && 
+    if (this.state.selectedProtein != null &&
         this.state.selectedPeptide != null &&
         this.state.selectedScan != null &&
         this.state.selectedMz != null) {
       data = _.cloneDeep(this.state.data)
-      
+
       scan = data[this.state.selectedProtein]
               .peptides[this.state.selectedPeptide]
               .scans[this.state.selectedScan]
       scanData = scan.scanData
-      
+
       matchData = this.state.peptideData[peptide.peptideDataId]
                     .modificationStates[peptide.modificationStateId]
                     .mods[this.state.selectedPTMPlacement]
@@ -214,7 +224,7 @@ var ViewBox = React.createClass({
         }
       }
     }
-    
+
 //    console.log("selectedProtein:", this.state.selectedProtein, "selectedPeptide:", this.state.selectedPeptide, "selectedScan:", this.state.selectedScan, "selecedPTMPlacement:", this.state.selectedPTMPlacement)
 
 
@@ -224,9 +234,9 @@ var ViewBox = React.createClass({
                           closeCallback={this.closeFragmentSelectionModal}
                           updateCallback={this.updateSelectedFragment}
                           mz={this.state.selectedMz}
-                          fragmentMatches={this.state.fragmentMatches} 
+                          fragmentMatches={this.state.fragmentMatches}
                           currentLabel={this.state.currentLabel}/>
-        <ModalFileSelectionBox showModal={!this.state.submitted} 
+        <ModalFileSelectionBox showModal={!this.state.submitted}
                                setPeptideData={this.setPeptideData}
                                setData={this.setData}
                                setSubmitted={this.setSubmitted}/>
@@ -238,6 +248,7 @@ var ViewBox = React.createClass({
                              updateSelectedPeptideCallback={this.updateSelectedPeptide}
                              updateSelectedScanCallback={this.updateSelectedScan}
                              updateSelectedPTMPlacementCallback={this.updateSelectedPTMPlacement}
+                             updateAllCallback={this.updateAll}
                              selectedProtein={this.state.selectedProtein}
                              selectedPeptide={this.state.selectedPeptide}
                              selectedScan={this.state.selectedScan}
@@ -266,23 +277,22 @@ var ViewBox = React.createClass({
             <PrecursorSpectrumBox spectrumData={precursorSpectrumData}
                                   precursorMz={precursorMz}
                                   chargeState={chargeState}
-                                  ppm={50}/>                     
+                                  ppm={50}/>
           </div>
           <div id="quantSpectrumBox">
             <QuantSpectrumBox spectrumData={quantSpectrumData}
                                   quantMz={quantMz}
-                                  ppm={50}/>                     
+                                  ppm={50}/>
           </div>
         </div>
         <button id="save" onClick={this.save}>Save</button>
       </div>
-    )     
-    
+    )
+
   }
 });
 
 ReactDOM.render(
-  <ViewBox />, 
+  <ViewBox />,
   document.getElementById('content')
 );
-

@@ -1,3 +1,6 @@
+var hotkey = require('react-hotkey');
+hotkey.activate();
+
 var PTMPlacementListItem = React.createClass({
   update: function() {
     // console.log(this.props.proteinId, this.props.peptideId, this.props.scanId, this.props.ptmPlacement.id)
@@ -60,8 +63,8 @@ var ScanNumberListItem = React.createClass({
           </ul>
         </div>
       )
-    } else { 
-      return ( 
+    } else {
+      return (
         <li className="scan" onClick={this.toggle}><span className={selected ? 'selectedListItem' : 'unselectedListItem'}>Scan: {this.props.scan.scanNumber}</span></li>
       )
     }
@@ -71,7 +74,7 @@ var ScanNumberListItem = React.createClass({
 var PeptideListItem = React.createClass({
   getInitialState: function(){
     return {open: false}
-  },  
+  },
   toggle: function(){
     this.setState({open: !this.state.open})
     this.props.update(this.props.proteinId, this.props.peptideId, null, null)
@@ -91,16 +94,16 @@ var PeptideListItem = React.createClass({
         <ul>
           {this.props.scans.map(function(scan){
             return ( <ScanNumberListItem key={scan.scanId}
-                                         proteinId={this.props.proteinId} 
-                                         peptideId={this.props.peptideId} 
-                                         scan={scan} 
+                                         proteinId={this.props.proteinId}
+                                         peptideId={this.props.peptideId}
+                                         scan={scan}
                                          ptmPlacements={peptideModificationState.mods}
                                          update={this.props.update}
                                          selectedProtein={this.props.selectedProtein}
                                          selectedPeptide={this.props.selectedPeptide}
                                          selectedScan={this.props.selectedScan}
                                          selectedPTMPlacement={this.props.selectedPTMPlacement}/>
-                   )    
+                   )
           }.bind(this))}
         </ul>
         </div>
@@ -117,7 +120,7 @@ var ProteinListItem = React.createClass({
   getInitialState: function(){
     return {open: false,
             selected: false}
-  },  
+  },
   defaultProps: function() {
     return { protein: null,
              peptide: null,
@@ -167,11 +170,133 @@ var ProteinListItem = React.createClass({
 var ScanSelectionList = React.createClass({
   update: function(proteinId, peptideId, scanId, modsId){
     // console.log("proteinId: " + proteinId + " peptideId: " + peptideId + " scanId: " + scanId + " modsId: " + modsId)
-    this.props.updateSelectedProteinCallback(proteinId)
-    this.props.updateSelectedPeptideCallback(peptideId)
-    this.props.updateSelectedScanCallback(scanId)
-    this.props.updateSelectedPTMPlacementCallback(modsId)
+    this.props.updateAllCallback(proteinId, peptideId, scanId, modsId);
   },
+
+  mixins: [hotkey.Mixin('handleHotkey')],
+
+  selectLeft: function(node) {
+    if (node.length <= 1) {
+      return node;
+    }
+
+    node.pop();
+    return node;
+  },
+
+  selectRight: function(node) {
+    if (node.length >= 4) {
+      return node;
+    }
+
+    node.push(0);
+    return node;
+  },
+
+  getMaxLength: function(node) {
+    switch (node.length) {
+      case 1:
+        var proteins = this.props.data;
+        return proteins.length;
+
+      case 2:
+        var proteins = this.props.data;
+        var peptides = proteins[node[0]].peptides;
+        return peptides.length;
+
+      case 3:
+        var proteins = this.props.data;
+        var peptides = proteins[node[0]].peptides;
+        var scans = peptides[node[1]].scans;
+        return scans.length;
+
+      case 4:
+        var proteins = this.props.data;
+        var peptides = proteins[node[0]].peptides;
+        var peptide = peptides[node[1]];
+        var ptms = this.props.peptideData[peptide.peptideDataId].modificationStates[peptide.modificationStateId].mods;
+        return ptms.length;
+
+      default:
+        console.log("Unexpected node length: " + node.length)
+        return 0;
+    }
+  },
+
+  selectUp: function(node) {
+    if (node[node.length - 1] == 0) {
+      if (node.length > 1) {
+        node.pop();
+      }
+
+      return node;
+    }
+
+    node[node.length - 1] -= 1;
+
+    while(node.length < 4) {
+      node.push(0);
+      node[node.length - 1] = this.getMaxLength(node) - 1;
+    }
+
+    return node;
+  },
+
+  selectDown: function(node) {
+    var init = node.slice(0);
+
+    if (node.length >= 4) {
+      node[node.length - 1] += 1;
+    } else {
+      node.push(0);
+    }
+
+    while (node[node.length - 1] >= this.getMaxLength(node)) {
+      if (node.length <= 1) {
+        return init;
+      }
+
+      node.pop();
+      node[node.length - 1] += 1;
+    }
+
+    return node;
+  },
+
+  handleHotkey: function(e) {
+    var node = [
+      this.props.selectedProtein,
+      this.props.selectedPeptide,
+      this.props.selectedScan,
+      this.props.selectedPTMPlacement
+    ];
+    node = node.filter(function (i) { return i != null; })
+
+    if (node.length < 1) {
+      return;
+    }
+
+    switch (e.key) {
+      case 'ArrowLeft':
+        node = this.selectLeft(node);
+        break;
+      case 'ArrowRight':
+        node = this.selectRight(node);
+        break;
+      case 'ArrowUp':
+        node = this.selectUp(node);
+        break;
+      case 'ArrowDown':
+        node = this.selectDown(node);
+        break;
+      default:
+        return;
+    }
+
+    while (node.length < 4) { node.push(null); }
+    this.update(node[0], node[1], node[2], node[3]);
+  },
+
   render: function() {
     return ( <ul className="tree">
                {this.props.data.map(function(protein) {
