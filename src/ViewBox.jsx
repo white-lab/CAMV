@@ -1,5 +1,6 @@
 const fs = require('fs');
 const util = require('util');
+var update = require('react-addons-update');
 
 var ViewBox = React.createClass({
   getInitialState: function(){
@@ -124,12 +125,27 @@ var ViewBox = React.createClass({
     }
   },
 
-  updateChoice: function(choice){
-    data = _.cloneDeep(this.state.data)
-    scan = data[this.state.selectedProtein].peptides[this.state.selectedPeptide].scans[this.state.selectedScan]
-    choiceData = scan.choiceData
-    choiceData[this.state.selectedPTMPlacement].state = choice
-    this.setState({data: data})
+  updateChoice: function(choice) {
+    /* Messy solution because javascript doesn't allow variables as dict keys */
+    state_target = {state: {$set: choice}};
+    ptm_target = {};
+    ptm_target[this.state.selectedPTMPlacement] = state_target;
+    choice_target = {choiceData: ptm_target};
+    scan_target = {}
+    scan_target[this.state.selectedScan] = choice_target;
+    scans_target = {scans: scan_target};
+    peptide_target = {}
+    peptide_target[this.state.selectedPeptide] = scans_target;
+    peptides_target = {peptides: peptide_target};
+    protein_target = {}
+    protein_target[this.state.selectedProtein] = peptides_target;
+
+    /* However, doing it this way keeps from cloning data, saving a lot of time
+       on large files.
+     */
+    this.setState({
+      data: update(this.state.data, protein_target)
+    })
   },
 
   componentDidUpdate: function(prevProps, prevState){
