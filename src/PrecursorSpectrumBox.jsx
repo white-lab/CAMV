@@ -27,7 +27,7 @@ var PrecursorSpectrumBox = React.createClass({
         )
       );
 
-      data.addRows([[minMZ, 0, null, null, 0]]);
+      data.addRows([[minMZ, 0, null, null, null]]);
 
       /* Draw a box for the isolation window, if data is available */
       if (this.props.isolationWindow != null) {
@@ -65,14 +65,14 @@ var PrecursorSpectrumBox = React.createClass({
         }
 
         data.addRows([
-          [mz, 0,    null,  null, 0],
-          [mz, into, style, name, 0],
-          [mz, 0,    null,  null, 0]
+          [mz, 0,    null,  null, null],
+          [mz, into, style, name, null],
+          [mz, 0,    null,  null, null]
         ])
       })
 
       data.addRows([
-        [maxMZ, 0, null, null, 0]
+        [maxMZ, 0, null, null, null]
       ])
     }
 
