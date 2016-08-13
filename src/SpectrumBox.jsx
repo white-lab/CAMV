@@ -172,13 +172,18 @@ var SpectrumBox = React.createClass({
 
     var options = {
       // title: 'Age vs. Weight comparison',
-      hAxis: {title: 'mz',
-              minValue: minMZ,
-              maxValue: maxMZ
-             },
-      vAxis: {title: 'Intensity',
-              minValue: 0,
-              maxValue: max_y},
+      hAxis: {
+        title: 'mz',
+        gridlines: { color: 'transparent' },
+        minValue: minMZ,
+        maxValue: maxMZ
+      },
+      vAxis: {
+        title: 'Intensity',
+        gridlines: { color: 'transparent' },
+        minValue: 0,
+        maxValue: max_y
+      },
       annotations: { style: 'line', stemColor: 'none' },
       chartArea: { width: "80%", height: "80%" },
       legend: 'none',

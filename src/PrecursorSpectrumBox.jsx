@@ -80,11 +80,13 @@ var PrecursorSpectrumBox = React.createClass({
       title: 'Precursor',
       hAxis: {
         // title: 'mz',
+        gridlines: { color: 'transparent' },
         minValue: minMZ,
         maxValue: maxMZ
       },
       vAxis: {
         // title: 'Intensity',
+        gridlines: { color: 'transparent' },
         minValue: 0,
         maxValue: max_y * 1.1
       },

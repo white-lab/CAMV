@@ -51,11 +51,13 @@ var QuantSpectrumBox = React.createClass({
       title: 'Quantification',
       hAxis: {
         // title: 'mz',
+        gridlines: { color: 'transparent' },
         minValue: minMZ,
         maxValue: maxMZ
       },
       vAxis: {
         // title: 'Intensity'
+        gridlines: { color: 'transparent' }
       },
       annotations: { textStyle: { }, stemColor: 'none' },
       legend: 'none',
