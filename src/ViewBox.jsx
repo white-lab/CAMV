@@ -97,31 +97,54 @@ var ViewBox = React.createClass({
                    selectedMz: null,
                    currentLabel: ''})
   },
-  updateSelectedFragment: function(matchId){
+  updateSelectedFragment: function(matchId) {
     if (this.state.selectedProtein != null &&
         this.state.selectedPeptide != null &&
         this.state.selectedScan != null &&
         this.state.selectedMz != null) {
-      data = _.cloneDeep(this.state.data)
 
-      scan = data[this.state.selectedProtein]
-              .peptides[this.state.selectedPeptide]
-              .scans[this.state.selectedScan]
-      scanData = scan.scanData
+      peak_targets = {}
 
       matchData = this.state.peptideData[peptide.peptideDataId]
-                    .modificationStates[peptide.modificationStateId]
-                    .mods[this.state.selectedPTMPlacement]
-                    .matchData
+        .modificationStates[peptide.modificationStateId]
+        .mods[this.state.selectedPTMPlacement]
+        .matchData
 
-      scanData.forEach(function(peak){
-        if (peak.mz === this.state.selectedMz){
-          peak.matchInfo[this.state.selectedPTMPlacement].matchId = matchId
-          currentLabel = matchData[matchId].name
-          this.setState({ currentLabel: currentLabel})
-        }
-      }.bind(this))
-      this.setState({data: data})
+      scanData = this.state.data[this.state.selectedProtein]
+        .peptides[this.state.selectedPeptide]
+        .scans[this.state.selectedScan]
+        .scanData
+
+      scanData.forEach(
+        function(peak, index) {
+          if (peak.mz === this.state.selectedMz) {
+            match_id_target = {matchId: {$set: matchId}}
+            ptm_target = {}
+            ptm_target[this.state.selectedPTMPlacement] = match_id_target
+            match_info_target = {matchInfo: ptm_target}
+            peak_targets[index] = match_info_target
+            peak.matchInfo[this.state.selectedPTMPlacement].matchId = matchId
+
+            this.setState({
+              currentLabel: matchData[matchId].name
+            })
+          }
+        }.bind(this)
+      )
+
+      scan_data_target = {scanData: peak_targets}
+      scan_target = {}
+      scan_target[this.state.selectedScan] = scan_data_target;
+      scans_target = {scans: scan_target};
+      peptide_target = {}
+      peptide_target[this.state.selectedPeptide] = scans_target;
+      peptides_target = {peptides: peptide_target};
+      protein_target = {}
+      protein_target[this.state.selectedProtein] = peptides_target;
+
+      this.setState({
+        data: update(this.state.data, protein_target)
+      })
     }
   },
 
