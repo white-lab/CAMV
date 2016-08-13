@@ -191,32 +191,49 @@ var ViewBox = React.createClass({
   setSubmitted: function(submitted){
     this.setState({submitted: submitted})
   },
-  save: function(){
-    // console.log('saving...')
+  save: function() {
+    dialog.showSaveDialog(
+      {filters: [{name: 'text', extensions: ['camv']}]},
+      function(fileName) {
+        if (fileName === undefined)
+          return;
 
-    var dataToSave = JSON.stringify({scanData: this.state.data, peptideData: this.state.peptideData}, null, 2)
-    dialog.showSaveDialog({filters: [{name: 'text', extensions: ['camv']}]},function(fileName) {
-      if (fileName === undefined) return;
-      var dataToSave = JSON.stringify({scanData: this.state.data, peptideData: this.state.peptideData}, null, 2)
-      var ws = fs.createWriteStream('testDataOut.camv');
-      ws.on('error', function(err){
-        dialog.showErrorBox("File Save Error", err.message);
-      });
-      ws.on('finish', function(){
-          dialog.showMessageBox({ message: "The file has been saved!", buttons: ["OK"]});
-      });
-      var lines = dataToSave.split("\n");
-      for (i = 0; i < lines.length; i++){
-        ws.write(lines[i] + "\n")
-      }
-      ws.end();
-    }.bind(this));
+        var dataToSave = JSON.stringify(
+          {scanData: this.state.data, peptideData: this.state.peptideData},
+          null, 2
+        )
+
+        var ws = fs.createWriteStream(fileName);
+
+        ws.on('error', function(err) {
+          dialog.showErrorBox("File Save Error", err.message);
+        });
+
+        ws.on('finish', function() {
+            dialog.showMessageBox(
+              {
+                message: "The file has been saved!",
+                buttons: ["OK"]
+              }
+            );
+        });
+
+        var lines = dataToSave.split("\n");
+
+        for (i = 0; i < lines.length; i++) {
+          ws.write(lines[i] + "\n")
+        }
+
+        ws.end();
+      }.bind(this)
+    );
   },
 
   render: function() {
     var spectrumData = []
     var precursorSpectrumData = []
     var precursorMz = null
+    var isolationWindow = null
     var quantSpectrumData = []
     var quantMz = null
     var chargeState = null
@@ -238,6 +255,7 @@ var ViewBox = React.createClass({
           spectrumData = scan.scanData
           precursorSpectrumData = scan.precursorScanData
           precursorMz = scan.precursorMz
+          isolationWindow = scan.precursorIsolationWindow
           chargeState = scan.chargeState
           quantSpectrumData = scan.quantScanData
           quantMz = scan.quantMz
@@ -315,6 +333,7 @@ var ViewBox = React.createClass({
           <div id="precursorSpectrumBox">
             <PrecursorSpectrumBox spectrumData={precursorSpectrumData}
                                   precursorMz={precursorMz}
+                                  isolationWindow={isolationWindow}
                                   chargeState={chargeState}
                                   ppm={50}/>
           </div>
