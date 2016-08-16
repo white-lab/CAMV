@@ -82,22 +82,24 @@ var ScanNumberListItem = React.createClass({
           </li>
           <ul>
             {
-              this.props.ptmPlacements.map(function(ptmPlacement, i) {
-                return (
-                  <PTMPlacementListItem
-                    key={ptmPlacement.id}
-                    choice={this.props.scan.choiceData[i].state}
-                    proteinId={this.props.proteinId}
-                    peptideId={this.props.peptideId}
-                    scanId={this.props.scan.scanId}
-                    ptmPlacement={ptmPlacement}
-                    update={this.props.update}
-                    selectedProtein={this.props.selectedProtein}
-                    selectedPeptide={this.props.selectedPeptide}
-                    selectedScan={this.props.selectedScan}
-                    selectedPTMPlacement={this.props.selectedPTMPlacement}/>
-                )
-              }.bind(this))
+              this.props.ptmPlacements.map(
+                (ptmPlacement, i) => {
+                  return (
+                    <PTMPlacementListItem
+                      key={ptmPlacement.id}
+                      choice={this.props.scan.choiceData[i].state}
+                      proteinId={this.props.proteinId}
+                      peptideId={this.props.peptideId}
+                      scanId={this.props.scan.scanId}
+                      ptmPlacement={ptmPlacement}
+                      update={this.props.update}
+                      selectedProtein={this.props.selectedProtein}
+                      selectedPeptide={this.props.selectedPeptide}
+                      selectedScan={this.props.selectedScan}
+                      selectedPTMPlacement={this.props.selectedPTMPlacement}/>
+                  )
+                }
+              )
             }
           </ul>
         </div>
@@ -150,21 +152,23 @@ var PeptideListItem = React.createClass({
           </li>
           <ul>
             {
-              this.props.scans.map(function(scan) {
-                return (
-                  <ScanNumberListItem
-                    key={scan.scanId}
-                    proteinId={this.props.proteinId}
-                    peptideId={this.props.peptideId}
-                    scan={scan}
-                    ptmPlacements={peptideModificationState.mods}
-                    update={this.props.update}
-                    selectedProtein={this.props.selectedProtein}
-                    selectedPeptide={this.props.selectedPeptide}
-                    selectedScan={this.props.selectedScan}
-                    selectedPTMPlacement={this.props.selectedPTMPlacement}/>
-                )
-              }.bind(this))
+              this.props.scans.map(
+                (scan) => {
+                  return (
+                    <ScanNumberListItem
+                      key={scan.scanId}
+                      proteinId={this.props.proteinId}
+                      peptideId={this.props.peptideId}
+                      scan={scan}
+                      ptmPlacements={peptideModificationState.mods}
+                      update={this.props.update}
+                      selectedProtein={this.props.selectedProtein}
+                      selectedPeptide={this.props.selectedPeptide}
+                      selectedScan={this.props.selectedScan}
+                      selectedPTMPlacement={this.props.selectedPTMPlacement}/>
+                  )
+                }
+              )
             }
           </ul>
         </div>
@@ -224,22 +228,24 @@ var ProteinListItem = React.createClass({
           </li>
           <ul>
             {
-              this.props.protein.peptides.map(function(peptide) {
-                return (
-                  <PeptideListItem
-                    key={[peptide.peptideId, peptide.modificationStateId]}
-                    proteinId={this.props.protein.proteinId}
-                    peptideId={peptide.peptideId}
-                    modificationStateId={peptide.modificationStateId}
-                    peptideData={this.props.peptideData[peptide.peptideDataId]}
-                    scans={peptide.scans}
-                    update={this.props.update}
-                    selectedProtein={this.props.selectedProtein}
-                    selectedPeptide={this.props.selectedPeptide}
-                    selectedPTMPlacement={this.props.selectedPTMPlacement}
-                    selectedScan={this.props.selectedScan}/>
-                )
-              }.bind(this))
+              this.props.protein.peptides.map(
+                (peptide) => {
+                  return (
+                    <PeptideListItem
+                      key={[peptide.peptideId, peptide.modificationStateId]}
+                      proteinId={this.props.protein.proteinId}
+                      peptideId={peptide.peptideId}
+                      modificationStateId={peptide.modificationStateId}
+                      peptideData={this.props.peptideData[peptide.peptideDataId]}
+                      scans={peptide.scans}
+                      update={this.props.update}
+                      selectedProtein={this.props.selectedProtein}
+                      selectedPeptide={this.props.selectedPeptide}
+                      selectedPTMPlacement={this.props.selectedPTMPlacement}
+                      selectedScan={this.props.selectedScan}/>
+                  )
+                }
+              )
             }
           </ul>
         </div>
@@ -359,7 +365,7 @@ var ScanSelectionList = React.createClass({
       this.props.selectedScan,
       this.props.selectedPTMPlacement
     ];
-    node = node.filter(function (i) { return i != null; })
+    node = node.filter((i) => { return i != null; })
 
     if (node.length < 1) {
       return;
@@ -392,19 +398,22 @@ var ScanSelectionList = React.createClass({
     return (
       <ul className="tree">
         {
-          this.props.data.map(function(protein) {
-            return (
-              <ProteinListItem
-                key={protein.proteinId}
-                protein={protein}
-                update={this.update}
-                selectedProtein={this.props.selectedProtein}
-                selectedPeptide={this.props.selectedPeptide}
-                selectedScan={this.props.selectedScan}
-                selectedPTMPlacement={this.props.selectedPTMPlacement}
-                peptideData={this.props.peptideData}/>
+          this.props.data.map(
+            (protein) => {
+              return (
+                <ProteinListItem
+                  key={protein.proteinId}
+                  protein={protein}
+                  update={this.update}
+                  selectedProtein={this.props.selectedProtein}
+                  selectedPeptide={this.props.selectedPeptide}
+                  selectedScan={this.props.selectedScan}
+                  selectedPTMPlacement={this.props.selectedPTMPlacement}
+                  peptideData={this.props.peptideData}/>
+              )
+            }
           )
-        }.bind(this))}
+        }
       </ul>
     )
   }

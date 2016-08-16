@@ -1,7 +1,7 @@
 
 var YIonElement = React.createClass({
-  render: function(){
-    if (this.props.found){
+  render: function() {
+    if (this.props.found) {
       return <td className="yIon" style={{color:"red"}}>&lfloor;</td>
     } else {
       return <td className="yIon" style={{color:"lightgray"}}>&lfloor;</td>
@@ -10,8 +10,8 @@ var YIonElement = React.createClass({
 });
 
 var BIonElement = React.createClass({
-  render: function(){
-    if (this.props.found){
+  render: function() {
+    if (this.props.found) {
       return <td className="bIon" style={{color:"red"}}>&rceil;</td>
     } else{
       return <td className="bIon" style={{color:"lightgray"}}>&rceil;</td>
@@ -20,14 +20,14 @@ var BIonElement = React.createClass({
 });
 
 var SequenceElement = React.createClass({
-  render: function(){
+  render: function() {
     return <td className="aminoAcid">{this.props.AA}</td>
   }
 });
 
 var SequenceBox = React.createClass({
-  render: function(){
-    if (this.props.sequence != null){
+  render: function() {
+    if (this.props.sequence != null) {
       var sequence = this.props.sequence.split('')
 
       var bs = [<td key={0}></td>]
@@ -61,11 +61,17 @@ var SequenceBox = React.createClass({
 
       return (
         <div id="sequence">
-          <table><tbody>
-          {rows.map(function(row, i){
-            return <tr key={i}>{row}</tr>
-          })}
-          </tbody></table>
+          <table>
+            <tbody>
+              {
+                rows.map(
+                  (row, i) => {
+                    return <tr key={i}>{row}</tr>
+                  }
+                )
+              }
+            </tbody>
+          </table>
         </div>
       );
     } else {

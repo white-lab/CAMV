@@ -1,5 +1,5 @@
 var QuantSpectrumBox = React.createClass({
-  getInitialState: function(){
+  getInitialState: function() {
     return {chartLoaded: false}
   },
 
@@ -19,29 +19,31 @@ var QuantSpectrumBox = React.createClass({
     if (this.props.spectrumData.length > 0) {
       data.addRows([[minMZ, 0, null, null]])
 
-      this.props.spectrumData.forEach(function(peak){
+      this.props.spectrumData.forEach(function(peak) {
         var mz = peak.mz
         var into = peak.into
         var name = ''
 
         var found = false
 
-        quantMz.forEach(function(val){
+        quantMz.forEach(function(val) {
           var currPPM = 1000000 * Math.abs(mz - val) / val
-          if (currPPM < ppm){
+          if (currPPM < ppm) {
             found = true
           }
         })
 
-        if (found){
+        if (found) {
           style = 'point {size: 5; fill-color: green; visible: true}'
         } else {
           style = 'point {size: 5; fill-color: green; visible: false}'
         }
 
-        data.addRows([[mz, 0, null, null],
-                      [mz, into, style, name],
-                      [mz, 0, null, null]])
+        data.addRows([
+          [mz, 0, null, null],
+          [mz, into, style, name],
+          [mz, 0, null, null]
+        ])
       })
 
       data.addRows([[maxMZ, 0, null, null]])
@@ -69,7 +71,7 @@ var QuantSpectrumBox = React.createClass({
     chart.draw(data, options);
   },
 
-  componentDidMount: function(){
+  componentDidMount: function() {
     window.addEventListener('resize', this.handleResize);
 
     var component = this;
@@ -109,7 +111,7 @@ var QuantSpectrumBox = React.createClass({
     }
   },
 
-  render: function(){
+  render: function() {
     return (
       <div>
         <div id="quantGoogleChart"></div>

@@ -1,5 +1,5 @@
 var PrecursorSpectrumBox = React.createClass({
-  getInitialState: function(){
+  getInitialState: function() {
     return {chartLoaded: false}
   },
 
@@ -21,9 +21,9 @@ var PrecursorSpectrumBox = React.createClass({
       var max_y = Math.max.apply(
         null,
         this.props.spectrumData.filter(
-          function(element) { return element.mz >= minMZ && element.mz <= maxMZ }
+          (element) => { return element.mz >= minMZ && element.mz <= maxMZ }
         ).map(
-          function(element) { return element.into }
+          (element) => { return element.into }
         )
       );
 
@@ -100,7 +100,7 @@ var PrecursorSpectrumBox = React.createClass({
     chart.draw(data, options);
   },
 
-  componentDidMount: function(){
+  componentDidMount: function() {
     window.addEventListener('resize', this.handleResize);
 
     var component = this;
@@ -140,7 +140,7 @@ var PrecursorSpectrumBox = React.createClass({
     }
   },
 
-  render: function(){
+  render: function() {
     return (
       <div>
         <div id="precursorGoogleChart"></div>

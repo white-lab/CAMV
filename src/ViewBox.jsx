@@ -3,38 +3,39 @@ const util = require('util');
 var update = require('react-addons-update');
 
 var ViewBox = React.createClass({
-  getInitialState: function(){
-    return {selectedRun: null,
-            selectedSearch:null,
-            submitted: false,
-            selectedProtein: null,
-            selectedPeptide: null,
-            selectedScan: null,
-            selectedPTMPlacement: null,
-            selectedMz: null,
-            currentLabel: null,
-            fragmentSelectionModalIsOpen: false,
-            fragmentMatches: [],
-            maxPPM: 100,
-            minMZ: 0,
-            maxMZ: null,
-            //data: allData.fullTestData,
-            data: [],
-            //peptideData: allData.peptideData
-            peptideData: []
+  getInitialState: function() {
+    return {
+      selectedRun: null,
+      selectedSearch:null,
+      submitted: false,
+      selectedProtein: null,
+      selectedPeptide: null,
+      selectedScan: null,
+      selectedPTMPlacement: null,
+      selectedMz: null,
+      currentLabel: null,
+      fragmentSelectionModalIsOpen: false,
+      fragmentMatches: [],
+      maxPPM: 100,
+      minMZ: 0,
+      maxMZ: null,
+      //data: allData.fullTestData,
+      data: [],
+      //peptideData: allData.peptideData
+      peptideData: []
     }
   },
 
-  updateSelectedProtein: function(proteinId){
+  updateSelectedProtein: function(proteinId) {
     this.setState({selectedProtein: proteinId})
   },
-  updateSelectedPeptide: function(peptideId){
+  updateSelectedPeptide: function(peptideId) {
     this.setState({selectedPeptide: peptideId})
   },
-  updateSelectedScan: function(scanId){
+  updateSelectedScan: function(scanId) {
     this.setState({selectedScan: scanId, minMZ: 0, maxMZ: null})
   },
-  updateSelectedPTMPlacement: function(modsId){
+  updateSelectedPTMPlacement: function(modsId) {
     this.setState({selectedPTMPlacement: modsId})
   },
   updateAll: function(proteinId, peptideId, scanId, modsId) {
@@ -47,20 +48,20 @@ var ViewBox = React.createClass({
       selectedPTMPlacement: modsId
     })
   },
-  updateMinMZ: function(newMinMZ){
-    if (newMinMZ > 0){
+  updateMinMZ: function(newMinMZ) {
+    if (newMinMZ > 0) {
       this.setState({minMZ: newMinMZ})
     } else {
       this.setState({minMZ: 0})
     }
   },
-  updateMaxMZ: function(newMaxMZ){
-    if (newMaxMZ > this.state.minMZ){
+  updateMaxMZ: function(newMaxMZ) {
+    if (newMaxMZ > this.state.minMZ) {
       this.setState({maxMZ: newMaxMZ})
     }
   },
 
-  updateSelectedMz: function(mz){
+  updateSelectedMz: function(mz) {
     data = this.state.data[this.state.selectedProtein].peptides[this.state.selectedPeptide].scans[this.state.selectedScan].scanData
     peptide = this.state.data[this.state.selectedProtein].peptides[this.state.selectedPeptide]
     peptideDataId = peptide.peptideDataId
@@ -68,34 +69,42 @@ var ViewBox = React.createClass({
     scan = peptide.scans[this.state.selectedScan]
 
     matchData = this.state.peptideData[peptideDataId]
-                          .modificationStates[modificationStateId]
-                          .mods[this.state.selectedPTMPlacement]
-                          .matchData
+      .modificationStates[modificationStateId]
+      .mods[this.state.selectedPTMPlacement]
+      .matchData
 
     currentLabel = ''
 
-    matchId = data.find(function(peak){return (peak.mz === mz)}).matchInfo[this.state.selectedPTMPlacement].matchId
+    matchId = data.find(
+      (peak) => { return (peak.mz === mz) }
+    ).matchInfo[this.state.selectedPTMPlacement].matchId
 
-    if (matchId !== null){ currentLabel = matchData[matchId].name }
+    if (matchId !== null) { currentLabel = matchData[matchId].name }
 
-    matches = matchData.filter(function(item){
-      ppm = (item.mz - mz) / mz * 1000000
-      item.ppm = ppm
-      return Math.abs(ppm) < this.state.maxPPM
-    }.bind(this))
+    matches = matchData.filter(
+      (item) => {
+        ppm = (item.mz - mz) / mz * 1000000
+        item.ppm = ppm
+        return Math.abs(ppm) < this.state.maxPPM
+      }
+    )
 
-    this.setState({selectedMz: mz,
-                   fragmentSelectionModalIsOpen: true,
-                   fragmentMatches: matches,
-                   currentLabel: currentLabel})
+    this.setState({
+      selectedMz: mz,
+      fragmentSelectionModalIsOpen: true,
+      fragmentMatches: matches,
+      currentLabel: currentLabel
+    })
   },
 
 
-  closeFragmentSelectionModal: function(){
-    this.setState({fragmentSelectionModalIsOpen: false,
-                   fragmentMatches: [],
-                   selectedMz: null,
-                   currentLabel: ''})
+  closeFragmentSelectionModal: function() {
+    this.setState({
+      fragmentSelectionModalIsOpen: false,
+      fragmentMatches: [],
+      selectedMz: null,
+      currentLabel: ''
+    })
   },
   updateSelectedFragment: function(matchId) {
     if (this.state.selectedProtein != null &&
@@ -171,24 +180,24 @@ var ViewBox = React.createClass({
     })
   },
 
-  componentDidUpdate: function(prevProps, prevState){
-    if (prevState.selectedRun != this.state.selectedRun){
+  componentDidUpdate: function(prevProps, prevState) {
+    if (prevState.selectedRun != this.state.selectedRun) {
       // console.log('New run: ' + this.state.selectedRun)
     }
-    if (prevState.selectedSearch != this.state.selectedSearch){
+    if (prevState.selectedSearch != this.state.selectedSearch) {
       // console.log('New search: ' + this.state.selectedSearch)
     }
   },
-  goButtonClicked: function(){
+  goButtonClicked: function() {
     this.setState({submitted: true})
   },
-  setData: function(data){
+  setData: function(data) {
     this.setState({data: data})
   },
-  setPeptideData: function(peptideData){
+  setPeptideData: function(peptideData) {
     this.setState({peptideData: peptideData})
   },
-  setSubmitted: function(submitted){
+  setSubmitted: function(submitted) {
     this.setState({submitted: submitted})
   },
   save: function() {
@@ -250,7 +259,7 @@ var ViewBox = React.createClass({
       protein = this.state.data[this.state.selectedProtein]
       if (this.state.selectedPeptide != null) {
         peptide = protein.peptides[this.state.selectedPeptide]
-        if (this.state.selectedScan != null){
+        if (this.state.selectedScan != null) {
           scan = peptide.scans[this.state.selectedScan]
           spectrumData = scan.scanData
           precursorSpectrumData = scan.precursorScanData
@@ -259,7 +268,7 @@ var ViewBox = React.createClass({
           chargeState = scan.chargeState
           quantSpectrumData = scan.quantScanData
           quantMz = scan.quantMz
-          if (this.state.selectedPTMPlacement != null){
+          if (this.state.selectedPTMPlacement != null) {
             inputDisabled = false
             mod = this.state.peptideData[peptide.peptideDataId]
                     .modificationStates[peptide.modificationStateId]
@@ -267,12 +276,12 @@ var ViewBox = React.createClass({
             matchData = mod.matchData
             peptideSequence = mod.name
 
-            spectrumData.forEach(function(peak){
+            spectrumData.forEach(function(peak) {
               var matchId = peak.matchInfo[this.state.selectedPTMPlacement].matchId
-              if (matchId){
-                if (matchData[matchId].ionType == 'b'){
+              if (matchId) {
+                if (matchData[matchId].ionType == 'b') {
                   bFound.push(matchData[matchId].ionPosition)
-                } else if (matchData[matchId].ionType == 'y'){
+                } else if (matchData[matchId].ionType == 'y') {
                   yFound.push(matchData[matchId].ionPosition)
                 }
               }

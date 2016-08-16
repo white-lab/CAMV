@@ -1,29 +1,33 @@
-  
+
 // var ReactCSSTransitionGroup = React.addons.CSSTransitionGroup;
 
 var ReactCSSTransitionGroup = require('react-addons-css-transition-group');
 
 var ModalFragmentBox = React.createClass({
-  getInitialState(){
-    return { mz: null,
-             fragmentMatches: [],
-             currentLabel: ''}
+  getInitialState() {
+    return {
+      mz: null,
+      fragmentMatches: [],
+      currentLabel: ''
+    }
   },
-  update: function(){
-    var matchId = $( "#fragmentSelect" ).val() 
+  update: function() {
+    var matchId = $( "#fragmentSelect" ).val()
     this.props.updateCallback(matchId);
     this.close()
   },
-  close: function(){
+  close: function() {
     this.props.closeCallback();
   },
-  componentWillReceiveProps: function(nextProps){
-    this.setState({ mz: nextProps.mz, 
-                    fragmentMatches: nextProps.fragmentMatches,
-                    currentLabel: nextProps.currentLabel})
+  componentWillReceiveProps: function(nextProps) {
+    this.setState({
+      mz: nextProps.mz,
+      fragmentMatches: nextProps.fragmentMatches,
+      currentLabel: nextProps.currentLabel
+    })
   },
 
-  render: function(){
+  render: function() {
     return (
       <ReactBootstrap.Modal show={this.props.showModal} onHide={this.close}>
         <ReactBootstrap.Modal.Header>
@@ -33,18 +37,22 @@ var ModalFragmentBox = React.createClass({
           </ReactBootstrap.Modal.Title>
         </ReactBootstrap.Modal.Header>
         <ReactBootstrap.Modal.Body>
-          New Label:&nbsp; 
+          New Label:&nbsp;
           <select id="fragmentSelect">
-          {this.state.fragmentMatches.map(function(object, i){
-            return <option key={i} value={object.id}>{object.name + ' (' + String(Math.round(object.ppm))+ ' ppm)'}</option>
-          }.bind(this))}
+          {
+            this.state.fragmentMatches.map(
+              (object, i) => {
+                return <option key={i} value={object.id}>{object.name + ' (' + String(Math.round(object.ppm))+ ' ppm)'}</option>
+              }
+            )
+          }
           </select>
         </ReactBootstrap.Modal.Body>
         <ReactBootstrap.Modal.Footer>
           <ReactBootstrap.Button onClick={this.update} disabled={this.state.fragmentMatches.length == 0}>Update</ReactBootstrap.Button>
           <ReactBootstrap.Button onClick={this.close}>Close</ReactBootstrap.Button>
         </ReactBootstrap.Modal.Footer>
-      </ReactBootstrap.Modal>    
-    ) 
+      </ReactBootstrap.Modal>
+    )
   }
 });

@@ -2,10 +2,10 @@ var hotkey = require('react-hotkey');
 hotkey.activate();
 
 var AcceptButton = React.createClass({
-  onChange: function(){
+  onChange: function() {
     this.props.callback('accept')
   },
-  render: function(){
+  render: function() {
     return (<input id="acceptButton"
                    className="choiceButton"
                    type="button"
@@ -16,10 +16,10 @@ var AcceptButton = React.createClass({
 });
 
 var MaybeButton = React.createClass({
-  onChange: function(){
+  onChange: function() {
     this.props.callback('maybe')
   },
-  render: function(){
+  render: function() {
     return (<input id="maybeButton"
                    className="choiceButton"
                    type="button"
@@ -30,10 +30,10 @@ var MaybeButton = React.createClass({
 });
 
 var RejectButton = React.createClass({
-  onChange: function(){
+  onChange: function() {
     this.props.callback('reject')
   },
-  render: function(){
+  render: function() {
     return (<input id="rejectButton"
                    className="choiceButton"
                    type="button"
@@ -47,15 +47,17 @@ var SetMinMZ = React.createClass({
   handleChange: function(event) {
     this.props.callback(event.target.value)
   },
-  render: function(){
-    return (<div id="setMinMZ">
-              Min. m/z:
-              <input className="numInput"
-                     type="number"
-                     value={this.props.minMZ}
-                     disabled={this.props.disabled}
-                     onChange={this.handleChange}/>
-            </div>)
+  render: function() {
+    return (
+      <div id="setMinMZ">
+        Min. m/z:
+        <input className="numInput"
+               type="number"
+               value={this.props.minMZ}
+               disabled={this.props.disabled}
+               onChange={this.handleChange}/>
+      </div>
+    )
   }
 });
 
@@ -63,20 +65,22 @@ var SetMaxMZ = React.createClass({
   handleChange: function(event) {
     this.props.callback(event.target.value)
   },
-  render: function(){
-    return (<div id="setMaxMZ">
-              Max. m/z:
-              <input className="numInput"
-                     type="number"
-                     value={this.props.maxMZ == null ? this.props.scanMaxMZ : this.props.maxMZ}
-                     disabled={this.props.disabled}
-                     onChange={this.handleChange}/>
-            </div>)
+  render: function() {
+    return (
+      <div id="setMaxMZ">
+        Max. m/z:
+        <input className="numInput"
+               type="number"
+               value={this.props.maxMZ == null ? this.props.scanMaxMZ : this.props.maxMZ}
+               disabled={this.props.disabled}
+               onChange={this.handleChange}/>
+      </div>
+    )
   }
 });
 
 var SpectrumBox = React.createClass({
-  getInitialState: function(){
+  getInitialState: function() {
     return {chartLoaded: false}
   },
 
@@ -104,16 +108,16 @@ var SpectrumBox = React.createClass({
     var maxMZ = 1
     var max_y = 15
 
-    if (this.props.spectrumData.length > 0){
+    if (this.props.spectrumData.length > 0) {
       var scanMax = this.props.spectrumData[this.props.spectrumData.length - 1].mz + 1
       maxMZ = this.props.maxMZ == null ? scanMax : Math.min(scanMax, this.props.maxMZ)
 
       max_y = Math.max.apply(
         null,
         this.props.spectrumData.filter(
-          function(element) { return element.mz >= minMZ && element.mz <= maxMZ }
+          (element) => { return element.mz >= minMZ && element.mz <= maxMZ }
         ).map(
-          function(element) { return element.into }
+          (element) => { return element.into }
         )
       )
     }
@@ -127,14 +131,14 @@ var SpectrumBox = React.createClass({
     if (this.props.spectrumData.length > 0) {
       data.addRows([[minMZ, 0, null, null]])
 
-      this.props.spectrumData.forEach(function(peak){
+      this.props.spectrumData.forEach(function(peak) {
         mz = peak.mz
         into = peak.into
         name = ''
         ppm = null
 
-        if (mz > minMZ && mz < maxMZ){
-          if (this.props.selectedPTMPlacement != null){
+        if (mz > minMZ && mz < maxMZ) {
+          if (this.props.selectedPTMPlacement != null) {
             style = 'point {size: 3; fill-color: red; visible: true}'
           } else {
             style = 'point {size: 3; fill-color: red; visible: false}'
@@ -153,7 +157,7 @@ var SpectrumBox = React.createClass({
               if (into == 0) {
                 // Plot intermediate line-plot points along x-axis
                 style = null
-              } else if (ppm < 10){
+              } else if (ppm < 10) {
                 style = 'point {size: 3; fill-color: green; visible: true}'
               }
             } else if (into < max_y / 10) {
@@ -161,9 +165,11 @@ var SpectrumBox = React.createClass({
             }
         }
 
-          data.addRows([[mz, 0, null, null],
-                        [mz, into, style, name],
-                        [mz, 0, null, null]])
+          data.addRows([
+            [mz, 0, null, null],
+            [mz, into, style, name],
+            [mz, 0, null, null]
+          ])
         }
       }.bind(this))
 
@@ -204,7 +210,7 @@ var SpectrumBox = React.createClass({
     chart.draw(data, options);
   },
 
-  componentDidMount: function(){
+  componentDidMount: function() {
     window.addEventListener('resize', this.handleResize);
 
     var component = this;
@@ -240,7 +246,7 @@ var SpectrumBox = React.createClass({
     if (this.state.chartLoaded) {
       if (prevProps.spectrumData != this.props.spectrumData) {
         this.drawChart();
-      } else if (prevProps.selectedPTMPlacement != this.props.selectedPTMPlacement){
+      } else if (prevProps.selectedPTMPlacement != this.props.selectedPTMPlacement) {
         this.drawChart();
       } else if (prevProps.minMZ != this.props.minMZ || prevProps.maxMZ != this.props.maxMZ) {
         this.drawChart();
@@ -248,7 +254,7 @@ var SpectrumBox = React.createClass({
     }
   },
 
-  render: function(){
+  render: function() {
     return (
       <div>
         <div id="fragmentGoogleChart"></div>

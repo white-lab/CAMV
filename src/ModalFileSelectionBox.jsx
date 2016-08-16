@@ -6,37 +6,42 @@ var ReactCSSTransitionGroup = require('react-addons-css-transition-group');
 
 var ModalFileSelectionBox = React.createClass({
   getInitialState: function() {
-    return {fileChosen: false,
-            data: [],
-            peptideData: [],
-            fileName: ''}
+    return {
+      fileChosen: false,
+      data: [],
+      peptideData: [],
+      fileName: ''
+    }
   },
 
   update: function() {
     var component = this;
 
-    dialog.showOpenDialog({filters: [{name: 'text', extensions: ['camv']}]}, function (fileNames){
-      if (fileNames === undefined) return;
-      var fileName = fileNames[0];
-      fs.readFile(fileName, 'utf-8', function(err, data){
-        inputData = JSON.parse(data)
-        // console.log(inputData)
-        component.setState({
-                        data: inputData.scanData,
-                        peptideData: inputData.peptideData
-        })
-      });
-      component.setState({fileChosen: true, fileName: fileName})
-    })
+    dialog.showOpenDialog(
+      {filters: [{name: 'text', extensions: ['camv']}]},
+      function (fileNames) {
+        if (fileNames === undefined) return;
+        var fileName = fileNames[0];
+        fs.readFile(fileName, 'utf-8', function(err, data) {
+          inputData = JSON.parse(data)
+          // console.log(inputData)
+          component.setState({
+            data: inputData.scanData,
+            peptideData: inputData.peptideData
+          })
+        });
+        component.setState({fileChosen: true, fileName: fileName})
+      }
+    )
   },
 
-  submit: function(){
+  submit: function() {
     this.props.setData(this.state.data)
     this.props.setPeptideData(this.state.peptideData)
     this.props.setSubmitted(true)
   },
 
-  render: function(){
+  render: function() {
     return (
       <ReactBootstrap.Modal show={this.props.showModal} onHide={this.submit}>
         <ReactBootstrap.Modal.Header>
