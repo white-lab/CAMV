@@ -14,23 +14,50 @@ var ModalFileSelectionBox = React.createClass({
     }
   },
 
+  setStateFromText: function(data) {
+    inputData = JSON.parse(data);
+    this.setState({
+      data: inputData.scanData,
+      peptideData: inputData.peptideData
+    });
+  },
+
   update: function() {
     var component = this;
 
     dialog.showOpenDialog(
-      {filters: [{name: 'text', extensions: ['camv']}]},
+      {
+        filters: [{
+          name: 'text',
+          extensions: ['camv', 'camv.gz']
+        }]
+      },
       function (fileNames) {
         if (fileNames === undefined) return;
         var fileName = fileNames[0];
-        fs.readFile(fileName, 'utf-8', function(err, data) {
-          inputData = JSON.parse(data)
-          // console.log(inputData)
-          component.setState({
-            data: inputData.scanData,
-            peptideData: inputData.peptideData
-          })
-        });
-        component.setState({fileChosen: true, fileName: fileName})
+        var compressed = fileName.endsWith(".gz");
+
+        fs.readFile(
+          fileName,
+          (compressed ? null : 'utf-8'),
+          (err, data) => {
+            if (err) { console.log(err); }
+
+            if (compressed) {
+              zlib.gunzip(data, (err, out) => {
+                if (err) { console.log(err); }
+                component.setStateFromText(out);
+              })
+            } else {
+              component.setStateFromText(data);
+            }
+          }
+        );
+
+        component.setState({
+          fileChosen: true,
+          fileName: fileName
+        })
       }
     )
   },

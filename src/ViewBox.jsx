@@ -1,4 +1,5 @@
 const fs = require('fs');
+const zlib = require('zlib');
 const util = require('util');
 var update = require('react-addons-update');
 
@@ -202,15 +203,22 @@ var ViewBox = React.createClass({
   },
   save: function() {
     dialog.showSaveDialog(
-      {filters: [{name: 'text', extensions: ['camv']}]},
+      {
+        filters: [{
+          name: 'text',
+          extensions: ['camv', 'camv.gz']
+        }]
+      },
       function(fileName) {
         if (fileName === undefined)
           return;
 
+        var compressed = fileName.endsWith(".gz");
+
         var dataToSave = JSON.stringify(
           {scanData: this.state.data, peptideData: this.state.peptideData},
           null, 2
-        )
+        );
 
         var ws = fs.createWriteStream(fileName);
 
@@ -227,13 +235,18 @@ var ViewBox = React.createClass({
             );
         });
 
-        var lines = dataToSave.split("\n");
-
-        for (i = 0; i < lines.length; i++) {
-          ws.write(lines[i] + "\n")
+        if (compressed) {
+          zlib.gzip(
+            dataToSave, (err, out) => {
+              if (err) { console.log(err); }
+              ws.write(out);
+              ws.end();
+            }
+          )
+        } else {
+          ws.write(dataToSave);
+          ws.end();
         }
-
-        ws.end();
       }.bind(this)
     );
   },
