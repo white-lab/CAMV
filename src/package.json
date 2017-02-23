@@ -12,7 +12,7 @@
     "react-hotkey": "^0.7.0",
     "react-native-fs": "^2.1.0-rc.1",
     "electron": "^1.4.15",
-    "electron-packager": "^8.5.0"
+    "electron-packager": "^8.5.2"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
