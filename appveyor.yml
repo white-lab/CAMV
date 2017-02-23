@@ -22,15 +22,14 @@ test_script:
 
 build_script:
     - src\node_modules\.bin\electron-packager src/ --all
-    - zip -qr CAMV-darwin-x64.zip CAMV-darwin-x64
-    - zip -qr CAMV-linux-ia32.zip CAMV-linux-ia32
-    - zip -qr CAMV-linux-x64.zip  CAMV-linux-x64
-    - zip -qr CAMV-mas-x64.zip    CAMV-mas-x64
-    - zip -qr CAMV-win32-ia32.zip CAMV-win32-ia32
-    - zip -qr CAMV-win32-x64.zip  CAMV-win32-x64
 
 artifacts:
-    - path: "CAMV-*.zip"
+    - path: "CAMV-darwin-x64"
+    - path: "CAMV-linux-ia32"
+    - path: "CAMV-linux-x64"
+    - path: "CAMV-mas-x64"
+    - path: "CAMV-win32-ia32"
+    - path: "CAMV-win32-x64"
 
 deploy:
     - provider: GitHub
