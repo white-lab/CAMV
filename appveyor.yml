@@ -1,0 +1,40 @@
+version: Build {build}
+
+skip_non_tags: true
+
+# build:
+#     verbosity: minimal
+
+environment:
+    matrix:
+        - nodejs_version: "6"
+
+install:
+    - ps: Install-Product node $env:nodejs_version
+    - "cd src/"
+    - "npm install"
+    - "npm install bower"
+    - "bower install"
+    - "cd .."
+
+test_script:
+    - npm test
+
+build_script:
+    - electron-packager src/ --all
+    - zip -qr CAMV-darwin-x64.zip CAMV-darwin-x64
+    - zip -qr CAMV-linux-ia32.zip CAMV-linux-ia32
+    - zip -qr CAMV-linux-x64.zip  CAMV-linux-x64
+    - zip -qr CAMV-mas-x64.zip    CAMV-mas-x64
+    - zip -qr CAMV-win32-ia32.zip CAMV-win32-ia32
+    - zip -qr CAMV-win32-x64.zip  CAMV-win32-x64
+
+artifacts:
+    - path: "CAMV-*.zip"
+
+deploy:
+    - provider: GitHub
+      description: ""
+      artifact: "CAMV-*.zip"
+      draft: false
+      prerelease: false
