@@ -187,11 +187,26 @@ var ViewBox = React.createClass({
     // Export spectra as xls file
   },
 
-  iterate_spectra: function*() {
+  iterate_spectra: function*(export_spectras) {
+    while (export_spectras.length < 4) {
+      export_spectras.push(false);
+    }
+
     for (let protein of this.state.data) {
       for (let peptide of protein.peptides) {
         for (let scan of peptide.scans) {
           for (let match of scan.choiceData) {
+            state = match.state
+
+            if (
+              (state == "accept" && !export_spectras[0]) ||
+              (state == "maybe" && !export_spectras[1]) ||
+              (state == "reject" && !export_spectras[2]) ||
+              (state == null && !export_spectras[3])
+            ) {
+              continue;
+            }
+
             nodes = [
               protein.proteinId,
               peptide.peptideId,
@@ -204,8 +219,7 @@ var ViewBox = React.createClass({
               this.state.peptideData[peptide.peptideDataId]
                 .modificationStates[peptide.modificationStateId]
                 .mods[match.modsId].name,
-              scan.scanNumber,
-              match.state
+              scan.scanNumber
             ];
           }
         }
@@ -213,8 +227,76 @@ var ViewBox = React.createClass({
     }
   },
 
+  spectraToImage: async function (dirName, export_spectras) {
+    this.setState({exporting: true});
+    var win = remote.getCurrentWindow();
+    var sizes = win.getBounds();
+    win.setSize(800, 650);
+    this.forceUpdate();
+
+    scan_list = this.refs["scanSelectionList"];
+
+    current_node = [
+      scan_list.props.selectedProtein,
+      scan_list.props.selectedPeptide,
+      scan_list.props.selectedScan,
+      scan_list.props.selectedPTMPlacement
+    ];
+
+    promises = [];
+
+    for (let vals of this.iterate_spectra(export_spectras)) {
+      [nodes, prot, pep, scan] = vals;
+
+      out_name = prot + " - " + pep + " - " + scan;
+      console.log(out_name, state);
+
+      this.refs["scanSelectionList"].update(...nodes);
+
+      this.refs["fragmentSpectrum"].drawChart();
+      this.refs["precursorSpectrum"].drawChart();
+      this.refs["quantSpectrum"].drawChart();
+
+      // promises.push(
+      //
+      // domtoimage.toSvg(
+      dataUrl = await domtoimage.toPng(
+        document.getElementById('viewBox'),
+        {
+          width: 1147,
+          height: 522,
+          bgcolor: 'red',
+          filter: node =>
+            !~[
+              "scanSelectionList", "exportSave", "setMinMZ", "setMaxMZ",
+              "rejectButton", "maybeButton", "acceptButton"
+            ].indexOf(node.id)
+        }
+      )
+      promises.push(
+        fs.writeFile(
+          // path.join(dirName, out_name + ".svg"),
+          // '<?xml version="1.0" encoding="UTF-8" standalone="no"?>' +
+          // dataUrl.slice("data:image/svg+xml;charset=utf-8,".length)
+          path.join(dirName, out_name + ".png"),
+          this.decodeBase64Image(dataUrl).data
+        )
+      )
+    }
+
+    Promise.all(promises).then(
+      function() {
+        this.setState({exporting: false});
+        win.setSize(sizes.width, sizes.height);
+        this.refs["scanSelectionList"].update(...current_node);
+      }.bind(this)
+    )
+  },
+
   exportCallback: function(dirName, export_spectras, export_tables) {
     this.setState({modalExportIsOpen: false});
+
+    console.log(dirName)
 
     if (export_tables || export_spectras.some(i => i)) {
       fs.mkdir(
@@ -228,75 +310,9 @@ var ViewBox = React.createClass({
             return;
           }
 
-          this.setState({exporting: true});
-          var win = remote.getCurrentWindow();
-          var sizes = win.getBounds();
-          win.setSize(800, 650);
-          this.forceUpdate();
-
-          scan_list = this.refs["scanSelectionList"];
-
-          current_node = [
-            scan_list.props.selectedProtein,
-            scan_list.props.selectedPeptide,
-            scan_list.props.selectedScan,
-            scan_list.props.selectedPTMPlacement
-          ];
-
-          for (let vals of this.iterate_spectra()) {
-            [nodes, prot, pep, scan, state] = vals;
-
-            if (
-              (state == "accept" && !export_spectras[0]) ||
-              (state == "maybe" && !export_spectras[1]) ||
-              (state == "reject" && !export_spectras[2]) ||
-              (state == null)
-            ) {
-              continue;
-            }
-
-            out_name = prot + " - " + pep + " - " + scan;
-            console.log(out_name, state);
-
-            this.refs["scanSelectionList"].update(...nodes);
-
-            this.refs["fragmentSpectrum"].drawChart();
-            this.refs["precursorSpectrum"].drawChart();
-            this.refs["quantSpectrum"].drawChart();
-
-            // domtoimage.toSvg(
-            domtoimage.toPng(
-              document.getElementById('viewBox'),
-              {
-                width: 1147,
-                height: 522,
-                bgcolor: 'red',
-                filter: function(node) {
-                  return !~[
-                    "scanSelectionList", "exportSave", "setMinMZ", "setMaxMZ",
-                    "rejectButton", "maybeButton", "acceptButton"
-                  ].indexOf(node.id)
-                }
-              }
-            ).then(
-              function (dataUrl) {
-                fs.writeFile(
-                  // path.join(dirName, out_name + ".svg"),
-                  // '<?xml version="1.0" encoding="UTF-8" standalone="no"?>' +
-                  // dataUrl.slice("data:image/svg+xml;charset=utf-8,".length)
-                  path.join(dirName, out_name + ".png"),
-                  this.decodeBase64Image(dataUrl).data
-                );
-
-                this.setState({exporting: false});
-                win.setSize(sizes.width, sizes.height);
-                this.refs["scanSelectionList"].update(...current_node);
-              }.bind(this)
-            )
-          }
-
+          this.spectraToImage(dirName, export_spectras)
         }.bind(this)
-      );
+      )
     }
   },
 
@@ -343,7 +359,8 @@ var ViewBox = React.createClass({
   setSubmitted: function(submitted, fileName) {
     this.setState({submitted: submitted})
     this.refs["modalExportBox"].setState({
-      exportDirectory: fileName.match(/(.*)[\/\\]/)[1] || ''
+      exportDirectory: fileName.match(/(.*)[\/\\]/)[1] || '',
+      dirChosen: true
     })
   },
   openExport: function() {
