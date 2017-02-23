@@ -1,6 +1,6 @@
 version: Build {build}
 
-skip_non_tags: true
+# skip_non_tags: true
 
 # build:
 #     verbosity: minimal
@@ -21,7 +21,7 @@ install:
 #     - npm test
 
 build_script:
-    - src\node_modules\.bin\electron-packager src/ --platform=win32 --arch=x64
+    - src\node_modules\.bin\electron-packager src/ --platform=win32 --arch=all
     # - src\node_modules\.bin\electron-packager src/ --all
 
 artifacts:
@@ -29,7 +29,7 @@ artifacts:
     # - path: "CAMV-linux-ia32"
     # - path: "CAMV-linux-x64"
     # - path: "CAMV-mas-x64"
-    # - path: "CAMV-win32-ia32"
+    - path: "CAMV-win32-ia32"
     - path: "CAMV-win32-x64"
 
 deploy:
@@ -42,4 +42,4 @@ deploy:
       prerelease: false
       on:
         branch: master
-        appveyor_repo_tag: true
+        # appveyor_repo_tag: true
