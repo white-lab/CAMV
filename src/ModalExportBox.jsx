@@ -7,7 +7,7 @@ var ModalExportBox = React.createClass({
     return {
       exportDirectory: null,
       dirChosen: false,
-      exportAcceptSpectra: false,
+      exportAcceptSpectra: true,
       exportMaybeSpectra: false,
       exportRejectSpectra: false,
       exportTables: true
