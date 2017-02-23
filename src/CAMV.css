@@ -88,7 +88,7 @@
   margin: 0% 1%;
 }
 
-#export {
+#openExport {
   float: right;
   margin: 0% 1%;
 }
@@ -189,4 +189,8 @@ li::before {
   bottom: 8;
   position: relative;
   border-bottom: 1px solid #333;
+}
+
+body {
+    margin: 2px 0px;
 }

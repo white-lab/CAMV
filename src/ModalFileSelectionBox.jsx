@@ -58,7 +58,7 @@ var ModalFileSelectionBox = React.createClass({
           fileChosen: true,
           fileName: fileName
         })
-      }
+      }.bind(this)
     )
   },
 
@@ -77,10 +77,21 @@ var ModalFileSelectionBox = React.createClass({
           </ReactBootstrap.Modal.Title>
         </ReactBootstrap.Modal.Header>
         <ReactBootstrap.Modal.Body>
-          <button id="fileSelect" onClick={this.update}>Choose File</button>  {this.state.fileName}
+          <button
+            id="fileSelect"
+            onClick={this.update}
+            >
+            Choose File
+          </button>
+          {this.state.fileName}
         </ReactBootstrap.Modal.Body>
         <ReactBootstrap.Modal.Footer>
-          <ReactBootstrap.Button onClick={this.submit} disabled={!this.state.fileChosen}>Done</ReactBootstrap.Button>
+          <ReactBootstrap.Button
+            onClick={this.submit}
+            disabled={!this.state.fileChosen}
+            >
+            Done
+          </ReactBootstrap.Button>
         </ReactBootstrap.Modal.Footer>
       </ReactBootstrap.Modal>
     )

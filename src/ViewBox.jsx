@@ -35,6 +35,7 @@ var ViewBox = React.createClass({
       selectedMz: null,
       currentLabel: null,
       fragmentSelectionModalIsOpen: false,
+      modalExportIsOpen: false,
       fragmentMatches: [],
       maxPPM: 100,
       minMZ: 0,
@@ -178,6 +179,84 @@ var ViewBox = React.createClass({
     }
   },
 
+  closeExportModal: function() {
+    this.setState({modalExportIsOpen: false})
+  },
+
+  export_tables: function() {
+    // Export spectra as xls file
+  },
+
+  exportCallback: function(dirName, export_spectras, export_tables) {
+    this.setState({modalExportIsOpen: false});
+
+    if (export_tables || export_spectras.some(i => i)) {
+      fs.mkdir(
+        dirName,
+        function() {
+          if (export_tables) {
+            this.export_tables();
+          }
+
+          if (!export_spectras.some(i => i)) {
+            return;
+          }
+
+          if (export_spectras[0]) {
+            // Export accepted
+          }
+
+          if (export_spectras[1]) {
+            // Export maybed
+          }
+
+          if (export_spectras[2]) {
+            // Export rejected
+          }
+
+          this.setState({exporting: true});
+          var win = remote.getCurrentWindow();
+          var sizes = win.getBounds();
+          win.setSize(800, 650);
+          this.forceUpdate();
+
+          this.refs["fragmentSpectrum"].drawChart();
+          this.refs["precursorSpectrum"].drawChart();
+          this.refs["quantSpectrum"].drawChart();
+
+          domtoimage.toSvg(
+          //domtoimage.toPng(
+            document.getElementById('viewBox'),
+            {
+              width: 1147,
+              height: 522,
+              bgcolor: 'red',
+              filter: function(node) {
+                return !~[
+                  "scanSelectionList", "save", "export", "setMinMZ", "setMaxMZ",
+                  "rejectButton", "maybeButton", "acceptButton"
+                ].indexOf(node.id)
+              }
+            }
+          ).then(
+            function (dataUrl) {
+              fs.writeFile(
+                path.join(dirName, "my-node.svg"),
+                '<?xml version="1.0" encoding="UTF-8" standalone="no"?>' +
+                dataUrl.slice("data:image/svg+xml;charset=utf-8,".length)
+                // path.join(dirName, "my-node.png"),
+                // this.decodeBase64Image(dataUrl).data
+              );
+
+              this.setState({exporting: false});
+              win.setSize(sizes.width, sizes.height);
+            }.bind(this)
+          )
+        }.bind(this)
+      );
+    }
+  },
+
   updateChoice: function(choice) {
     /* Messy solution because javascript doesn't allow variables as dict keys */
     state_target = {state: {$set: choice}};
@@ -221,61 +300,8 @@ var ViewBox = React.createClass({
   setSubmitted: function(submitted) {
     this.setState({submitted: submitted})
   },
-  export: function() {
-    dialog.showOpenDialog(
-      {
-        title: "Export Spectra",
-        properties: ["createDirectory", "openDirectory"]
-      },
-      function(dirName) {
-        if (dirName === undefined || dirName.length != 1)
-          return;
-
-        fs.mkdir(
-          dirName[0],
-          function() {
-            this.setState({exporting: true});
-            var win = remote.getCurrentWindow();
-            var sizes = win.getBounds();
-            win.setSize(800, 650);
-            this.forceUpdate();
-
-            this.refs["fragmentSpectrum"].drawChart();
-            this.refs["precursorSpectrum"].drawChart();
-            this.refs["quantSpectrum"].drawChart();
-
-            domtoimage.toSvg(
-            //domtoimage.toPng(
-              document.getElementById('viewBox'),
-              {
-                width: 1147,
-                height: 522,
-                bgcolor: 'red',
-                filter: function(node) {
-                  return !~[
-                    "scanSelectionList", "save", "export", "setMinMZ", "setMaxMZ",
-                    "rejectButton", "maybeButton", "acceptButton"
-                  ].indexOf(node.id)
-                }
-              }
-            ).then(
-              function (dataUrl) {
-                fs.writeFile(
-                  path.join(dirName[0], "my-node.svg"),
-                  '<?xml version="1.0" encoding="UTF-8" standalone="no"?>' +
-                  dataUrl.slice("data:image/svg+xml;charset=utf-8,".length)
-                  // path.join(dirName[0], "my-node.png"),
-                  // this.decodeBase64Image(dataUrl).data
-                );
-
-                this.setState({exporting: false});
-                win.setSize(sizes.width, sizes.height);
-              }.bind(this)
-            );
-          }.bind(this)
-        );
-      }.bind(this)
-    )
+  openExport: function() {
+    this.setState({modalExportIsOpen: true})
   },
   save: function() {
     dialog.showSaveDialog(
@@ -398,12 +424,15 @@ var ViewBox = React.createClass({
           mz={this.state.selectedMz}
           fragmentMatches={this.state.fragmentMatches}
           currentLabel={this.state.currentLabel}/>
-        <ModalFileSelectionBox
-          showModal={!this.state.submitted}
-          setPeptideData={this.setPeptideData}
-          setData={this.setData}
-          setSubmitted={this.setSubmitted}/>
-
+          <ModalFileSelectionBox
+            showModal={!this.state.submitted}
+            setPeptideData={this.setPeptideData}
+            setData={this.setData}
+            setSubmitted={this.setSubmitted}/>
+          <ModalExportBox
+            showModal={this.state.modalExportIsOpen}
+            closeCallback={this.closeExportModal}
+            exportCallback={this.exportCallback}/>
         <div className="panel panel-default" id="scanSelectionList">
           <ScanSelectionList
             data={this.state.data}
@@ -456,7 +485,7 @@ var ViewBox = React.createClass({
               </div>
               <div id="exportSave">
                 <button id="save" onClick={this.save}>Save</button>
-                <button id="export" onClick={this.export}>Export</button>
+                <button id="openExport" onClick={this.openExport}>Export</button>
               </div>
             </div>
             <div id="fragmentSpectrumBox">
