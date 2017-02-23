@@ -22,7 +22,7 @@ install:
 
 build_script:
     - src\node_modules\.bin\electron-packager src/ --platform=win32 --arch=x64
-    - src\node_modules\.bin\electron-packager src/ --all
+    # - src\node_modules\.bin\electron-packager src/ --all
 
 artifacts:
     # - path: "CAMV-darwin-x64"
