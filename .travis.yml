@@ -15,13 +15,10 @@ install:
   - cd ..
 
 script:
-  - electron-packager src/ --all
+  - electron-packager src/ --platform=darwin,linux
   - zip -qr CAMV-darwin-x64.zip CAMV-darwin-x64
   - zip -qr CAMV-linux-ia32.zip CAMV-linux-ia32
   - zip -qr CAMV-linux-x64.zip  CAMV-linux-x64
-  - zip -qr CAMV-mas-x64.zip    CAMV-mas-x64
-  - zip -qr CAMV-win32-ia32.zip CAMV-win32-ia32
-  - zip -qr CAMV-win32-x64.zip  CAMV-win32-x64
 
 deploy:
   provider: releases
@@ -29,9 +26,6 @@ deploy:
     - "CAMV-darwin-x64.zip"
     - "CAMV-linux-ia32.zip"
     - "CAMV-linux-x64.zip"
-    - "CAMV-mas-x64.zip"
-    - "CAMV-win32-ia32.zip"
-    - "CAMV-win32-x64.zip"
   skip_cleanup: true
   on:
     repo: naderm/CAMV
