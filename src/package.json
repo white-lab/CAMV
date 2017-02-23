@@ -19,6 +19,6 @@
   },
   "author": "",
   "license": "MIT",
-  "repository": "https://github.com/timgc/CAMV",
+  "repository": "https://github.com/white-lab/CAMV",
   "description": "Tool for validation proteomic mass spectrometry peptide assignments."
 }

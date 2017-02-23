@@ -3,7 +3,8 @@
   "description": "",
   "main": "main.js",
   "authors": [
-    "Tim Curran <tim@ginkgobioworks.com>"
+    "Tim Curran <tim@ginkgobioworks.com>",
+    "Nader Morshed <morshed@mit.edu>"
   ],
   "license": "MIT",
   "homepage": "",
