@@ -233,7 +233,7 @@ var ViewBox = React.createClass({
               bgcolor: 'red',
               filter: function(node) {
                 return !~[
-                  "scanSelectionList", "save", "export", "setMinMZ", "setMaxMZ",
+                  "scanSelectionList", "exportSave", "setMinMZ", "setMaxMZ",
                   "rejectButton", "maybeButton", "acceptButton"
                 ].indexOf(node.id)
               }
