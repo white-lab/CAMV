@@ -14,6 +14,7 @@ install:
     - "cd src/"
     - "npm install"
     - "npm install bower"
+    - "export PATH=$(pwd)/src/node_modules/.bin:$PATH"
     - "bower install"
     - "cd .."
 
