@@ -21,14 +21,15 @@ install:
 #     - npm test
 
 build_script:
+    - src\node_modules\.bin\electron-packager src/ --platform=win32 --arch=x64
     - src\node_modules\.bin\electron-packager src/ --all
 
 artifacts:
-    - path: "CAMV-darwin-x64"
-    - path: "CAMV-linux-ia32"
-    - path: "CAMV-linux-x64"
-    - path: "CAMV-mas-x64"
-    - path: "CAMV-win32-ia32"
+    # - path: "CAMV-darwin-x64"
+    # - path: "CAMV-linux-ia32"
+    # - path: "CAMV-linux-x64"
+    # - path: "CAMV-mas-x64"
+    # - path: "CAMV-win32-ia32"
     - path: "CAMV-win32-x64"
 
 deploy:
