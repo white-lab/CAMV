@@ -63,6 +63,7 @@ var ModalExportBox = React.createClass({
           <div>
             <button
               id="exportDir"
+              value={this.state.exportDirectory}
               onClick={this.updateDir}
               >
               Choose Directory
