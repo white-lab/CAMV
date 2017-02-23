@@ -37,7 +37,7 @@ deploy:
       auth_token:
         secure: Vt90BNYB5BI/GtFTilnFdNNEC8T+/szE6cmO3M3gpMaMRXzE4p+XNdAHyymTxnJN
       description: "Computer Assisted Manual Validation for Mass Spectrometry Proteomics"
-      artifact: "CAMV-*.zip"
+      artifact: "/CAMV-.*\.zip/"
       draft: false
       prerelease: false
       on:
