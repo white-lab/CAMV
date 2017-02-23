@@ -9,4 +9,4 @@ src/testData.json
 .DS_Store
 CAMV-*-*/
 *.zip
-
+*-debug.log
