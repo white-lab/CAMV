@@ -13,6 +13,7 @@ install:
     - ps: Install-Product node $env:nodejs_version
     - "cd src/"
     - "npm install -g --dev"
+    - "npm install -g --only=dev"
     - "npm install bower -g"
     - "bower install"
     - "cd .."
