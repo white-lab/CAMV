@@ -15,7 +15,7 @@ install:
   - cd ..
 
 script:
-  - electron-packager src/ --platform=darwin,linux
+  - electron-packager src/ --platform=darwin,linux --arch=all
   - zip -qr CAMV-darwin-x64.zip CAMV-darwin-x64
   - zip -qr CAMV-linux-ia32.zip CAMV-linux-ia32
   - zip -qr CAMV-linux-x64.zip  CAMV-linux-x64
