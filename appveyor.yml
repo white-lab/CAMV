@@ -34,6 +34,10 @@ artifacts:
 deploy:
     - provider: GitHub
       description: ""
-      artifact: "CAMV-*.zip"
+      artifact: "CAMV-*"
       draft: false
       prerelease: false
+      on:
+        appveyor_repo_tag: true
+      auth_token:
+        secure: eD410Uh2srKjC/H5V/J1q8xLeMZQuo2ChyO5RiSlAq1wsmlkQhvqfRfoMed2/ZOk
