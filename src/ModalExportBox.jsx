@@ -28,7 +28,7 @@ var ModalExportBox = React.createClass({
 
         component.setState({
           dirChosen: true,
-          exportDirectory: dirName
+          exportDirectory: dirName[0]
         })
       }
     )
@@ -40,7 +40,7 @@ var ModalExportBox = React.createClass({
 
   export: function() {
     this.props.exportCallback(
-      this.state.exportDirectory[0],
+      this.state.exportDirectory,
       [
         this.state.exportAcceptSpectra,
         this.state.exportMaybeSpectra,
