@@ -11,10 +11,10 @@
     "react-dom": "^15.4.2",
     "react-hotkey": "^0.7.0",
     "react-native-fs": "^2.1.0-rc.1",
-    "electron-prebuilt": "^1.4.13"
+    "electron": "^1.4.15"
   },
   "devDependencies": {
-    "electron-prebuilt": "^1.4.13",
+    "electron": "^1.4.15",
     "electron-packager": "^8.5.0"
   },
   "scripts": {

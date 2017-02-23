@@ -12,8 +12,8 @@ environment:
 install:
     - ps: Install-Product node $env:nodejs_version
     - "cd src/"
-    - "npm install -g"
-    - "npm install bower electorn-packager -g"
+    - "npm install -g --dev"
+    - "npm install bower -g"
     - "bower install"
     - "cd .."
 

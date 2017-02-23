@@ -9,8 +9,8 @@ before_script:
 
 install:
   - cd src/
-  - npm install
-  - npm install bower
+  - npm install -g --dev
+  - npm install bower -g
   - bower install
   - cd ..
 
