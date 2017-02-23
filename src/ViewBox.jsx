@@ -1,9 +1,28 @@
 const fs = require('fs');
-const zlib = require('zlib');
+const http = require('http');
+const path = require('path');
 const util = require('util');
+const zlib = require('zlib');
+
+var domtoimage = require('dom-to-image');
 var update = require('react-addons-update');
+var remote = require('electron').remote
 
 var ViewBox = React.createClass({
+  decodeBase64Image: function (dataString) {
+    var matches = dataString.match(/^data:([A-Za-z-+\/]+);base64,(.+)$/),
+      response = {};
+
+    if (matches.length !== 3) {
+      return new Error('Invalid input string');
+    }
+
+    response.type = matches[1];
+    response.data = new Buffer(matches[2], 'base64');
+
+    return response;
+  },
+
   getInitialState: function() {
     return {
       selectedRun: null,
@@ -23,7 +42,8 @@ var ViewBox = React.createClass({
       //data: allData.fullTestData,
       data: [],
       //peptideData: allData.peptideData
-      peptideData: []
+      peptideData: [],
+      exporting: false
     }
   },
 
@@ -201,13 +221,75 @@ var ViewBox = React.createClass({
   setSubmitted: function(submitted) {
     this.setState({submitted: submitted})
   },
+  export: function() {
+    dialog.showOpenDialog(
+      {
+        title: "Export Spectra",
+        properties: ["createDirectory", "openDirectory"]
+      },
+      function(dirName) {
+        if (dirName === undefined || dirName.length != 1)
+          return;
+
+        fs.mkdir(
+          dirName[0],
+          function() {
+            this.setState({exporting: true});
+            var win = remote.getCurrentWindow();
+            var sizes = win.getBounds();
+            win.setSize(800, 650);
+            this.forceUpdate();
+
+            this.refs["fragmentSpectrum"].drawChart();
+            this.refs["precursorSpectrum"].drawChart();
+            this.refs["quantSpectrum"].drawChart();
+
+            domtoimage.toSvg(
+            //domtoimage.toPng(
+              document.getElementById('viewBox'),
+              {
+                width: 1147,
+                height: 522,
+                bgcolor: 'red',
+                filter: function(node) {
+                  return !~[
+                    "scanSelectionList", "save", "export", "setMinMZ", "setMaxMZ",
+                    "rejectButton", "maybeButton", "acceptButton"
+                  ].indexOf(node.id)
+                }
+              }
+            ).then(
+              function (dataUrl) {
+                fs.writeFile(
+                  path.join(dirName[0], "my-node.svg"),
+                  '<?xml version="1.0" encoding="UTF-8" standalone="no"?>' +
+                  dataUrl.slice("data:image/svg+xml;charset=utf-8,".length)
+                  // path.join(dirName[0], "my-node.png"),
+                  // this.decodeBase64Image(dataUrl).data
+                );
+
+                this.setState({exporting: false});
+                win.setSize(sizes.width, sizes.height);
+              }.bind(this)
+            );
+          }.bind(this)
+        );
+      }.bind(this)
+    )
+  },
   save: function() {
     dialog.showSaveDialog(
       {
-        filters: [{
-          name: 'text',
-          extensions: ['camv', 'camv.gz']
-        }]
+        filters: [
+          {
+            name: 'compressed JSON',
+            extensions: ['camv.gz']
+          },
+          {
+            name: "JSON",
+            extensions: ["camv"]
+          }
+        ]
       },
       function(fileName) {
         if (fileName === undefined)
@@ -309,66 +391,92 @@ var ViewBox = React.createClass({
 
     return (
       <div className="panel panel-default" id="viewBox">
-        <ModalFragmentBox showModal={this.state.fragmentSelectionModalIsOpen}
-                          closeCallback={this.closeFragmentSelectionModal}
-                          updateCallback={this.updateSelectedFragment}
-                          mz={this.state.selectedMz}
-                          fragmentMatches={this.state.fragmentMatches}
-                          currentLabel={this.state.currentLabel}/>
-        <ModalFileSelectionBox showModal={!this.state.submitted}
-                               setPeptideData={this.setPeptideData}
-                               setData={this.setData}
-                               setSubmitted={this.setSubmitted}/>
+        <ModalFragmentBox
+          showModal={this.state.fragmentSelectionModalIsOpen}
+          closeCallback={this.closeFragmentSelectionModal}
+          updateCallback={this.updateSelectedFragment}
+          mz={this.state.selectedMz}
+          fragmentMatches={this.state.fragmentMatches}
+          currentLabel={this.state.currentLabel}/>
+        <ModalFileSelectionBox
+          showModal={!this.state.submitted}
+          setPeptideData={this.setPeptideData}
+          setData={this.setData}
+          setSubmitted={this.setSubmitted}/>
 
         <div className="panel panel-default" id="scanSelectionList">
-          <ScanSelectionList data={this.state.data}
-                             peptideData={this.state.peptideData}
-                             updateSelectedProteinCallback={this.updateSelectedProtein}
-                             updateSelectedPeptideCallback={this.updateSelectedPeptide}
-                             updateSelectedScanCallback={this.updateSelectedScan}
-                             updateSelectedPTMPlacementCallback={this.updateSelectedPTMPlacement}
-                             updateAllCallback={this.updateAll}
-                             selectedProtein={this.state.selectedProtein}
-                             selectedPeptide={this.state.selectedPeptide}
-                             selectedScan={this.state.selectedScan}
-                             selectedPTMPlacement={this.state.selectedPTMPlacement}/>
+          <ScanSelectionList
+            data={this.state.data}
+            peptideData={this.state.peptideData}
+            updateSelectedProteinCallback={this.updateSelectedProtein}
+            updateSelectedPeptideCallback={this.updateSelectedPeptide}
+            updateSelectedScanCallback={this.updateSelectedScan}
+            updateSelectedPTMPlacementCallback={this.updateSelectedPTMPlacement}
+            updateAllCallback={this.updateAll}
+            selectedProtein={this.state.selectedProtein}
+            selectedPeptide={this.state.selectedPeptide}
+            selectedScan={this.state.selectedScan}
+            selectedPTMPlacement={this.state.selectedPTMPlacement}/>
         </div>
 
-        <div className="panel panel-default" id="sequenceBox">
-          <SequenceBox sequence={peptideSequence}
-                       bFound={bFound}
-                       yFound={yFound}/>
+        <div id="sequenceSpectraContainer" style={{width: this.state.exporting ? "100%" : "80%"}}>
+          <div className="panel panel-default" id="sequenceBox">
+            <SequenceBox
+              sequence={peptideSequence}
+              bFound={bFound}
+              yFound={yFound}/>
+          </div>
+          <div className="panel panel-default" id="spectra">
+            <div id="precursorQuantContainer">
+              <div
+                id="precursorSpectrumBox"
+                style={{
+                  height: this.state.exporting ? "50%" : "46.25%",
+                  width: this.state.exporting ? "95%" : "100%"
+                }}>
+                <PrecursorSpectrumBox
+                  ref="precursorSpectrum"
+                  spectrumData={precursorSpectrumData}
+                  precursorMz={precursorMz}
+                  isolationWindow={isolationWindow}
+                  chargeState={chargeState}
+                  ppm={50}/>
+              </div>
+              <div
+                id="quantSpectrumBox"
+                style={{
+                  height: this.state.exporting ? "50%" : "46.25%",
+                  width: this.state.exporting ? "95%" : "100%"
+                }}>
+                <QuantSpectrumBox
+                  ref="quantSpectrum"
+                  spectrumData={quantSpectrumData}
+                  quantMz={quantMz}
+                  ppm={50}/>
+              </div>
+              <div id="exportSave">
+                <button id="save" onClick={this.save}>Save</button>
+                <button id="export" onClick={this.export}>Export</button>
+              </div>
+            </div>
+            <div id="fragmentSpectrumBox">
+              <SpectrumBox
+                ref="fragmentSpectrum"
+                spectrumData={spectrumData}
+                minMZ={this.state.minMZ}
+                maxMZ = {this.state.maxMZ}
+                updateMinMZ={this.updateMinMZ}
+                updateMaxMZ={this.updateMaxMZ}
+                inputDisabled={inputDisabled}
+                matchData={matchData}
+                selectedPTMPlacement={this.state.selectedPTMPlacement}
+                updateChoice={this.updateChoice}
+                pointChosenCallback={this.updateSelectedMz}/>
+            </div>
+          </div>
         </div>
-        <div className="panel panel-default" id="spectra">
-          <div id="fragmentSpectrumBox">
-            <SpectrumBox spectrumData={spectrumData}
-                         minMZ={this.state.minMZ}
-                         maxMZ = {this.state.maxMZ}
-                         updateMinMZ={this.updateMinMZ}
-                         updateMaxMZ={this.updateMaxMZ}
-                         inputDisabled={inputDisabled}
-                         matchData={matchData}
-                         selectedPTMPlacement={this.state.selectedPTMPlacement}
-                         updateChoice={this.updateChoice}
-                         pointChosenCallback={this.updateSelectedMz}/>
-          </div>
-          <div id="precursorSpectrumBox">
-            <PrecursorSpectrumBox spectrumData={precursorSpectrumData}
-                                  precursorMz={precursorMz}
-                                  isolationWindow={isolationWindow}
-                                  chargeState={chargeState}
-                                  ppm={50}/>
-          </div>
-          <div id="quantSpectrumBox">
-            <QuantSpectrumBox spectrumData={quantSpectrumData}
-                                  quantMz={quantMz}
-                                  ppm={50}/>
-          </div>
-        </div>
-        <button id="save" onClick={this.save}>Save</button>
       </div>
     )
-
   }
 });
 
