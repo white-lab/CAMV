@@ -65,7 +65,7 @@ var ModalFileSelectionBox = React.createClass({
   submit: function() {
     this.props.setData(this.state.data)
     this.props.setPeptideData(this.state.peptideData)
-    this.props.setSubmitted(true)
+    this.props.setSubmitted(true, this.state.fileName)
   },
 
   render: function() {
