@@ -13,8 +13,7 @@ install:
     - ps: Install-Product node $env:nodejs_version
     - "cd src/"
     - "npm install"
-    - "npm install bower"
-    - "export PATH=$(pwd)/src/node_modules/.bin:$PATH"
+    - "npm install bower -g"
     - "bower install"
     - "cd .."
 
