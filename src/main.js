@@ -4,6 +4,8 @@ const electron = require('electron');
 const {app} = electron;
 const {BrowserWindow} = electron;
 
+require('crash-reporter').start();
+
 var mainWindow = null;
 
 app.on('window-all-closed', function() {
