@@ -2,7 +2,7 @@
 
 [![Build Status](https://img.shields.io/travis/white-lab/CAMV.svg)](https://travis-ci.org/white-lab/CAMV)
 [![Build status](https://ci.appveyor.com/api/projects/status/iva4po0glnswboc1?svg=true)](https://ci.appveyor.com/project/naderm/camv)
-[![Requirements Status](https://requires.io/github/white-lab/camv/requirements.svg?branch=master)](https://requires.io/github/white-lab/camv/requirements/?branch=master)
+[![Requirements Status](https://requires.io/github/white-lab/CAMV/requirements.svg?branch=master)](https://requires.io/github/white-lab/CAMV/requirements/?branch=master)
 
 Tool for validation proteomic mass spectrometry peptide assignments.
 
