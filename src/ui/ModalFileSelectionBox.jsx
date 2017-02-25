@@ -6,27 +6,26 @@ import zlib from 'zlib'
 
 const { dialog } = require('electron').remote
 
-var ModalFileSelectionBox = React.createClass({
-  getInitialState: function() {
-    return {
+class ModalFileSelectionBox extends React.Component {
+  constructor(props) {
+    super(props)
+    this.state = {
       fileChosen: false,
       data: [],
       peptideData: [],
-      fileName: ''
+      fileName: '',
     }
-  },
+  }
 
-  setStateFromText: function(data) {
+  setStateFromText(data) {
     let inputData = JSON.parse(data);
     this.setState({
       data: inputData.scanData,
       peptideData: inputData.peptideData
     });
-  },
+  }
 
-  update: function() {
-    var component = this;
-
+  update() {
     dialog.showOpenDialog(
       {
         filters: [{
@@ -43,38 +42,38 @@ var ModalFileSelectionBox = React.createClass({
         fs.readFile(
           fileName,
           (compressed ? null : 'utf-8'),
-          (err, data) => {
+          function (err, data) {
             if (err) { console.log(err); }
 
             if (compressed) {
               zlib.gunzip(data, (err, out) => {
                 if (err) { console.log(err); }
-                component.setStateFromText(out);
+                this.setStateFromText(out);
               })
             } else {
-              component.setStateFromText(data);
+              this.setStateFromText(data);
             }
-          }
+          }.bind(this)
         );
 
-        component.setState({
+        this.setState({
           fileChosen: true,
-          fileName: fileName
+          fileName: fileName,
         })
       }.bind(this)
     )
-  },
+  }
 
-  submit: function() {
+  submit() {
     this.props.setData(this.state.data)
     this.props.setPeptideData(this.state.peptideData)
     this.props.setSubmitted(true, this.state.fileName)
-  },
+  }
 
-  render: function() {
+  render() {
     return (
       <Modal
-        onHide={this.submit}
+        onHide={this.submit.bind(this)}
         show={this.props.showModal}
       >
         <Modal.Header>
@@ -85,7 +84,7 @@ var ModalFileSelectionBox = React.createClass({
         <Modal.Body>
           <button
             id="fileSelect"
-            onClick={this.update}
+            onClick={this.update.bind(this)}
           >
             Choose File
           </button>
@@ -94,7 +93,7 @@ var ModalFileSelectionBox = React.createClass({
         <Modal.Footer>
           <Button
             disabled={!this.state.fileChosen}
-            onClick={this.submit}
+            onClick={this.submit.bind(this)}
           >
             Done
           </Button>
@@ -102,6 +101,13 @@ var ModalFileSelectionBox = React.createClass({
       </Modal>
     )
   }
-});
+}
+
+ModalFileSelectionBox.propTypes = {
+  setData: React.PropTypes.func.isRequired,
+  setPeptideData: React.PropTypes.func.isRequired,
+  setSubmitted: React.PropTypes.func.isRequired,
+  showModal: React.PropTypes.bool.isRequired,
+}
 
 module.exports = ModalFileSelectionBox

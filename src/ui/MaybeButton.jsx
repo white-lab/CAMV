@@ -1,22 +1,32 @@
 import React from 'react'
 
-var MaybeButton = React.createClass({
-  onChange: function() {
+class MaybeButton extends React.Component {
+  onChange() {
     this.props.callback('maybe')
-  },
+  }
 
-  render: function() {
+  render() {
     return (
       <input
         className="choiceButton"
         disabled={this.props.disabled}
         id="maybeButton"
-        onClick={this.onChange}
+        onClick={this.onChange.bind(this)}
         type="button"
         value="Maybe"
       />
     )
   }
-});
+}
+
+MaybeButton.propTypes = {
+  disabled: React.PropTypes.bool,
+  callback: React.PropTypes.func,
+}
+
+MaybeButton.defaultProps = {
+  disabled: true,
+  callback: null,
+}
 
 module.exports = MaybeButton

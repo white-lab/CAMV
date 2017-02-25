@@ -3,8 +3,44 @@ import React from 'react'
 class QuantSpectrumBox extends React.Component {
   constructor(props) {
     super(props)
-    this.state = {chartLoaded: false}
+    this.state = {
+      chartLoaded: false,
+    }
     this.handleResize = this.handleResize.bind(this);
+  }
+
+  componentDidMount() {
+    window.addEventListener('resize', this.handleResize);
+
+    var component = this;
+
+    // Load the chart API
+    return jQuery.ajax({
+      dataType: "script",
+      cache: true,
+      url: "https://www.google.com/jsapi",
+    })
+      .done(function () {
+        google.load("visualization", "1", {
+          packages:["corechart"],
+          callback: function () {
+            component.drawChart();
+            component.setState({chartLoaded: true})
+          },
+        });
+      });
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    if (this.state.chartLoaded) {
+      if (prevProps.spectrumData != this.props.spectrumData) {
+        this.drawChart();
+      }
+    }
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener('resize', this.handleResize);
   }
 
   drawChart() {
@@ -77,40 +113,6 @@ class QuantSpectrumBox extends React.Component {
     );
 
     chart.draw(data, options);
-  }
-
-  componentDidMount() {
-    window.addEventListener('resize', this.handleResize);
-
-    var component = this;
-
-    // Load the chart API
-    return jQuery.ajax({
-      dataType: "script",
-      cache: true,
-      url: "https://www.google.com/jsapi",
-    })
-      .done(function () {
-        google.load("visualization", "1", {
-          packages:["corechart"],
-          callback: function () {
-            component.drawChart();
-            component.setState({chartLoaded: true})
-          },
-        });
-      });
-  }
-
-  componentDidUpdate(prevProps, prevState) {
-    if (this.state.chartLoaded) {
-      if (prevProps.spectrumData != this.props.spectrumData) {
-        this.drawChart();
-      }
-    }
-  }
-
-  componentWillUnmount() {
-    window.removeEventListener('resize', this.handleResize);
   }
 
   handleResize() {

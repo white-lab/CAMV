@@ -9,31 +9,57 @@ import SetMinMZ from './SetMinMZ'
 
 hotkey.activate();
 
-var SpectrumBox = React.createClass({
-  getInitialState: function() {
-    return {chartLoaded: false}
-  },
+class SpectrumBox extends React.Component {
+  constructor(props) {
+    super(props)
+    this.state = {
+      chartLoaded: false,
+    }
+    this.handleResize = this.handleResize.bind(this);
+    this.handleHotkey = this.handleHotkey.bind(this)
+  }
 
-  mixins: [hotkey.Mixin('handleHotkey')],
+  componentDidMount() {
+    window.addEventListener('resize', this.handleResize);
+    hotkey.addHandler(this.handleHotkey)
 
-  handleHotkey: function(e) {
-    if (!this.props.inputDisabled) {
-      switch (e.key) {
-        case 'a':
-          this.props.updateChoice('accept');
-          break;
-        case 's':
-          this.props.updateChoice('maybe');
-          break;
-        case 'd':
-          this.props.updateChoice('reject');
-          break;
+    var component = this;
+
+    // Load the chart API
+    return jQuery.ajax({
+      dataType: "script",
+      cache: true,
+      url: "https://www.google.com/jsapi",
+    })
+      .done(function () {
+        google.load("visualization", "1", {
+          packages:["corechart"],
+          callback: function () {
+            component.setState({chartLoaded: true})
+            component.drawChart();
+          },
+        });
+      });
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    if (this.state.chartLoaded) {
+      if (prevProps.spectrumData != this.props.spectrumData) {
+        this.drawChart();
+      } else if (prevProps.selectedPTMPlacement != this.props.selectedPTMPlacement) {
+        this.drawChart();
+      } else if (prevProps.minMZ != this.props.minMZ || prevProps.maxMZ != this.props.maxMZ) {
+        this.drawChart();
       }
     }
-  },
+  }
 
-  drawChart: function() {
+  componentWillUnmount() {
+    window.removeEventListener('resize', this.handleResize);
+    hotkey.removeHandler(this.handleHotkey)
+  }
 
+  drawChart() {
     var minMZ = Math.max(0, this.props.minMZ == null ? 0 : this.props.minMZ)
     var maxMZ = 1
     var max_y = 15
@@ -139,56 +165,34 @@ var SpectrumBox = React.createClass({
       }
     }
     chart.draw(data, options);
-  },
+  }
 
-  componentDidMount: function() {
-    window.addEventListener('resize', this.handleResize);
+  handleHotkey(e) {
+    if (!this.props.inputDisabled) {
+      switch (e.key) {
+        case 'a':
+          this.props.updateChoice('accept');
+          break;
+        case 's':
+          this.props.updateChoice('maybe');
+          break;
+        case 'd':
+          this.props.updateChoice('reject');
+          break;
+      }
+    }
+  }
 
-    var component = this;
-
-    // Load the chart API
-    return jQuery.ajax({
-      dataType: "script",
-      cache: true,
-      url: "https://www.google.com/jsapi",
-    })
-      .done(function () {
-        google.load("visualization", "1", {
-          packages:["corechart"],
-          callback: function () {
-            component.setState({chartLoaded: true})
-            component.drawChart();
-          },
-        });
-      });
-  },
-
-  componentWillUnmount: function() {
-    window.removeEventListener('resize', this.handleResize);
-  },
-
-  handleResize: function(e) {
+  handleResize(e) {
     if (this.state.chartLoaded) {
       this.drawChart();
     }
-  },
+  }
 
-  componentDidUpdate: function (prevProps, prevState) {
-    if (this.state.chartLoaded) {
-      if (prevProps.spectrumData != this.props.spectrumData) {
-        this.drawChart();
-      } else if (prevProps.selectedPTMPlacement != this.props.selectedPTMPlacement) {
-        this.drawChart();
-      } else if (prevProps.minMZ != this.props.minMZ || prevProps.maxMZ != this.props.maxMZ) {
-        this.drawChart();
-      }
-    }
-  },
-
-  render: function() {
+  render() {
     return (
       <div>
-        <div id="fragmentGoogleChart"></div>
+        <div id="fragmentGoogleChart" />
         <div id="updateBox">
           <div className="setMinMZ">
             <SetMinMZ
@@ -231,6 +235,27 @@ var SpectrumBox = React.createClass({
       </div>
     );
   }
-});
+}
+
+SpectrumBox.propTypes = {
+  minMZ: React.PropTypes.number,
+  maxMZ: React.PropTypes.number,
+  spectrumData: React.PropTypes.array,
+  updateChoice: React.PropTypes.func.isRequired,
+  updateMinMZ: React.PropTypes.func.isRequired,
+  updateMaxMZ: React.PropTypes.func.isRequired,
+  pointChosenCallback: React.PropTypes.func.isRequired,
+  inputDisabled: React.PropTypes.bool,
+  selectedPTMPlacement: React.PropTypes.number,
+  matchData: React.PropTypes.array.isRequired,
+}
+
+SpectrumBox.defaultProps = {
+  minMZ: null,
+  maxMZ: null,
+  spectrumData: null,
+  inputDisabled: true,
+  selectedPTMPlacement: null,
+}
 
 module.exports = SpectrumBox

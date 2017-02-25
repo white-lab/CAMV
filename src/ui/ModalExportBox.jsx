@@ -3,19 +3,20 @@ import { Modal, Checkbox, Button } from 'react-bootstrap'
 
 const { dialog } = require('electron').remote
 
-var ModalExportBox = React.createClass({
-  getInitialState: function() {
-    return {
+class ModalExportBox extends React.Component {
+  constructor(props) {
+    super(props)
+    this.state = {
       exportDirectory: null,
       dirChosen: false,
       exportAcceptSpectra: true,
       exportMaybeSpectra: false,
       exportRejectSpectra: false,
-      exportTables: true
+      exportTables: true,
     }
-  },
+  }
 
-  updateDir: function() {
+  updateDir() {
     var component = this;
 
     dialog.showOpenDialog(
@@ -33,13 +34,13 @@ var ModalExportBox = React.createClass({
         })
       }
     )
-  },
+  }
 
-  close: function() {
+  close() {
     this.props.closeCallback();
-  },
+  }
 
-  export: function() {
+  export() {
     this.props.exportCallback(
       this.state.exportDirectory,
       [
@@ -50,24 +51,26 @@ var ModalExportBox = React.createClass({
       this.state.exportTables
     );
     this.close();
-  },
+  }
 
-  render: function() {
+  render() {
     return (
       <Modal
-        onHide={this.close}
+        onHide={this.close.bind(this)}
         show={this.props.showModal}
       >
         <Modal.Header>
           <Modal.Title>
-            <div>Export Spectra / Validation Tables</div>
+            <div>
+              Export Spectra / Validation Tables
+            </div>
           </Modal.Title>
         </Modal.Header>
         <Modal.Body>
           <div>
             <button
               id="exportDir"
-              onClick={this.updateDir}
+              onClick={this.updateDir.bind(this)}
               value={this.state.exportDirectory}
             >
               Choose Directory
@@ -122,12 +125,12 @@ var ModalExportBox = React.createClass({
         <Modal.Footer>
           <Button
             disabled={!this.state.dirChosen}
-            onClick={this.export}
+            onClick={this.export.bind(this)}
           >
             Export
           </Button>
           <Button
-            onClick={this.close}
+            onClick={this.close.bind(this)}
           >
             Cancel
           </Button>
@@ -135,6 +138,12 @@ var ModalExportBox = React.createClass({
       </Modal>
     )
   }
-});
+}
+
+ModalExportBox.propTypes = {
+  exportCallback: React.PropTypes.func.isRequired,
+  closeCallback: React.PropTypes.func.isRequired,
+  showModal: React.PropTypes.bool.isRequired,
+}
 
 module.exports = ModalExportBox

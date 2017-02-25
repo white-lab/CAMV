@@ -1,4 +1,5 @@
 import React from 'react'
+import { Button } from 'react-bootstrap'
 
 import fs from 'fs'
 import path from 'path'
@@ -19,23 +20,10 @@ import SequenceBox from './SequenceBox'
 import SpectrumBox from './SpectrumBox'
 
 
-var ViewBox = React.createClass({
-  decodeBase64Image: function (dataString) {
-    let matches = dataString.match(/^data:([A-Za-z-+\/]+);base64,(.+)$/)
-    let response = {}
-
-    if (matches.length !== 3) {
-      return new Error('Invalid input string');
-    }
-
-    response.type = matches[1];
-    response.data = new Buffer(matches[2], 'base64');
-
-    return response;
-  },
-
-  getInitialState: function() {
-    return {
+class ViewBox extends React.Component {
+  constructor(props) {
+    super(props)
+    this.state = {
       selectedRun: null,
       selectedSearch:null,
       submitted: false,
@@ -51,27 +39,48 @@ var ViewBox = React.createClass({
       maxPPM: 100,
       minMZ: 0,
       maxMZ: null,
-      //data: allData.fullTestData,
       data: [],
-      //peptideData: allData.peptideData
       peptideData: [],
-      exporting: false
+      exporting: false,
     }
-  },
+  }
 
-  updateSelectedProtein: function(proteinId) {
-    this.setState({selectedProtein: proteinId})
-  },
-  updateSelectedPeptide: function(peptideId) {
-    this.setState({selectedPeptide: peptideId})
-  },
-  updateSelectedScan: function(scanId) {
-    this.setState({selectedScan: scanId, minMZ: 0, maxMZ: null})
-  },
-  updateSelectedPTMPlacement: function(modsId) {
-    this.setState({selectedPTMPlacement: modsId})
-  },
-  updateAll: function(proteinId, peptideId, scanId, modsId) {
+  componentDidUpdate(prevProps, prevState) {
+    if (prevState.selectedRun != this.state.selectedRun) {
+      // console.log('New run: ' + this.state.selectedRun)
+    }
+    if (prevState.selectedSearch != this.state.selectedSearch) {
+      // console.log('New search: ' + this.state.selectedSearch)
+    }
+  }
+
+  updateSelectedProtein(proteinId) {
+    this.setState({
+      selectedProtein: proteinId,
+    })
+  }
+
+  updateSelectedPeptide(peptideId) {
+    this.setState({
+      selectedPeptide: peptideId,
+    })
+  }
+
+  updateSelectedScan(scanId) {
+    this.setState({
+      selectedScan: scanId,
+      minMZ: 0,
+      maxMZ: null,
+    })
+  }
+
+  updateSelectedPTMPlacement(modsId) {
+    this.setState({
+      selectedPTMPlacement: modsId,
+    })
+  }
+
+  updateAll(proteinId, peptideId, scanId, modsId) {
     this.setState({
       selectedProtein: proteinId,
       selectedPeptide: peptideId,
@@ -80,21 +89,29 @@ var ViewBox = React.createClass({
       maxMZ: null,
       selectedPTMPlacement: modsId
     })
-  },
-  updateMinMZ: function(newMinMZ) {
-    if (newMinMZ > 0) {
-      this.setState({minMZ: newMinMZ})
-    } else {
-      this.setState({minMZ: 0})
-    }
-  },
-  updateMaxMZ: function(newMaxMZ) {
-    if (newMaxMZ > this.state.minMZ) {
-      this.setState({maxMZ: newMaxMZ})
-    }
-  },
+  }
 
-  updateSelectedMz: function(mz) {
+  updateMinMZ(newMinMZ) {
+    if (newMinMZ > 0) {
+      this.setState({
+        minMZ: newMinMZ,
+      })
+    } else {
+      this.setState({
+        minMZ: 0,
+      })
+    }
+  }
+
+  updateMaxMZ(newMaxMZ) {
+    if (newMaxMZ > this.state.minMZ) {
+      this.setState({
+        maxMZ: newMaxMZ,
+      })
+    }
+  }
+
+  updateSelectedMz(mz) {
     let data = this.state.data[this.state.selectedProtein]
       .peptides[this.state.selectedPeptide]
       .scans[this.state.selectedScan]
@@ -140,18 +157,18 @@ var ViewBox = React.createClass({
       fragmentMatches: matches,
       currentLabel: currentLabel
     })
-  },
+  }
 
-
-  closeFragmentSelectionModal: function() {
+  closeFragmentSelectionModal() {
     this.setState({
       fragmentSelectionModalIsOpen: false,
       fragmentMatches: [],
       selectedMz: null,
       currentLabel: ''
     })
-  },
-  updateSelectedFragment: function(matchId) {
+  }
+
+  updateSelectedFragment(matchId) {
     if (
       this.state.selectedProtein == null ||
       this.state.selectedPeptide == null ||
@@ -206,17 +223,17 @@ var ViewBox = React.createClass({
     this.setState({
       data: update(this.state.data, protein_target)
     })
-  },
+  }
 
-  closeExportModal: function() {
+  closeExportModal() {
     this.setState({modalExportIsOpen: false})
-  },
+  }
 
-  export_tables: function() {
+  export_tables() {
     // Export spectra as xls file
-  },
+  }
 
-  iterate_spectra: function*(export_spectras) {
+  *iterate_spectra(export_spectras) {
     while (export_spectras.length < 4) {
       export_spectras.push(false);
     }
@@ -254,9 +271,9 @@ var ViewBox = React.createClass({
         }
       }
     }
-  },
+  }
 
-  spectraToImage: async function (dirName, export_spectras) {
+  async spectraToImage(dirName, export_spectras) {
     this.setState({exporting: true});
     var win = remote.getCurrentWindow();
     var sizes = win.getBounds();
@@ -320,12 +337,12 @@ var ViewBox = React.createClass({
         this.refs["scanSelectionList"].update(...current_node);
       }.bind(this)
     )
-  },
+  }
 
-  exportCallback: function(dirName, export_spectras, export_tables) {
-    this.setState({modalExportIsOpen: false});
-
-    console.log(dirName)
+  exportCallback(dirName, export_spectras, export_tables) {
+    this.setState({
+      modalExportIsOpen: false,
+    })
 
     if (export_tables || export_spectras.some(i => i)) {
       fs.mkdir(
@@ -343,9 +360,9 @@ var ViewBox = React.createClass({
         }.bind(this)
       )
     }
-  },
+  }
 
-  updateChoice: function(choice) {
+  updateChoice(choice) {
     /* Messy solution because javascript doesn't allow variables as dict keys */
     let state_target = {state: {$set: choice}};
     let ptm_target = {};
@@ -366,42 +383,47 @@ var ViewBox = React.createClass({
     this.setState({
       data: update(this.state.data, protein_target)
     })
-  },
+  }
 
-  componentDidUpdate: function(prevProps, prevState) {
-    if (prevState.selectedRun != this.state.selectedRun) {
-      // console.log('New run: ' + this.state.selectedRun)
-    }
-    if (prevState.selectedSearch != this.state.selectedSearch) {
-      // console.log('New search: ' + this.state.selectedSearch)
-    }
-  },
+  decodeBase64Image(dataString) {
+    let matches = dataString.match(/^data:([A-Za-z-+\/]+);base64,(.+)$/)
+    let response = {}
 
-  goButtonClicked: function() {
+    if (matches.length !== 3) {
+      return new Error('Invalid input string');
+    }
+
+    response.type = matches[1];
+    response.data = new Buffer(matches[2], 'base64');
+
+    return response;
+  }
+
+  goButtonClicked() {
     this.setState({submitted: true})
-  },
+  }
 
-  setData: function(data) {
+  setData(data) {
     this.setState({data: data})
-  },
+  }
 
-  setPeptideData: function(peptideData) {
+  setPeptideData(peptideData) {
     this.setState({peptideData: peptideData})
-  },
+  }
 
-  setSubmitted: function(submitted, fileName) {
+  setSubmitted(submitted, fileName) {
     this.setState({submitted: submitted})
     this.refs["modalExportBox"].setState({
       exportDirectory: fileName.match(/(.*)[\/\\]/)[1] || '',
       dirChosen: true
     })
-  },
+  }
 
-  openExport: function() {
+  openExport() {
     this.setState({modalExportIsOpen: true})
-  },
+  }
 
-  save: function() {
+  save() {
     dialog.showSaveDialog(
       {
         filters: [
@@ -455,9 +477,9 @@ var ViewBox = React.createClass({
         }
       }.bind(this)
     );
-  },
+  }
 
-  render: function() {
+  render() {
     let spectrumData = []
     let precursorSpectrumData = []
     let precursorMz = null
@@ -514,37 +536,43 @@ var ViewBox = React.createClass({
     }
 
     return (
-      <div className="panel panel-default" id="viewBox">
+      <div
+        className="panel panel-default"
+        id="viewBox"
+      >
         <ModalFragmentBox
           showModal={this.state.fragmentSelectionModalIsOpen}
-          closeCallback={this.closeFragmentSelectionModal}
-          updateCallback={this.updateSelectedFragment}
+          closeCallback={this.closeFragmentSelectionModal.bind(this)}
+          updateCallback={this.updateSelectedFragment.bind(this)}
           mz={this.state.selectedMz}
           fragmentMatches={this.state.fragmentMatches}
           currentLabel={this.state.currentLabel}
         />
         <ModalFileSelectionBox
           showModal={!this.state.submitted}
-          setPeptideData={this.setPeptideData}
-          setData={this.setData}
-          setSubmitted={this.setSubmitted}
+          setPeptideData={this.setPeptideData.bind(this)}
+          setData={this.setData.bind(this)}
+          setSubmitted={this.setSubmitted.bind(this)}
         />
         <ModalExportBox
           ref="modalExportBox"
           showModal={this.state.modalExportIsOpen}
-          closeCallback={this.closeExportModal}
-          exportCallback={this.exportCallback}
+          closeCallback={this.closeExportModal.bind(this)}
+          exportCallback={this.exportCallback.bind(this)}
         />
-        <div className="panel panel-default" id="scanSelectionList">
+        <div
+          className="panel panel-default"
+          id="scanSelectionList"
+        >
           <ScanSelectionList
             ref="scanSelectionList"
             data={this.state.data}
             peptideData={this.state.peptideData}
-            updateSelectedProteinCallback={this.updateSelectedProtein}
-            updateSelectedPeptideCallback={this.updateSelectedPeptide}
-            updateSelectedScanCallback={this.updateSelectedScan}
-            updateSelectedPTMPlacementCallback={this.updateSelectedPTMPlacement}
-            updateAllCallback={this.updateAll}
+            updateSelectedProteinCallback={this.updateSelectedProtein.bind(this)}
+            updateSelectedPeptideCallback={this.updateSelectedPeptide.bind(this)}
+            updateSelectedScanCallback={this.updateSelectedScan.bind(this)}
+            updateSelectedPTMPlacementCallback={this.updateSelectedPTMPlacement.bind(this)}
+            updateAllCallback={this.updateAll.bind(this)}
             selectedProtein={this.state.selectedProtein}
             selectedPeptide={this.state.selectedPeptide}
             selectedScan={this.state.selectedScan}
@@ -553,22 +581,32 @@ var ViewBox = React.createClass({
         </div>
         <div
           id="sequenceSpectraContainer"
-          style={{width: this.state.exporting ? "100%" : "80%"}}>
-          <div className="panel panel-default" id="sequenceBox">
+          style={{width: this.state.exporting ? "100%" : "80%"}}
+        >
+          <div
+            className="panel panel-default"
+            id="sequenceBox"
+          >
             <SequenceBox
               bFound={bFound}
               sequence={peptideSequence}
               yFound={yFound}
             />
           </div>
-          <div className="panel panel-default" id="spectra">
-            <div id="precursorQuantContainer">
+          <div
+            className="panel panel-default"
+            id="spectra"
+          >
+            <div
+              id="precursorQuantContainer"
+            >
               <div
                 id="precursorSpectrumBox"
                 style={{
                   height: this.state.exporting ? "50%" : "46.25%",
                   width: this.state.exporting ? "95%" : "100%"
-                }}>
+                }}
+              >
                 <PrecursorSpectrumBox
                   ref="precursorSpectrum"
                   spectrumData={precursorSpectrumData}
@@ -583,7 +621,8 @@ var ViewBox = React.createClass({
                 style={{
                   height: this.state.exporting ? "50%" : "46.25%",
                   width: this.state.exporting ? "95%" : "100%"
-                }}>
+                }}
+              >
                 <QuantSpectrumBox
                   ref="quantSpectrum"
                   spectrumData={quantSpectrumData}
@@ -592,27 +631,35 @@ var ViewBox = React.createClass({
                 />
               </div>
               <div id="exportSave">
-                <button id="save" onClick={this.save}>
+                <Button
+                  id="save"
+                  onClick={this.save.bind(this)}
+                >
                   Save
-                </button>
-                <button id="openExport" onClick={this.openExport}>
+                </Button>
+                <Button
+                  id="openExport"
+                  onClick={this.openExport.bind(this)}
+                >
                   Export
-                </button>
+                </Button>
               </div>
             </div>
-            <div id="fragmentSpectrumBox">
+            <div
+              id="fragmentSpectrumBox"
+            >
               <SpectrumBox
                 ref="fragmentSpectrum"
                 spectrumData={spectrumData}
                 minMZ={this.state.minMZ}
-                maxMZ = {this.state.maxMZ}
-                updateMinMZ={this.updateMinMZ}
-                updateMaxMZ={this.updateMaxMZ}
+                maxMZ={this.state.maxMZ}
+                updateMinMZ={this.updateMinMZ.bind(this)}
+                updateMaxMZ={this.updateMaxMZ.bind(this)}
                 inputDisabled={inputDisabled}
                 matchData={matchData}
                 selectedPTMPlacement={this.state.selectedPTMPlacement}
-                updateChoice={this.updateChoice}
-                pointChosenCallback={this.updateSelectedMz}
+                updateChoice={this.updateChoice.bind(this)}
+                pointChosenCallback={this.updateSelectedMz.bind(this)}
               />
             </div>
           </div>
@@ -620,6 +667,6 @@ var ViewBox = React.createClass({
       </div>
     )
   }
-});
+}
 
 module.exports = ViewBox

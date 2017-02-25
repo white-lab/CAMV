@@ -1,11 +1,11 @@
 import React from 'react'
 
-var RejectButton = React.createClass({
-  onChange: function() {
+class RejectButton extends React.Component {
+  onChange() {
     this.props.callback('reject')
-  },
+  }
 
-  render: function() {
+  render() {
     return (
       <input
         id="rejectButton"
@@ -13,10 +13,20 @@ var RejectButton = React.createClass({
         type="button"
         value="Reject"
         disabled={this.props.disabled}
-        onClick={this.onChange}
+        onClick={this.onChange.bind(this)}
       />
     )
   }
-});
+}
+
+RejectButton.propTypes = {
+  disabled: React.PropTypes.bool,
+  callback: React.PropTypes.func,
+}
+
+RejectButton.defaultProps = {
+  disabled: true,
+  callback: null,
+}
 
 module.exports = RejectButton
