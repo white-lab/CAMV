@@ -1,7 +1,7 @@
-import React from 'react';
-import { Modal, Checkbox, Button } from 'react-bootstrap';
+import React from 'react'
+import { Modal, Checkbox, Button } from 'react-bootstrap'
 
-var {dialog} = require('electron').remote;
+const { dialog } = require('electron').remote
 
 var ModalExportBox = React.createClass({
   getInitialState: function() {

@@ -1,5 +1,6 @@
-import React from 'react';
-import hotkey from 'react-hotkey';
+import React from 'react'
+import hotkey from 'react-hotkey'
+
 hotkey.activate();
 
 var AcceptButton = React.createClass({

@@ -1,9 +1,10 @@
-import React from 'react';
-import { Modal, Button } from 'react-bootstrap';
+import React from 'react'
+import { Modal, Button } from 'react-bootstrap'
 
-const {dialog} = require('electron').remote;
-const fs = require('fs');
-const zlib = require('zlib');
+import fs from 'fs'
+import zlib from 'zlib'
+
+const { dialog } = require('electron').remote
 
 var ModalFileSelectionBox = React.createClass({
   getInitialState: function() {

@@ -1,22 +1,22 @@
-import React from 'react';
+import React from 'react'
 
-const fs = require('fs');
-const path = require('path');
-const zlib = require('zlib');
+import fs from 'fs'
+import path from 'path'
+import zlib from 'zlib'
 
-const domtoimage = require('dom-to-image');
-const update = require('react-addons-update');
+import domtoimage from 'dom-to-image'
+import update from 'react-addons-update'
 const remote = require('electron').remote
-const {dialog} = require('electron').remote;
+const { dialog } = require('electron').remote
 
-const ModalExportBox = require('./ModalExportBox');
-const ModalFileSelectionBox = require('./ModalFileSelectionBox');
-const ModalFragmentBox = require('./ModalFragmentBox');
-const PrecursorSpectrumBox = require('./PrecursorSpectrumBox');
-const QuantSpectrumBox = require('./QuantSpectrumBox');
-const ScanSelectionList = require('./ScanSelectionList');
-const SequenceBox = require('./SequenceBox');
-const SpectrumBox = require('./SpectrumBox');
+import ModalExportBox from './ModalExportBox'
+import ModalFileSelectionBox from './ModalFileSelectionBox'
+import ModalFragmentBox from './ModalFragmentBox'
+import PrecursorSpectrumBox from './PrecursorSpectrumBox'
+import QuantSpectrumBox from './QuantSpectrumBox'
+import ScanSelectionList from './ScanSelectionList'
+import SequenceBox from './SequenceBox'
+import SpectrumBox from './SpectrumBox'
 
 
 var ViewBox = React.createClass({

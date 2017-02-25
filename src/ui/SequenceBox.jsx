@@ -1,4 +1,4 @@
-import React from 'react';
+import React from 'react'
 
 var YIonElement = React.createClass({
   render: function() {
