@@ -11,3 +11,4 @@ src/testData.json
 CAMV-*-*/
 *.zip
 *-debug.log
+.eslintcache
