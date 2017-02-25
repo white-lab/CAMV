@@ -79,7 +79,9 @@ var ScanNumberListItem = React.createClass({
       return (
         <div>
           <li className="scan" onClick={this.toggle}>
-            <span className={selected ? 'selectedListItem' : 'unselectedListItem'}>Scan: {this.props.scan.scanNumber}</span>
+            <span
+              className={selected ? 'selectedListItem' : 'unselectedListItem'}
+            >Scan: {this.props.scan.scanNumber}</span>
           </li>
           <ul>
             {
@@ -87,17 +89,18 @@ var ScanNumberListItem = React.createClass({
                 (ptmPlacement, i) => {
                   return (
                     <PTMPlacementListItem
-                      key={ptmPlacement.id}
                       choice={this.props.scan.choiceData[i].state}
+                      key={ptmPlacement.id}
                       proteinId={this.props.proteinId}
                       peptideId={this.props.peptideId}
                       scanId={this.props.scan.scanId}
                       ptmPlacement={ptmPlacement}
-                      update={this.props.update}
                       selectedProtein={this.props.selectedProtein}
                       selectedPeptide={this.props.selectedPeptide}
                       selectedScan={this.props.selectedScan}
-                      selectedPTMPlacement={this.props.selectedPTMPlacement}/>
+                      selectedPTMPlacement={this.props.selectedPTMPlacement}
+                      update={this.props.update}
+                    />
                   )
                 }
               )
@@ -108,7 +111,9 @@ var ScanNumberListItem = React.createClass({
     } else {
       return (
         <li className="scan" onClick={this.toggle}>
-          <span className={selected ? 'selectedListItem' : 'unselectedListItem'}>Scan: {this.props.scan.scanNumber}</span>
+          <span
+            className={selected ? 'selectedListItem' : 'unselectedListItem'}
+          >Scan: {this.props.scan.scanNumber}</span>
         </li>
       )
     }
@@ -162,11 +167,12 @@ var PeptideListItem = React.createClass({
                       peptideId={this.props.peptideId}
                       scan={scan}
                       ptmPlacements={peptideModificationState.mods}
-                      update={this.props.update}
                       selectedProtein={this.props.selectedProtein}
                       selectedPeptide={this.props.selectedPeptide}
                       selectedScan={this.props.selectedScan}
-                      selectedPTMPlacement={this.props.selectedPTMPlacement}/>
+                      selectedPTMPlacement={this.props.selectedPTMPlacement}
+                      update={this.props.update}
+                    />
                   )
                 }
               )
@@ -243,7 +249,8 @@ var ProteinListItem = React.createClass({
                       selectedProtein={this.props.selectedProtein}
                       selectedPeptide={this.props.selectedPeptide}
                       selectedPTMPlacement={this.props.selectedPTMPlacement}
-                      selectedScan={this.props.selectedScan}/>
+                      selectedScan={this.props.selectedScan}
+                    />
                   )
                 }
               )
@@ -410,7 +417,8 @@ var ScanSelectionList = React.createClass({
                   selectedPeptide={this.props.selectedPeptide}
                   selectedScan={this.props.selectedScan}
                   selectedPTMPlacement={this.props.selectedPTMPlacement}
-                  peptideData={this.props.peptideData}/>
+                  peptideData={this.props.peptideData}
+                />
               )
             }
           )

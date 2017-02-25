@@ -73,26 +73,29 @@ var ModalFileSelectionBox = React.createClass({
 
   render: function() {
     return (
-      <Modal show={this.props.showModal} onHide={this.submit}>
+      <Modal
+        onHide={this.submit}
+        show={this.props.showModal}
+      >
         <Modal.Header>
           <Modal.Title>
-            <div></div>
+            <div>Load CAMV Data Set</div>
           </Modal.Title>
         </Modal.Header>
         <Modal.Body>
           <button
             id="fileSelect"
             onClick={this.update}
-            >
+          >
             Choose File
           </button>
           {this.state.fileName}
         </Modal.Body>
         <Modal.Footer>
           <Button
-            onClick={this.submit}
             disabled={!this.state.fileChosen}
-            >
+            onClick={this.submit}
+          >
             Done
           </Button>
         </Modal.Footer>

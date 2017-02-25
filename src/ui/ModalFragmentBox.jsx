@@ -27,7 +27,10 @@ var ModalFragmentBox = React.createClass({
 
   render: function() {
     return (
-      <Modal show={this.props.showModal} onHide={this.close}>
+      <Modal
+        show={this.props.showModal}
+        onHide={this.close}
+      >
         <Modal.Header>
           <Modal.Title>
             <div>mz: {this.state.mz}</div>
@@ -47,8 +50,17 @@ var ModalFragmentBox = React.createClass({
           </select>
         </Modal.Body>
         <Modal.Footer>
-          <Button onClick={this.update} disabled={this.state.fragmentMatches.length == 0}>Update</Button>
-          <Button onClick={this.close}>Close</Button>
+          <Button
+            disabled={this.state.fragmentMatches.length == 0}
+            onClick={this.update}
+          >
+            Update
+          </Button>
+          <Button
+            onClick={this.close}
+          >
+            Close
+          </Button>
         </Modal.Footer>
       </Modal>
     )

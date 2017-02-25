@@ -54,7 +54,10 @@ var ModalExportBox = React.createClass({
 
   render: function() {
     return (
-      <Modal show={this.props.showModal} onHide={this.close}>
+      <Modal
+        onHide={this.close}
+        show={this.props.showModal}
+      >
         <Modal.Header>
           <Modal.Title>
             <div>Export Spectra / Validation Tables</div>
@@ -64,9 +67,9 @@ var ModalExportBox = React.createClass({
           <div>
             <button
               id="exportDir"
-              value={this.state.exportDirectory}
               onClick={this.updateDir}
-              >
+              value={this.state.exportDirectory}
+            >
               Choose Directory
             </button>
             {this.state.exportDirectory}
@@ -78,7 +81,7 @@ var ModalExportBox = React.createClass({
                     exportAcceptSpectra: !this.state.exportAcceptSpectra
                   })
                 }}
-              >
+            >
               Export Accepted Spectra
             </Checkbox>
             <Checkbox
@@ -89,7 +92,7 @@ var ModalExportBox = React.createClass({
                     exportMaybeSpectra: !this.state.exportMaybeSpectra
                   })
                 }}
-              >
+            >
               Export Maybed Spectra
             </Checkbox>
             <Checkbox
@@ -100,7 +103,7 @@ var ModalExportBox = React.createClass({
                     exportRejectSpectra: !this.state.exportRejectSpectra
                   })
                 }}
-              >
+            >
               Export Rejected Spectra
             </Checkbox>
             <Checkbox
@@ -111,21 +114,21 @@ var ModalExportBox = React.createClass({
                     exportTables: !this.state.exportTables
                   })
                 }}
-              >
+            >
               Export Excel Table
             </Checkbox>
           </div>
         </Modal.Body>
         <Modal.Footer>
           <Button
-            onClick={this.export}
             disabled={!this.state.dirChosen}
-            >
+            onClick={this.export}
+          >
             Export
           </Button>
           <Button
             onClick={this.close}
-            >
+          >
             Cancel
           </Button>
         </Modal.Footer>
