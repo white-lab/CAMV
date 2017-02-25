@@ -1,7 +1,9 @@
-import React  from 'react';
-import ReactDOM from 'react-dom';
-// import ReactCSSTransitionGroup from 'react-addons-css-transition-group'
+import React  from 'react'
+import ReactDOM from 'react-dom'
 
-import ViewBox from './ui/ViewBox';
+import ViewBox from './ui/ViewBox'
 
-ReactDOM.render(<ViewBox/>, document.getElementById('root'));
+ReactDOM.render(
+  <ViewBox/>,
+  document.getElementById('root')
+);
