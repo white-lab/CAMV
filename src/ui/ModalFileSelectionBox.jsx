@@ -1,5 +1,4 @@
 import React from 'react';
-import ReactCSSTransitionGroup from 'react-addons-css-transition-group'
 import { Modal, Button } from 'react-bootstrap';
 
 const {dialog} = require('electron').remote;

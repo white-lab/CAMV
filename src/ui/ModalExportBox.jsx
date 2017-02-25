@@ -1,5 +1,4 @@
 import React from 'react';
-import ReactCSSTransitionGroup from 'react-addons-css-transition-group'
 import { Modal, Checkbox, Button } from 'react-bootstrap';
 
 var {dialog} = require('electron').remote;
