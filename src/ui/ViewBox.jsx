@@ -521,17 +521,20 @@ var ViewBox = React.createClass({
           updateCallback={this.updateSelectedFragment}
           mz={this.state.selectedMz}
           fragmentMatches={this.state.fragmentMatches}
-          currentLabel={this.state.currentLabel}/>
-          <ModalFileSelectionBox
-            showModal={!this.state.submitted}
-            setPeptideData={this.setPeptideData}
-            setData={this.setData}
-            setSubmitted={this.setSubmitted}/>
-          <ModalExportBox
-            ref="modalExportBox"
-            showModal={this.state.modalExportIsOpen}
-            closeCallback={this.closeExportModal}
-            exportCallback={this.exportCallback}/>
+          currentLabel={this.state.currentLabel}
+        />
+        <ModalFileSelectionBox
+          showModal={!this.state.submitted}
+          setPeptideData={this.setPeptideData}
+          setData={this.setData}
+          setSubmitted={this.setSubmitted}
+        />
+        <ModalExportBox
+          ref="modalExportBox"
+          showModal={this.state.modalExportIsOpen}
+          closeCallback={this.closeExportModal}
+          exportCallback={this.exportCallback}
+        />
         <div className="panel panel-default" id="scanSelectionList">
           <ScanSelectionList
             ref="scanSelectionList"
@@ -545,17 +548,18 @@ var ViewBox = React.createClass({
             selectedProtein={this.state.selectedProtein}
             selectedPeptide={this.state.selectedPeptide}
             selectedScan={this.state.selectedScan}
-            selectedPTMPlacement={this.state.selectedPTMPlacement}/>
+            selectedPTMPlacement={this.state.selectedPTMPlacement}
+          />
         </div>
-
         <div
           id="sequenceSpectraContainer"
           style={{width: this.state.exporting ? "100%" : "80%"}}>
           <div className="panel panel-default" id="sequenceBox">
             <SequenceBox
-              sequence={peptideSequence}
               bFound={bFound}
-              yFound={yFound}/>
+              sequence={peptideSequence}
+              yFound={yFound}
+            />
           </div>
           <div className="panel panel-default" id="spectra">
             <div id="precursorQuantContainer">
@@ -571,7 +575,8 @@ var ViewBox = React.createClass({
                   precursorMz={precursorMz}
                   isolationWindow={isolationWindow}
                   chargeState={chargeState}
-                  ppm={50}/>
+                  ppm={50}
+                />
               </div>
               <div
                 id="quantSpectrumBox"
@@ -583,11 +588,16 @@ var ViewBox = React.createClass({
                   ref="quantSpectrum"
                   spectrumData={quantSpectrumData}
                   quantMz={quantMz}
-                  ppm={50}/>
+                  ppm={50}
+                />
               </div>
               <div id="exportSave">
-                <button id="save" onClick={this.save}>Save</button>
-                <button id="openExport" onClick={this.openExport}>Export</button>
+                <button id="save" onClick={this.save}>
+                  Save
+                </button>
+                <button id="openExport" onClick={this.openExport}>
+                  Export
+                </button>
               </div>
             </div>
             <div id="fragmentSpectrumBox">
@@ -602,7 +612,8 @@ var ViewBox = React.createClass({
                 matchData={matchData}
                 selectedPTMPlacement={this.state.selectedPTMPlacement}
                 updateChoice={this.updateChoice}
-                pointChosenCallback={this.updateSelectedMz}/>
+                pointChosenCallback={this.updateSelectedMz}
+              />
             </div>
           </div>
         </div>
