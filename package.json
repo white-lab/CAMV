@@ -16,7 +16,6 @@
     "electron-compilers": "latest",
     "electron-packager": "^8.5.2",
     "react": "^15.4.2",
-    "react-addons-css-transition-group": "^15.4.2",
     "react-addons-update": "^15.4.2",
     "react-bootstrap": "latest",
     "react-dom": "^15.4.2",
@@ -39,9 +38,10 @@
     "bower.json",
     "node_modules",
     "src/bower_components",
-    "src/CAMV.css",
-    "src/index.html",
-    "src/main.js"
+    "src/*.css",
+    "src/*.html",
+    "src/*.js",
+    "src/ui/*.jsx"
   ],
   "devEngines": {
     "node": ">=7.x",
