@@ -1,60 +1,54 @@
 import React from 'react'
 
-var YIonElement = React.createClass({
-  render: function() {
-    if (this.props.found) {
-      return <td className="yIon" style={{color:"red"}}>&lfloor;</td>
-    } else {
-      return <td className="yIon" style={{color:"lightgray"}}>&lfloor;</td>
-    }
-  }
-});
+import IonElement from './IonElement'
+import SequenceElement from './SequenceElement'
 
-var BIonElement = React.createClass({
-  render: function() {
-    if (this.props.found) {
-      return <td className="bIon" style={{color:"red"}}>&rceil;</td>
-    } else{
-      return <td className="bIon" style={{color:"lightgray"}}>&rceil;</td>
-    }
-  }
-});
-
-var SequenceElement = React.createClass({
-  render: function() {
-    return <td className="aminoAcid">{this.props.AA}</td>
-  }
-});
-
-var SequenceBox = React.createClass({
-  render: function() {
+class SequenceBox extends React.Component {
+  render() {
     if (this.props.sequence != null) {
       var sequence = this.props.sequence.split('')
 
-      var bs = [<td key={0}></td>]
+      var bs = [<td key={0} />]
       var seq = []
-      var ys = [<td key={0}></td>]
+      var ys = [<td key={0} />]
 
       sequence.slice(0, -1).forEach(
         function (item, i) {
           let found = this.props.bFound.indexOf(i + 1) > -1
-          bs.push(<BIonElement key={i * 2 + 1} found={found}/>)
-          bs.push(<td key={i * 2 + 2}></td>)
+          bs.push(
+            <IonElement
+              bion={true}
+              found={found}
+              key={i * 2 + 1}
+            />
+          )
+          bs.push(<td key={i * 2 + 2} />)
         }.bind(this)
       )
 
       sequence.forEach(
         function (item, i) {
-          seq.push(<SequenceElement AA={item} key={i * 2}/>)
-          seq.push(<td key={i * 2 + 1}></td>)
+          seq.push(
+            <SequenceElement
+              AA={item}
+              key={i * 2}
+            />
+          )
+          seq.push(<td key={i * 2 + 1} />)
         }.bind(this)
       )
 
       sequence.slice(0, -1).forEach(
         function (item, i) {
           let found = this.props.yFound.indexOf(this.props.sequence.length - i - 1) > -1
-          ys.push(<YIonElement key={i * 2 + 1} found={found}/>)
-          ys.push(<td key={i * 2 + 2}></td>)
+          ys.push(
+            <IonElement
+              bion={false}
+              found={found}
+              key={i * 2 + 1}
+            />
+          )
+          ys.push(<td key={i * 2 + 2} />)
         }.bind(this)
       )
 
@@ -74,12 +68,24 @@ var SequenceBox = React.createClass({
             </tbody>
           </table>
         </div>
-      );
+      )
     } else {
-      return <table><tbody></tbody></table>
+      return <table><tbody /></table>
     }
   }
 
-});
+}
+
+SequenceBox.propTypes = {
+  bFound: React.PropTypes.arrayOf(React.PropTypes.number),
+  sequence: React.PropTypes.string,
+  yFound: React.PropTypes.arrayOf(React.PropTypes.number),
+}
+
+SequenceBox.defaultProps = {
+  bFound: [],
+  sequence: null,
+  yFound: [],
+}
 
 module.exports = SequenceBox
