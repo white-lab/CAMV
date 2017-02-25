@@ -1,4 +1,5 @@
-var hotkey = require('react-hotkey');
+import React from 'react';
+import hotkey from 'react-hotkey';
 hotkey.activate();
 
 var AcceptButton = React.createClass({
@@ -132,10 +133,11 @@ var SpectrumBox = React.createClass({
       data.addRows([[minMZ, 0, null, null]])
 
       this.props.spectrumData.forEach(function(peak) {
-        mz = peak.mz
-        into = peak.into
-        name = ''
-        ppm = null
+        let mz = peak.mz
+        let into = peak.into
+        let name = ''
+        let ppm = null
+        let style = ''
 
         if (mz > minMZ && mz < maxMZ) {
           if (this.props.selectedPTMPlacement != null) {
@@ -291,3 +293,5 @@ var SpectrumBox = React.createClass({
     );
   }
 });
+
+module.exports = SpectrumBox

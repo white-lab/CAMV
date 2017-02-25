@@ -1,6 +1,8 @@
-var {dialog} = require('electron').remote;
+import React from 'react';
+import ReactCSSTransitionGroup from 'react-addons-css-transition-group'
+import { Modal, Checkbox, Button } from 'react-bootstrap';
 
-var ReactCSSTransitionGroup = require('react-addons-css-transition-group');
+var {dialog} = require('electron').remote;
 
 var ModalExportBox = React.createClass({
   getInitialState: function() {
@@ -53,13 +55,13 @@ var ModalExportBox = React.createClass({
 
   render: function() {
     return (
-      <ReactBootstrap.Modal show={this.props.showModal} onHide={this.close}>
-        <ReactBootstrap.Modal.Header>
-          <ReactBootstrap.Modal.Title>
+      <Modal show={this.props.showModal} onHide={this.close}>
+        <Modal.Header>
+          <Modal.Title>
             <div>Export Spectra / Validation Tables</div>
-          </ReactBootstrap.Modal.Title>
-        </ReactBootstrap.Modal.Header>
-        <ReactBootstrap.Modal.Body>
+          </Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
           <div>
             <button
               id="exportDir"
@@ -69,7 +71,7 @@ var ModalExportBox = React.createClass({
               Choose Directory
             </button>
             {this.state.exportDirectory}
-            <ReactBootstrap.Checkbox
+            <Checkbox
               checked={this.state.exportAcceptSpectra}
               onChange={
                 () => {
@@ -79,8 +81,8 @@ var ModalExportBox = React.createClass({
                 }}
               >
               Export Accepted Spectra
-            </ReactBootstrap.Checkbox>
-            <ReactBootstrap.Checkbox
+            </Checkbox>
+            <Checkbox
               checked={this.state.exportMaybeSpectra}
               onChange={
                 () => {
@@ -90,8 +92,8 @@ var ModalExportBox = React.createClass({
                 }}
               >
               Export Maybed Spectra
-            </ReactBootstrap.Checkbox>
-            <ReactBootstrap.Checkbox
+            </Checkbox>
+            <Checkbox
               checked={this.state.exportRejectSpectra}
               onChange={
                 () => {
@@ -101,8 +103,8 @@ var ModalExportBox = React.createClass({
                 }}
               >
               Export Rejected Spectra
-            </ReactBootstrap.Checkbox>
-            <ReactBootstrap.Checkbox
+            </Checkbox>
+            <Checkbox
               checked={this.state.exportTables}
               onChange={
                 () => {
@@ -112,23 +114,25 @@ var ModalExportBox = React.createClass({
                 }}
               >
               Export Excel Table
-            </ReactBootstrap.Checkbox>
+            </Checkbox>
           </div>
-        </ReactBootstrap.Modal.Body>
-        <ReactBootstrap.Modal.Footer>
-          <ReactBootstrap.Button
+        </Modal.Body>
+        <Modal.Footer>
+          <Button
             onClick={this.export}
             disabled={!this.state.dirChosen}
             >
             Export
-          </ReactBootstrap.Button>
-          <ReactBootstrap.Button
+          </Button>
+          <Button
             onClick={this.close}
             >
             Cancel
-          </ReactBootstrap.Button>
-        </ReactBootstrap.Modal.Footer>
-      </ReactBootstrap.Modal>
+          </Button>
+        </Modal.Footer>
+      </Modal>
     )
   }
 });
+
+module.exports = ModalExportBox

@@ -1,0 +1,7 @@
+{
+  "application/javascript": {
+    "presets": ["es2017-node7", "react"],
+    "plugins": ["syntax-async-functions", "transform-runtime"],
+    "sourceMaps": "inline"
+  }
+}

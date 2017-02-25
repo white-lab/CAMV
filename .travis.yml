@@ -5,7 +5,7 @@ node_js:
   - '7'
 
 before_script:
-  - export PATH=$(pwd)/src/node_modules/.bin:$PATH
+  - export PATH=$(pwd)/node_modules/.bin:$PATH
 
 install:
   - cd src/
@@ -15,7 +15,8 @@ install:
   - cd ..
 
 script:
-  - electron-packager src/ --platform=darwin,linux --arch=all
+  - npm run package-linux
+  - npm run package-osx
   - zip -qr CAMV-darwin-x64.zip CAMV-darwin-x64
   - zip -qr CAMV-linux-ia32.zip CAMV-linux-ia32
   - zip -qr CAMV-linux-x64.zip  CAMV-linux-x64

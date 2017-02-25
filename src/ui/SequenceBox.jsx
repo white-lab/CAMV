@@ -1,3 +1,4 @@
+import React from 'react';
 
 var YIonElement = React.createClass({
   render: function() {
@@ -36,7 +37,7 @@ var SequenceBox = React.createClass({
 
       sequence.slice(0, -1).forEach(
         function (item, i) {
-          found = this.props.bFound.indexOf(i + 1) > -1
+          let found = this.props.bFound.indexOf(i + 1) > -1
           bs.push(<BIonElement key={i * 2 + 1} found={found}/>)
           bs.push(<td key={i * 2 + 2}></td>)
         }.bind(this)
@@ -51,7 +52,7 @@ var SequenceBox = React.createClass({
 
       sequence.slice(0, -1).forEach(
         function (item, i) {
-          found = this.props.yFound.indexOf(this.props.sequence.length - i - 1) > -1
+          let found = this.props.yFound.indexOf(this.props.sequence.length - i - 1) > -1
           ys.push(<YIonElement key={i * 2 + 1} found={found}/>)
           ys.push(<td key={i * 2 + 2}></td>)
         }.bind(this)
@@ -80,3 +81,5 @@ var SequenceBox = React.createClass({
   }
 
 });
+
+module.exports = SequenceBox

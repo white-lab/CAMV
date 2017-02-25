@@ -1,7 +1,7 @@
 {
   "name": "camv",
   "description": "",
-  "main": "main.js",
+  "main": "src/es6-init.js",
   "authors": [
     "Tim Curran <tim@ginkgobioworks.com>",
     "Nader Morshed <morshed@mit.edu>"

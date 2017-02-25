@@ -1,8 +1,10 @@
-var {dialog} = require('electron').remote;
+import React from 'react';
+import ReactCSSTransitionGroup from 'react-addons-css-transition-group'
+import { Modal, Button } from 'react-bootstrap';
 
-// var ReactCSSTransitionGroup = React.addons.CSSTransitionGroup;
-
-var ReactCSSTransitionGroup = require('react-addons-css-transition-group');
+const {dialog} = require('electron').remote;
+const fs = require('fs');
+const zlib = require('zlib');
 
 var ModalFileSelectionBox = React.createClass({
   getInitialState: function() {
@@ -15,7 +17,7 @@ var ModalFileSelectionBox = React.createClass({
   },
 
   setStateFromText: function(data) {
-    inputData = JSON.parse(data);
+    let inputData = JSON.parse(data);
     this.setState({
       data: inputData.scanData,
       peptideData: inputData.peptideData
@@ -34,6 +36,7 @@ var ModalFileSelectionBox = React.createClass({
       },
       function (fileNames) {
         if (fileNames === undefined) return;
+
         var fileName = fileNames[0];
         var compressed = fileName.endsWith(".gz");
 
@@ -70,13 +73,13 @@ var ModalFileSelectionBox = React.createClass({
 
   render: function() {
     return (
-      <ReactBootstrap.Modal show={this.props.showModal} onHide={this.submit}>
-        <ReactBootstrap.Modal.Header>
-          <ReactBootstrap.Modal.Title>
+      <Modal show={this.props.showModal} onHide={this.submit}>
+        <Modal.Header>
+          <Modal.Title>
             <div></div>
-          </ReactBootstrap.Modal.Title>
-        </ReactBootstrap.Modal.Header>
-        <ReactBootstrap.Modal.Body>
+          </Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
           <button
             id="fileSelect"
             onClick={this.update}
@@ -84,16 +87,18 @@ var ModalFileSelectionBox = React.createClass({
             Choose File
           </button>
           {this.state.fileName}
-        </ReactBootstrap.Modal.Body>
-        <ReactBootstrap.Modal.Footer>
-          <ReactBootstrap.Button
+        </Modal.Body>
+        <Modal.Footer>
+          <Button
             onClick={this.submit}
             disabled={!this.state.fileChosen}
             >
             Done
-          </ReactBootstrap.Button>
-        </ReactBootstrap.Modal.Footer>
-      </ReactBootstrap.Modal>
+          </Button>
+        </Modal.Footer>
+      </Modal>
     )
   }
 });
+
+module.exports = ModalFileSelectionBox

@@ -1,17 +1,28 @@
+import React from 'react';
+
 const fs = require('fs');
-const http = require('http');
 const path = require('path');
-const util = require('util');
 const zlib = require('zlib');
 
-var domtoimage = require('dom-to-image');
-var update = require('react-addons-update');
-var remote = require('electron').remote
+const domtoimage = require('dom-to-image');
+const update = require('react-addons-update');
+const remote = require('electron').remote
+const {dialog} = require('electron').remote;
+
+const ModalExportBox = require('./ModalExportBox');
+const ModalFileSelectionBox = require('./ModalFileSelectionBox');
+const ModalFragmentBox = require('./ModalFragmentBox');
+const PrecursorSpectrumBox = require('./PrecursorSpectrumBox');
+const QuantSpectrumBox = require('./QuantSpectrumBox');
+const ScanSelectionList = require('./ScanSelectionList');
+const SequenceBox = require('./SequenceBox');
+const SpectrumBox = require('./SpectrumBox');
+
 
 var ViewBox = React.createClass({
   decodeBase64Image: function (dataString) {
-    var matches = dataString.match(/^data:([A-Za-z-+\/]+);base64,(.+)$/),
-      response = {};
+    let matches = dataString.match(/^data:([A-Za-z-+\/]+);base64,(.+)$/)
+    let response = {}
 
     if (matches.length !== 3) {
       return new Error('Invalid input string');
@@ -84,28 +95,40 @@ var ViewBox = React.createClass({
   },
 
   updateSelectedMz: function(mz) {
-    data = this.state.data[this.state.selectedProtein].peptides[this.state.selectedPeptide].scans[this.state.selectedScan].scanData
-    peptide = this.state.data[this.state.selectedProtein].peptides[this.state.selectedPeptide]
-    peptideDataId = peptide.peptideDataId
-    modificationStateId = peptide.modificationStateId
-    scan = peptide.scans[this.state.selectedScan]
+    let data = this.state.data[this.state.selectedProtein]
+      .peptides[this.state.selectedPeptide]
+      .scans[this.state.selectedScan]
+      .scanData
+    let peptide = this.state.data[this.state.selectedProtein]
+      .peptides[this.state.selectedPeptide]
+    let peptideDataId = peptide.peptideDataId
+    let modificationStateId = peptide.modificationStateId
+    let scan = peptide.scans[this.state.selectedScan]
 
-    matchData = this.state.peptideData[peptideDataId]
+    if (
+      peptideDataId == null ||
+      modificationStateId == null ||
+      this.state.selectedPTMPlacement == null
+    ) {
+      return;
+    }
+
+    let matchData = this.state.peptideData[peptideDataId]
       .modificationStates[modificationStateId]
       .mods[this.state.selectedPTMPlacement]
       .matchData
 
-    currentLabel = ''
+    let currentLabel = ''
 
-    matchId = data.find(
+    let matchId = data.find(
       (peak) => { return (peak.mz === mz) }
     ).matchInfo[this.state.selectedPTMPlacement].matchId
 
     if (matchId !== null) { currentLabel = matchData[matchId].name }
 
-    matches = matchData.filter(
+    let matches = matchData.filter(
       (item) => {
-        ppm = (item.mz - mz) / mz * 1000000
+        let ppm = (item.mz - mz) / mz * 1000000
         item.ppm = ppm
         return Math.abs(ppm) < this.state.maxPPM
       }
@@ -129,54 +152,60 @@ var ViewBox = React.createClass({
     })
   },
   updateSelectedFragment: function(matchId) {
-    if (this.state.selectedProtein != null &&
-        this.state.selectedPeptide != null &&
-        this.state.selectedScan != null &&
-        this.state.selectedMz != null) {
-
-      peak_targets = {}
-
-      matchData = this.state.peptideData[peptide.peptideDataId]
-        .modificationStates[peptide.modificationStateId]
-        .mods[this.state.selectedPTMPlacement]
-        .matchData
-
-      scanData = this.state.data[this.state.selectedProtein]
-        .peptides[this.state.selectedPeptide]
-        .scans[this.state.selectedScan]
-        .scanData
-
-      scanData.forEach(
-        function(peak, index) {
-          if (peak.mz === this.state.selectedMz) {
-            match_id_target = {matchId: {$set: matchId}}
-            ptm_target = {}
-            ptm_target[this.state.selectedPTMPlacement] = match_id_target
-            match_info_target = {matchInfo: ptm_target}
-            peak_targets[index] = match_info_target
-            peak.matchInfo[this.state.selectedPTMPlacement].matchId = matchId
-
-            this.setState({
-              currentLabel: matchData[matchId].name
-            })
-          }
-        }.bind(this)
-      )
-
-      scan_data_target = {scanData: peak_targets}
-      scan_target = {}
-      scan_target[this.state.selectedScan] = scan_data_target;
-      scans_target = {scans: scan_target};
-      peptide_target = {}
-      peptide_target[this.state.selectedPeptide] = scans_target;
-      peptides_target = {peptides: peptide_target};
-      protein_target = {}
-      protein_target[this.state.selectedProtein] = peptides_target;
-
-      this.setState({
-        data: update(this.state.data, protein_target)
-      })
+    if (
+      this.state.selectedProtein == null ||
+      this.state.selectedPeptide == null ||
+      this.state.selectedScan == null ||
+      this.state.selectedMz == null
+    ) {
+        return
     }
+
+    let peak_targets = {}
+
+    let peptide = this.state.data[this.state.selectedProtein]
+      .peptides[this.state.selectedPeptide]
+
+    let matchData = this.state.peptideData[peptide.peptideDataId]
+      .modificationStates[peptide.modificationStateId]
+      .mods[this.state.selectedPTMPlacement]
+      .matchData
+
+    let scanData = this.state.data[this.state.selectedProtein]
+      .peptides[this.state.selectedPeptide]
+      .scans[this.state.selectedScan]
+      .scanData
+
+    scanData.forEach(
+      function(peak, index) {
+        if (peak.mz === this.state.selectedMz) {
+          let match_id_target = {matchId: {$set: matchId}}
+          let ptm_target = {}
+          ptm_target[this.state.selectedPTMPlacement] = match_id_target
+          let match_info_target = {matchInfo: ptm_target}
+          peak_targets[index] = match_info_target
+          peak.matchInfo[this.state.selectedPTMPlacement].matchId = matchId
+
+          this.setState({
+            currentLabel: matchData[matchId].name
+          })
+        }
+      }.bind(this)
+    )
+
+    let scan_data_target = {scanData: peak_targets}
+    let scan_target = {}
+    scan_target[this.state.selectedScan] = scan_data_target;
+    let scans_target = {scans: scan_target};
+    let peptide_target = {}
+    peptide_target[this.state.selectedPeptide] = scans_target;
+    let peptides_target = {peptides: peptide_target};
+    let protein_target = {}
+    protein_target[this.state.selectedProtein] = peptides_target;
+
+    this.setState({
+      data: update(this.state.data, protein_target)
+    })
   },
 
   closeExportModal: function() {
@@ -196,7 +225,7 @@ var ViewBox = React.createClass({
       for (let peptide of protein.peptides) {
         for (let scan of peptide.scans) {
           for (let match of scan.choiceData) {
-            state = match.state
+            let state = match.state
 
             if (
               (state == "accept" && !export_spectras[0]) ||
@@ -207,7 +236,7 @@ var ViewBox = React.createClass({
               continue;
             }
 
-            nodes = [
+            let nodes = [
               protein.proteinId,
               peptide.peptideId,
               scan.scanId,
@@ -234,22 +263,20 @@ var ViewBox = React.createClass({
     win.setSize(800, 650);
     this.forceUpdate();
 
-    scan_list = this.refs["scanSelectionList"];
+    let scan_list = this.refs["scanSelectionList"];
 
-    current_node = [
+    let current_node = [
       scan_list.props.selectedProtein,
       scan_list.props.selectedPeptide,
       scan_list.props.selectedScan,
       scan_list.props.selectedPTMPlacement
     ];
 
-    promises = [];
+    let promises = [];
 
     for (let vals of this.iterate_spectra(export_spectras)) {
-      [nodes, prot, pep, scan] = vals;
-
-      out_name = prot + " - " + pep + " - " + scan;
-      console.log(out_name, state);
+      let [nodes, prot, pep, scan] = vals;
+      let out_name = prot + " - " + pep + " - " + scan;
 
       this.refs["scanSelectionList"].update(...nodes);
 
@@ -260,7 +287,7 @@ var ViewBox = React.createClass({
       // promises.push(
       //
       // domtoimage.toSvg(
-      dataUrl = await domtoimage.toPng(
+      let dataUrl = await domtoimage.toPng(
         document.getElementById('viewBox'),
         {
           width: 1147,
@@ -271,7 +298,8 @@ var ViewBox = React.createClass({
               "scanSelectionList", "exportSave", "setMinMZ", "setMaxMZ",
               "rejectButton", "maybeButton", "acceptButton"
             ].indexOf(node.id)
-        }
+        },
+        function () {}
       )
       promises.push(
         fs.writeFile(
@@ -318,17 +346,17 @@ var ViewBox = React.createClass({
 
   updateChoice: function(choice) {
     /* Messy solution because javascript doesn't allow variables as dict keys */
-    state_target = {state: {$set: choice}};
-    ptm_target = {};
+    let state_target = {state: {$set: choice}};
+    let ptm_target = {};
     ptm_target[this.state.selectedPTMPlacement] = state_target;
-    choice_target = {choiceData: ptm_target};
-    scan_target = {}
+    let choice_target = {choiceData: ptm_target};
+    let scan_target = {}
     scan_target[this.state.selectedScan] = choice_target;
-    scans_target = {scans: scan_target};
-    peptide_target = {}
+    let scans_target = {scans: scan_target};
+    let peptide_target = {}
     peptide_target[this.state.selectedPeptide] = scans_target;
-    peptides_target = {peptides: peptide_target};
-    protein_target = {}
+    let peptides_target = {peptides: peptide_target};
+    let protein_target = {}
     protein_target[this.state.selectedProtein] = peptides_target;
 
     /* However, doing it this way keeps from cloning data, saving a lot of time
@@ -347,15 +375,19 @@ var ViewBox = React.createClass({
       // console.log('New search: ' + this.state.selectedSearch)
     }
   },
+
   goButtonClicked: function() {
     this.setState({submitted: true})
   },
+
   setData: function(data) {
     this.setState({data: data})
   },
+
   setPeptideData: function(peptideData) {
     this.setState({peptideData: peptideData})
   },
+
   setSubmitted: function(submitted, fileName) {
     this.setState({submitted: submitted})
     this.refs["modalExportBox"].setState({
@@ -363,9 +395,11 @@ var ViewBox = React.createClass({
       dirChosen: true
     })
   },
+
   openExport: function() {
     this.setState({modalExportIsOpen: true})
   },
+
   save: function() {
     dialog.showSaveDialog(
       {
@@ -423,28 +457,28 @@ var ViewBox = React.createClass({
   },
 
   render: function() {
-    var spectrumData = []
-    var precursorSpectrumData = []
-    var precursorMz = null
-    var isolationWindow = null
-    var quantSpectrumData = []
-    var quantMz = null
-    var chargeState = null
-    var matchData = []
-    var bFound = []
-    var yFound = []
-    var protein = null
-    var peptide = null
-    var scan = null
-    var choice = null
-    var peptideSequence = null
-    var inputDisabled = true
+    let spectrumData = []
+    let precursorSpectrumData = []
+    let precursorMz = null
+    let isolationWindow = null
+    let quantSpectrumData = []
+    let quantMz = null
+    let chargeState = null
+    let matchData = []
+    let bFound = []
+    let yFound = []
+    let peptideSequence = null
+    let inputDisabled = true
+
     if (this.state.selectedProtein != null) {
-      protein = this.state.data[this.state.selectedProtein]
+      let protein = this.state.data[this.state.selectedProtein]
+
       if (this.state.selectedPeptide != null) {
-        peptide = protein.peptides[this.state.selectedPeptide]
+        let peptide = protein.peptides[this.state.selectedPeptide]
+
         if (this.state.selectedScan != null) {
-          scan = peptide.scans[this.state.selectedScan]
+          let scan = peptide.scans[this.state.selectedScan]
+
           spectrumData = scan.scanData
           precursorSpectrumData = scan.precursorScanData
           precursorMz = scan.precursorMz
@@ -452,16 +486,19 @@ var ViewBox = React.createClass({
           chargeState = scan.chargeState
           quantSpectrumData = scan.quantScanData
           quantMz = scan.quantMz
+
           if (this.state.selectedPTMPlacement != null) {
             inputDisabled = false
-            mod = this.state.peptideData[peptide.peptideDataId]
-                    .modificationStates[peptide.modificationStateId]
-                    .mods[this.state.selectedPTMPlacement]
+            let mod = this.state.peptideData[peptide.peptideDataId]
+              .modificationStates[peptide.modificationStateId]
+              .mods[this.state.selectedPTMPlacement]
             matchData = mod.matchData
             peptideSequence = mod.name
 
             spectrumData.forEach(function(peak) {
-              var matchId = peak.matchInfo[this.state.selectedPTMPlacement].matchId
+              var matchId = peak.matchInfo[this.state.selectedPTMPlacement]
+                .matchId
+
               if (matchId) {
                 if (matchData[matchId].ionType == 'b') {
                   bFound.push(matchData[matchId].ionPosition)
@@ -474,9 +511,6 @@ var ViewBox = React.createClass({
         }
       }
     }
-
-//    console.log("selectedProtein:", this.state.selectedProtein, "selectedPeptide:", this.state.selectedPeptide, "selectedScan:", this.state.selectedScan, "selecedPTMPlacement:", this.state.selectedPTMPlacement)
-
 
     return (
       <div className="panel panel-default" id="viewBox">
@@ -513,7 +547,9 @@ var ViewBox = React.createClass({
             selectedPTMPlacement={this.state.selectedPTMPlacement}/>
         </div>
 
-        <div id="sequenceSpectraContainer" style={{width: this.state.exporting ? "100%" : "80%"}}>
+        <div
+          id="sequenceSpectraContainer"
+          style={{width: this.state.exporting ? "100%" : "80%"}}>
           <div className="panel panel-default" id="sequenceBox">
             <SequenceBox
               sequence={peptideSequence}
@@ -574,7 +610,4 @@ var ViewBox = React.createClass({
   }
 });
 
-ReactDOM.render(
-  <ViewBox />,
-  document.getElementById('content')
-);
+module.exports = ViewBox

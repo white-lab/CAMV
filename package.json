@@ -1,0 +1,58 @@
+{
+  "name": "camv",
+  "version": "0.1.0",
+  "main": "src/es6-init.js",
+  "productName": "CAMV",
+  "dependencies": {
+    "babel-plugin-syntax-async-functions": "latest",
+    "babel-plugin-transform-runtime": "latest",
+    "babel-preset-es2017-node7": "latest",
+    "babel-preset-react": "latest",
+    "babel-runtime": "latest",
+    "babel-register": "latest",
+    "dom-to-image": "^2.5.2",
+    "electron": "^1.6.1",
+    "electron-compile": "^6.1.2",
+    "electron-compilers": "latest",
+    "electron-packager": "^8.5.2",
+    "react": "^15.4.2",
+    "react-addons-css-transition-group": "^15.4.2",
+    "react-addons-update": "^15.4.2",
+    "react-bootstrap": "latest",
+    "react-dom": "^15.4.2",
+    "react-hot-loader": "^1.3.1",
+    "react-hotkey": "^0.7.0",
+    "react-native-fs": "^2.1.0-rc.1",
+    "react-hot-loader": "latest"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "electron --js-flags='--harmony-async-await' .",
+    "compile": "electron-compile --js-flags='--harmony-async-await' --appDir . src/",
+    "package": "electron-packager . --all",
+    "package-win": "electron-packager . --platform=win32 --arch=all",
+    "package-linux": "electron-packager . --platform=linux --arch=all",
+    "package-osx": "electron-packager . --platform=darwin --arch=all"
+  },
+  "files": [
+    "package.json",
+    "bower.json",
+    "node_modules",
+    "src/bower_components",
+    "src/CAMV.css",
+    "src/index.html",
+    "src/main.js"
+  ],
+  "devEngines": {
+    "node": ">=7.x",
+    "npm": ">=4.x"
+  },
+  "author": {
+    "name": "Nader Morshed",
+    "email": "morshed@mit.edu",
+    "url": "https://github.com/naderm"
+  },
+  "license": "MIT",
+  "repository": "https://github.com/white-lab/CAMV",
+  "description": "Tool for validation proteomic mass spectrometry peptide assignments."
+}

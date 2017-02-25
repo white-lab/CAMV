@@ -6,6 +6,7 @@ src/package.json-old
 src/testData.camv
 src/testDataOut.camv
 src/testData.json
+.cache/
 .DS_Store
 CAMV-*-*/
 *.zip

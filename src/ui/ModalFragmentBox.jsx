@@ -1,7 +1,6 @@
-
-// var ReactCSSTransitionGroup = React.addons.CSSTransitionGroup;
-
-var ReactCSSTransitionGroup = require('react-addons-css-transition-group');
+import React from 'react';
+import ReactCSSTransitionGroup from 'react-addons-css-transition-group'
+import { Modal, Button } from 'react-bootstrap';
 
 var ModalFragmentBox = React.createClass({
   getInitialState() {
@@ -29,14 +28,14 @@ var ModalFragmentBox = React.createClass({
 
   render: function() {
     return (
-      <ReactBootstrap.Modal show={this.props.showModal} onHide={this.close}>
-        <ReactBootstrap.Modal.Header>
-          <ReactBootstrap.Modal.Title>
+      <Modal show={this.props.showModal} onHide={this.close}>
+        <Modal.Header>
+          <Modal.Title>
             <div>mz: {this.state.mz}</div>
             <div>current label: {this.state.currentLabel}</div>
-          </ReactBootstrap.Modal.Title>
-        </ReactBootstrap.Modal.Header>
-        <ReactBootstrap.Modal.Body>
+          </Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
           New Label:&nbsp;
           <select id="fragmentSelect">
           {
@@ -47,12 +46,14 @@ var ModalFragmentBox = React.createClass({
             )
           }
           </select>
-        </ReactBootstrap.Modal.Body>
-        <ReactBootstrap.Modal.Footer>
-          <ReactBootstrap.Button onClick={this.update} disabled={this.state.fragmentMatches.length == 0}>Update</ReactBootstrap.Button>
-          <ReactBootstrap.Button onClick={this.close}>Close</ReactBootstrap.Button>
-        </ReactBootstrap.Modal.Footer>
-      </ReactBootstrap.Modal>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button onClick={this.update} disabled={this.state.fragmentMatches.length == 0}>Update</Button>
+          <Button onClick={this.close}>Close</Button>
+        </Modal.Footer>
+      </Modal>
     )
   }
 });
+
+module.exports = ModalFragmentBox

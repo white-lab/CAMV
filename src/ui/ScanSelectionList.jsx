@@ -1,9 +1,9 @@
-var hotkey = require('react-hotkey');
+import React from 'react';
+import hotkey from 'react-hotkey';
 hotkey.activate();
 
 var PTMPlacementListItem = React.createClass({
   update: function() {
-    // console.log(this.props.proteinId, this.props.peptideId, this.props.scanId, this.props.ptmPlacement.id)
     this.props.update(
       this.props.proteinId,
       this.props.peptideId,
@@ -418,3 +418,5 @@ var ScanSelectionList = React.createClass({
     )
   }
 });
+
+module.exports = ScanSelectionList

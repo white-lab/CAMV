@@ -23,7 +23,7 @@ install:
 #     - cd ..
 
 build_script:
-    - src\node_modules\.bin\electron-packager src/ --all
+    - npm run package
 
 artifacts:
     - path: "CAMV-darwin-x64"

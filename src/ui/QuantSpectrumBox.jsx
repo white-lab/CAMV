@@ -1,46 +1,25 @@
-var PrecursorSpectrumBox = React.createClass({
+import React from 'react';
+
+var QuantSpectrumBox = React.createClass({
   getInitialState: function() {
     return {chartLoaded: false}
   },
 
   drawChart: function() {
+
     var data = new google.visualization.DataTable();
     data.addColumn('number', 'mz');
     data.addColumn('number', 'Intensity');
     data.addColumn({'type': 'string', 'role': 'style'})
     data.addColumn({'type': 'string', 'role': 'annotation'})
-    data.addColumn('number', 'Isolation');
 
-    var precursorMz = this.props.precursorMz
-    var minMZ = precursorMz - 1
-    var maxMZ = precursorMz + 1
-    var chargeState = this.props.chargeState
+    var quantMz = this.props.quantMz
+    var minMZ = Math.round(2 * Math.min.apply(null, quantMz)) / 2 - 1
+    var maxMZ = Math.round(2 * Math.max.apply(null, quantMz)) / 2 + 1
     var ppm = this.props.ppm
 
     if (this.props.spectrumData.length > 0) {
-      var max_y = Math.max.apply(
-        null,
-        this.props.spectrumData.filter(
-          (element) => { return element.mz >= minMZ && element.mz <= maxMZ }
-        ).map(
-          (element) => { return element.into }
-        )
-      );
-
-      data.addRows([[minMZ, 0, null, null, null]]);
-
-      /* Draw a box for the isolation window, if data is available */
-      if (this.props.isolationWindow != null) {
-        var lower_window = precursorMz - this.props.isolationWindow[0];
-        var upper_window = precursorMz + this.props.isolationWindow[1];
-
-        data.addRows([
-          [lower_window, 0, null, null, 0],
-          [lower_window, 0, null, null, max_y * 1.1],
-          [upper_window, 0, null, null, max_y * 1.1],
-          [upper_window, 0, null, null, 0]
-        ]);
-      }
+      data.addRows([[minMZ, 0, null, null]])
 
       this.props.spectrumData.forEach(function(peak) {
         var mz = peak.mz
@@ -49,14 +28,14 @@ var PrecursorSpectrumBox = React.createClass({
 
         var found = false
 
-        var ionSeries = [0,1,2,3,4,5]
-
-        ionSeries.forEach(function(val) {
-          var currPPM = 1000000 * (mz - precursorMz - 1.0079 * val / chargeState) / mz
-          if (Math.abs(currPPM) < ppm) {
+        quantMz.forEach(function(val) {
+          var currPPM = 1000000 * Math.abs(mz - val) / val
+          if (currPPM < ppm) {
             found = true
           }
         })
+
+        var style = ''
 
         if (found) {
           style = 'point {size: 5; fill-color: green; visible: true}'
@@ -65,19 +44,17 @@ var PrecursorSpectrumBox = React.createClass({
         }
 
         data.addRows([
-          [mz, 0,    null,  null, null],
-          [mz, into, style, name, null],
-          [mz, 0,    null,  null, null]
+          [mz, 0, null, null],
+          [mz, into, style, name],
+          [mz, 0, null, null]
         ])
       })
 
-      data.addRows([
-        [maxMZ, 0, null, null, null]
-      ])
+      data.addRows([[maxMZ, 0, null, null]])
     }
 
     var options = {
-      title: 'Precursor',
+      title: 'Quantification',
       hAxis: {
         // title: 'mz',
         gridlines: { color: 'transparent' },
@@ -85,17 +62,15 @@ var PrecursorSpectrumBox = React.createClass({
         maxValue: maxMZ
       },
       vAxis: {
-        // title: 'Intensity',
-        gridlines: { color: 'transparent' },
-        minValue: 0,
-        maxValue: max_y * 1.1
+        // title: 'Intensity'
+        gridlines: { color: 'transparent' }
       },
       annotations: { textStyle: { }, stemColor: 'none' },
       legend: 'none',
       tooltip: {trigger: 'none'}
     };
 
-    var chart = new google.visualization.AreaChart(document.getElementById('precursorGoogleChart'));
+    var chart = new google.visualization.LineChart(document.getElementById('quantGoogleChart'));
 
     chart.draw(data, options);
   },
@@ -143,8 +118,10 @@ var PrecursorSpectrumBox = React.createClass({
   render: function() {
     return (
       <div>
-        <div id="precursorGoogleChart"></div>
+        <div id="quantGoogleChart"></div>
       </div>
     );
   }
 });
+
+module.exports = QuantSpectrumBox
