@@ -1,85 +1,13 @@
 import React from 'react'
 import hotkey from 'react-hotkey'
 
+import AcceptButton from './AcceptButton'
+import MaybeButton from './MaybeButton'
+import RejectButton from './RejectButton'
+import SetMaxMZ from './SetMaxMZ'
+import SetMinMZ from './SetMinMZ'
+
 hotkey.activate();
-
-var AcceptButton = React.createClass({
-  onChange: function() {
-    this.props.callback('accept')
-  },
-  render: function() {
-    return (<input id="acceptButton"
-                   className="choiceButton"
-                   type="button"
-                   value="Accept"
-                   disabled={this.props.disabled}
-                   onClick={this.onChange}/>)
-  }
-});
-
-var MaybeButton = React.createClass({
-  onChange: function() {
-    this.props.callback('maybe')
-  },
-  render: function() {
-    return (<input id="maybeButton"
-                   className="choiceButton"
-                   type="button"
-                   value="Maybe"
-                   disabled={this.props.disabled}
-                   onClick={this.onChange}/>)
-  }
-});
-
-var RejectButton = React.createClass({
-  onChange: function() {
-    this.props.callback('reject')
-  },
-  render: function() {
-    return (<input id="rejectButton"
-                   className="choiceButton"
-                   type="button"
-                   value="Reject"
-                   disabled={this.props.disabled}
-                   onClick={this.onChange}/>)
-  }
-});
-
-var SetMinMZ = React.createClass({
-  handleChange: function(event) {
-    this.props.callback(event.target.value)
-  },
-  render: function() {
-    return (
-      <div id="setMinMZ">
-        Min. m/z:
-        <input className="numInput"
-               type="number"
-               value={this.props.minMZ}
-               disabled={this.props.disabled}
-               onChange={this.handleChange}/>
-      </div>
-    )
-  }
-});
-
-var SetMaxMZ = React.createClass({
-  handleChange: function(event) {
-    this.props.callback(event.target.value)
-  },
-  render: function() {
-    return (
-      <div id="setMaxMZ">
-        Max. m/z:
-        <input className="numInput"
-               type="number"
-               value={this.props.maxMZ == null ? this.props.scanMaxMZ : this.props.maxMZ}
-               disabled={this.props.disabled}
-               onChange={this.handleChange}/>
-      </div>
-    )
-  }
-});
 
 var SpectrumBox = React.createClass({
   getInitialState: function() {
@@ -263,31 +191,41 @@ var SpectrumBox = React.createClass({
         <div id="fragmentGoogleChart"></div>
         <div id="updateBox">
           <div className="setMinMZ">
-            <SetMinMZ minMZ={this.props.minMZ}
-                      disabled={this.props.inputDisabled}
-                      callback={this.props.updateMinMZ}/>
+            <SetMinMZ
+              callback={this.props.updateMinMZ}
+              disabled={this.props.inputDisabled}
+              minMZ={this.props.minMZ}
+            />
           </div>
 
           <div className="setMaxMZ">
-            <SetMaxMZ maxMZ={this.props.maxMZ}
-                      disabled={this.props.inputDisabled}
-                      scanMaxMZ={this.props.spectrumData.length == 0 ? 1 : this.props.spectrumData[this.props.spectrumData.length - 1].mz + 1}
-                      callback={this.props.updateMaxMZ}/>
+            <SetMaxMZ
+              callback={this.props.updateMaxMZ}
+              disabled={this.props.inputDisabled}
+              maxMZ={this.props.maxMZ}
+              scanMaxMZ={this.props.spectrumData.length == 0 ? 1 : this.props.spectrumData[this.props.spectrumData.length - 1].mz + 1}
+            />
           </div>
 
           <div className="rejectButton">
-            <RejectButton disabled={this.props.inputDisabled}
-                          callback={this.props.updateChoice}/>
+            <RejectButton
+              callback={this.props.updateChoice}
+              disabled={this.props.inputDisabled}
+            />
           </div>
 
           <div className="maybeButton">
-            <MaybeButton disabled={this.props.inputDisabled}
-                         callback={this.props.updateChoice}/>
+            <MaybeButton
+              callback={this.props.updateChoice}
+              disabled={this.props.inputDisabled}
+            />
           </div>
 
           <div className="acceptButton">
-            <AcceptButton disabled={this.props.inputDisabled}
-                          callback={this.props.updateChoice}/>
+            <AcceptButton
+              callback={this.props.updateChoice}
+              disabled={this.props.inputDisabled}
+            />
           </div>
         </div>
       </div>
