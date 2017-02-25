@@ -1,13 +1,15 @@
 import React from 'react'
 
-var QuantSpectrumBox = React.createClass({
-  getInitialState: function() {
-    return {chartLoaded: false}
-  },
+class QuantSpectrumBox extends React.Component {
+  constructor(props) {
+    super(props)
+    this.state = {chartLoaded: false}
+    this.handleResize = this.handleResize.bind(this);
+  }
 
-  drawChart: function() {
-
+  drawChart() {
     var data = new google.visualization.DataTable();
+
     data.addColumn('number', 'mz');
     data.addColumn('number', 'Intensity');
     data.addColumn({'type': 'string', 'role': 'style'})
@@ -35,7 +37,7 @@ var QuantSpectrumBox = React.createClass({
           }
         })
 
-        var style = ''
+        let style = ''
 
         if (found) {
           style = 'point {size: 5; fill-color: green; visible: true}'
@@ -70,12 +72,14 @@ var QuantSpectrumBox = React.createClass({
       tooltip: {trigger: 'none'}
     };
 
-    var chart = new google.visualization.LineChart(document.getElementById('quantGoogleChart'));
+    var chart = new google.visualization.LineChart(
+      document.getElementById('quantGoogleChart')
+    );
 
     chart.draw(data, options);
-  },
+  }
 
-  componentDidMount: function() {
+  componentDidMount() {
     window.addEventListener('resize', this.handleResize);
 
     var component = this;
@@ -95,33 +99,45 @@ var QuantSpectrumBox = React.createClass({
           },
         });
       });
-  },
+  }
 
-  componentDidUpdate: function (prevProps, prevState) {
+  componentDidUpdate(prevProps, prevState) {
     if (this.state.chartLoaded) {
       if (prevProps.spectrumData != this.props.spectrumData) {
         this.drawChart();
       }
     }
-  },
+  }
 
-  componentWillUnmount: function() {
+  componentWillUnmount() {
     window.removeEventListener('resize', this.handleResize);
-  },
+  }
 
-  handleResize: function(e) {
+  handleResize() {
     if (this.state.chartLoaded) {
       this.drawChart();
     }
-  },
+  }
 
-  render: function() {
+  render() {
     return (
       <div>
-        <div id="quantGoogleChart"></div>
+        <div id="quantGoogleChart" />
       </div>
     );
   }
-});
+}
+
+QuantSpectrumBox.propTypes = {
+  ppm: React.PropTypes.number,
+  quantMz: React.PropTypes.arrayOf(React.PropTypes.number),
+  spectrumData: React.PropTypes.array,
+}
+
+QuantSpectrumBox.defaultProps = {
+  ppm: 20,
+  quantMz: [0, 1],
+  spectrumData: [],
+}
 
 module.exports = QuantSpectrumBox

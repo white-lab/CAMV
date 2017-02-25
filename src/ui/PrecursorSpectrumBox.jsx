@@ -1,12 +1,15 @@
 import React from 'react'
 
-var PrecursorSpectrumBox = React.createClass({
-  getInitialState: function() {
-    return {chartLoaded: false}
-  },
+class PrecursorSpectrumBox extends React.Component {
+  constructor(props) {
+    super(props)
+    this.state = {chartLoaded: false}
+    this.handleResize = this.handleResize.bind(this);
+  }
 
-  drawChart: function() {
+  drawChart() {
     var data = new google.visualization.DataTable();
+
     data.addColumn('number', 'mz');
     data.addColumn('number', 'Intensity');
     data.addColumn({'type': 'string', 'role': 'style'})
@@ -102,9 +105,9 @@ var PrecursorSpectrumBox = React.createClass({
     var chart = new google.visualization.AreaChart(document.getElementById('precursorGoogleChart'));
 
     chart.draw(data, options);
-  },
+  }
 
-  componentDidMount: function() {
+  componentDidMount() {
     window.addEventListener('resize', this.handleResize);
 
     var component = this;
@@ -124,33 +127,49 @@ var PrecursorSpectrumBox = React.createClass({
           },
         });
       });
-  },
+  }
 
-  componentDidUpdate: function (prevProps, prevState) {
+  componentDidUpdate(prevProps, prevState) {
     if (this.state.chartLoaded) {
       if (prevProps.spectrumData != this.props.spectrumData) {
         this.drawChart();
       }
     }
-  },
+  }
 
-  componentWillUnmount: function() {
+  componentWillUnmount() {
     window.removeEventListener('resize', this.handleResize);
-  },
+  }
 
-  handleResize: function(e) {
+  handleResize() {
     if (this.state.chartLoaded) {
       this.drawChart();
     }
-  },
+  }
 
-  render: function() {
+  render() {
     return (
       <div>
-        <div id="precursorGoogleChart"></div>
+        <div id="precursorGoogleChart" />
       </div>
     );
   }
-});
+}
+
+PrecursorSpectrumBox.propTypes = {
+  chargeState: React.PropTypes.number,
+  isolationWindow: React.PropTypes.number,
+  ppm: React.PropTypes.number,
+  precursorMz: React.PropTypes.number,
+  spectrumData: React.PropTypes.array,
+}
+
+PrecursorSpectrumBox.defaultProps = {
+  chargeState: 2,
+  isolationWindow: 0.4,
+  ppm: 20,
+  precursorMz: 0,
+  spectrumData: [],
+}
 
 module.exports = PrecursorSpectrumBox
