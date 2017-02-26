@@ -42,6 +42,7 @@ class ViewBox extends React.Component {
       data: [],
       peptideData: [],
       exporting: false,
+      basename: null,
     }
   }
 
@@ -226,11 +227,44 @@ class ViewBox extends React.Component {
   }
 
   closeExportModal() {
-    this.setState({modalExportIsOpen: false})
+    this.setState({
+      modalExportIsOpen: false,
+    })
   }
 
-  export_tables() {
-    // Export spectra as xls file
+  export_tables(dirName) {
+    // Export spectra as csv file
+    let dataOut = []
+    dataOut.push([
+      "Scan",
+      "Protein",
+      // "Accession",
+      "Sequence",
+      // "Score",
+      "Status",
+    ])
+
+    for (let vals of this.iterate_spectra([true, true, true, true])) {
+      let [nodes, prot, pep, scan, state] = vals;
+
+      dataOut.push([
+        scan,
+        prot,
+        pep,
+        state,
+      ])
+    }
+
+    let rows = []
+    for (let row of dataOut) {
+      rows.push(row.join(", "))
+    }
+
+    fs.writeFile(
+      path.join(dirName, this.state.basename + ".csv"),
+      rows.join("\n"),
+      function () {}
+    )
   }
 
   *iterate_spectra(export_spectras) {
@@ -257,7 +291,7 @@ class ViewBox extends React.Component {
               protein.proteinId,
               peptide.peptideId,
               scan.scanId,
-              match.modsId
+              match.modsId,
             ];
             yield [
               nodes,
@@ -265,7 +299,8 @@ class ViewBox extends React.Component {
               this.state.peptideData[peptide.peptideDataId]
                 .modificationStates[peptide.modificationStateId]
                 .mods[match.modsId].name,
-              scan.scanNumber
+              scan.scanNumber,
+              state,
             ];
           }
         }
@@ -292,7 +327,7 @@ class ViewBox extends React.Component {
     let promises = [];
 
     for (let vals of this.iterate_spectra(export_spectras)) {
-      let [nodes, prot, pep, scan] = vals;
+      let [nodes, prot, pep, scan, score, state] = vals;
       let out_name = prot + " - " + pep + " - " + scan;
 
       this.refs["scanSelectionList"].update(...nodes);
@@ -349,7 +384,7 @@ class ViewBox extends React.Component {
         dirName,
         function() {
           if (export_tables) {
-            this.export_tables();
+            this.export_tables(dirName);
           }
 
           if (!export_spectras.some(i => i)) {
@@ -400,27 +435,38 @@ class ViewBox extends React.Component {
   }
 
   goButtonClicked() {
-    this.setState({submitted: true})
+    this.setState({
+      submitted: true,
+    })
   }
 
   setData(data) {
-    this.setState({data: data})
+    this.setState({
+      data: data,
+    })
   }
 
   setPeptideData(peptideData) {
-    this.setState({peptideData: peptideData})
+    this.setState({
+      peptideData: peptideData,
+    })
   }
 
   setSubmitted(submitted, fileName) {
-    this.setState({submitted: submitted})
+    this.setState({
+      submitted: submitted,
+      basename: fileName.split(/(\\|\/)/g).pop().split('.')[0],
+    })
     this.refs["modalExportBox"].setState({
       exportDirectory: fileName.match(/(.*)[\/\\]/)[1] || '',
-      dirChosen: true
+      dirChosen: true,
     })
   }
 
   openExport() {
-    this.setState({modalExportIsOpen: true})
+    this.setState({
+      modalExportIsOpen: true,
+    })
   }
 
   save() {
