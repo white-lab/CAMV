@@ -1,13 +1,15 @@
 import React from 'react'
 
-function SequenceElement({ AA }) {
-  return (
-    <td
-      className="aminoAcid"
-    >
-      { AA }
-    </td>
-  )
+class SequenceElement extends React.Component {
+  render() {
+    return (
+      <td
+        className="aminoAcid"
+      >
+        { this.props.AA }
+      </td>
+    )
+  }
 }
 
 SequenceElement.propTypes = {

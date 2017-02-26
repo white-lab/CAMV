@@ -38,7 +38,10 @@ class PeptideListItem extends React.Component {
       this.props.selectedPTMPlacement == null
     )
     var peptideModificationState = this.props.peptideData.modificationStates[this.props.modificationStateId]
-    var sequenceName = this.props.peptideData.peptideSequence + peptideModificationState.modDesc
+    var sequenceName = (
+      this.props.peptideData.peptideSequence +
+      peptideModificationState.modDesc
+    )
 
     if (this.state.open || this.childSelected()) {
       return (
@@ -96,11 +99,18 @@ PeptideListItem.propTypes = {
   proteinId: React.PropTypes.number.isRequired,
   peptideId: React.PropTypes.number.isRequired,
   modificationStateId: React.PropTypes.number.isRequired,
-  selectedProtein: React.PropTypes.number.isRequired,
-  selectedPeptide: React.PropTypes.number.isRequired,
-  selectedScan: React.PropTypes.number.isRequired,
-  selectedPTMPlacement: React.PropTypes.number.isRequired,
-  peptideData: React.PropTypes.array.isRequired,
+  selectedProtein: React.PropTypes.number,
+  selectedPeptide: React.PropTypes.number,
+  selectedScan: React.PropTypes.number,
+  selectedPTMPlacement: React.PropTypes.number,
+  peptideData: React.PropTypes.object.isRequired,
+}
+
+PeptideListItem.defaultProps = {
+  selectedProtein: null,
+  selectedPeptide: null,
+  selectedScan: null,
+  selectedPTMPlacement: null,
 }
 
 module.exports = PeptideListItem

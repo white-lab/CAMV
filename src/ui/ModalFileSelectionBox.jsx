@@ -21,7 +21,7 @@ class ModalFileSelectionBox extends React.Component {
     let inputData = JSON.parse(data);
     this.setState({
       data: inputData.scanData,
-      peptideData: inputData.peptideData
+      peptideData: inputData.peptideData,
     });
   }
 

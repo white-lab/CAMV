@@ -1,14 +1,16 @@
 import React from 'react'
 
-function IonElement( { bion, found }) {
-  return (
-    <td
-      className={this.props.bion ? "bIon" : "yIon"}
-      style={{ color: this.props.found ? "red" : "lightgray" }}
-    >
-      {this.props.bion ? '⌉' : '⌊'}
-    </td>
-  )
+class IonElement extends React.Component {
+  render() {
+    return (
+      <td
+        className={this.props.bion ? "bIon" : "yIon"}
+        style={{ color: this.props.found ? "red" : "lightgray" }}
+      >
+        {this.props.bion ? '⌉' : '⌊'}
+      </td>
+    )
+  }
 }
 
 IonElement.propTypes = {

@@ -39,11 +39,19 @@ PTMPlacementListItem.propTypes = {
   peptideId: React.PropTypes.number.isRequired,
   scanId: React.PropTypes.number.isRequired,
   ptmPlacement: React.PropTypes.object.isRequired,
-  choice: React.PropTypes.string.isRequired,
-  selectedProtein: React.PropTypes.number.isRequired,
-  selectedPeptide: React.PropTypes.number.isRequired,
-  selectedScan: React.PropTypes.number.isRequired,
-  selectedPTMPlacement: React.PropTypes.number.isRequired,
+  choice: React.PropTypes.string,
+  selectedProtein: React.PropTypes.number,
+  selectedPeptide: React.PropTypes.number,
+  selectedScan: React.PropTypes.number,
+  selectedPTMPlacement: React.PropTypes.number,
+}
+
+PTMPlacementListItem.defaultProps = {
+  choice: null,
+  selectedProtein: null,
+  selectedPeptide: null,
+  selectedScan: null,
+  selectedPTMPlacement: null,
 }
 
 module.exports = PTMPlacementListItem

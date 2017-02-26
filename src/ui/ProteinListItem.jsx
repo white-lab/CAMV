@@ -99,13 +99,20 @@ class ProteinListItem extends React.Component {
 }
 
 ProteinListItem.propTypes = {
-  protein: React.PropTypes.array.isRequired,
+  protein: React.PropTypes.object.isRequired,
   update: React.PropTypes.func.isRequired,
-  selectedProtein: React.PropTypes.number.isRequired,
-  selectedPeptide: React.PropTypes.number.isRequired,
-  selectedScan: React.PropTypes.number.isRequired,
-  selectedPTMPlacement: React.PropTypes.number.isRequired,
+  selectedProtein: React.PropTypes.number,
+  selectedPeptide: React.PropTypes.number,
+  selectedScan: React.PropTypes.number,
+  selectedPTMPlacement: React.PropTypes.number,
   peptideData: React.PropTypes.array.isRequired,
+}
+
+ProteinListItem.defaultProps = {
+  selectedProtein: null,
+  selectedPeptide: null,
+  selectedScan: null,
+  selectedPTMPlacement: null,
 }
 
 module.exports = ProteinListItem

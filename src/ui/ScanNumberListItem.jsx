@@ -95,15 +95,22 @@ class ScanNumberListItem extends React.Component {
 }
 
 ScanNumberListItem.propTypes = {
-  scan: React.PropTypes.array.isRequired,
+  scan: React.PropTypes.object.isRequired,
   update: React.PropTypes.func.isRequired,
   proteinId: React.PropTypes.number.isRequired,
   peptideId: React.PropTypes.number.isRequired,
-  ptmPlacements: React.PropTypes.number.isRequired,
-  selectedProtein: React.PropTypes.number.isRequired,
-  selectedPeptide: React.PropTypes.number.isRequired,
-  selectedScan: React.PropTypes.number.isRequired,
-  selectedPTMPlacement: React.PropTypes.number.isRequired,
+  ptmPlacements: React.PropTypes.array.isRequired,
+  selectedProtein: React.PropTypes.number,
+  selectedPeptide: React.PropTypes.number,
+  selectedScan: React.PropTypes.number,
+  selectedPTMPlacement: React.PropTypes.number,
+}
+
+ScanNumberListItem.defaultProps = {
+  selectedProtein: null,
+  selectedPeptide: null,
+  selectedScan: null,
+  selectedPTMPlacement: null,
 }
 
 module.exports = ScanNumberListItem
