@@ -86,9 +86,9 @@ class ViewBox extends React.Component {
       selectedProtein: proteinId,
       selectedPeptide: peptideId,
       selectedScan: scanId,
+      selectedPTMPlacement: modsId,
       minMZ: 0,
       maxMZ: null,
-      selectedPTMPlacement: modsId
     })
   }
 
@@ -312,8 +312,9 @@ class ViewBox extends React.Component {
     this.setState({exporting: true});
     var win = remote.getCurrentWindow();
     var sizes = win.getBounds();
+
     win.setSize(800, 650);
-    this.forceUpdate();
+    win.setResizable(false);
 
     let scan_list = this.refs["scanSelectionList"];
 
@@ -323,6 +324,14 @@ class ViewBox extends React.Component {
       scan_list.props.selectedScan,
       scan_list.props.selectedPTMPlacement
     ];
+
+    /* Dummy call to force interface to redraw */
+    this.refs["scanSelectionList"].update(...[null, null, null, null])
+
+    await domtoimage.toPng(
+      document.getElementById('viewBox'),
+      function () {}
+    )
 
     let promises = [];
 
@@ -336,8 +345,6 @@ class ViewBox extends React.Component {
       this.refs["precursorSpectrum"].drawChart();
       this.refs["quantSpectrum"].drawChart();
 
-      // promises.push(
-      //
       // domtoimage.toSvg(
       let dataUrl = await domtoimage.toPng(
         document.getElementById('viewBox'),
@@ -369,6 +376,7 @@ class ViewBox extends React.Component {
       function() {
         this.setState({exporting: false});
         win.setSize(sizes.width, sizes.height);
+        win.setResizable(true);
         this.refs["scanSelectionList"].update(...current_node);
       }.bind(this)
     )
