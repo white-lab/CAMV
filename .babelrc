@@ -1,5 +1,9 @@
 {
   "presets": ["es2017-node7", "react"],
-  "plugins": ["syntax-async-functions", "transform-runtime"],
+  "plugins": [
+    "react-hot-loader/babel",
+    "syntax-async-functions",
+    "transform-runtime"
+  ],
   "sourceMaps": "inline",
 }

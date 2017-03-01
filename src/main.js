@@ -1,6 +1,9 @@
 const electron = require('electron');
 const {app} = electron;
 const {BrowserWindow} = electron;
+import {enableLiveReload} from 'electron-compile';
+
+enableLiveReload();
 
 var mainWindow = null;
 
@@ -23,6 +26,7 @@ app.on('window-all-closed', function() {
 });
 
 app.on('ready', function() {
+  enableLiveReload({strategy: 'react-hmr'});
   createWindow();
 });
 
