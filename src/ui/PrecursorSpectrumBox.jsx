@@ -158,7 +158,7 @@ class PrecursorSpectrumBox extends React.Component {
 
 PrecursorSpectrumBox.propTypes = {
   chargeState: React.PropTypes.number,
-  isolationWindow: React.PropTypes.number,
+  isolationWindow: React.PropTypes.array,
   ppm: React.PropTypes.number,
   precursorMz: React.PropTypes.number,
   spectrumData: React.PropTypes.array,
@@ -166,7 +166,7 @@ PrecursorSpectrumBox.propTypes = {
 
 PrecursorSpectrumBox.defaultProps = {
   chargeState: 2,
-  isolationWindow: 0.4,
+  isolationWindow: null,
   ppm: 20,
   precursorMz: 0,
   spectrumData: [],
