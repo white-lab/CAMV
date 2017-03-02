@@ -1,4 +1,5 @@
 import React from 'react'
+import { Button } from 'react-bootstrap'
 
 class MaybeButton extends React.Component {
   onChange() {
@@ -7,14 +8,15 @@ class MaybeButton extends React.Component {
 
   render() {
     return (
-      <input
+      <Button
         className="choiceButton"
+        bsStyle="warning"
         disabled={this.props.disabled}
         id="maybeButton"
         onClick={this.onChange.bind(this)}
-        type="button"
-        value="Maybe"
-      />
+      >
+        Maybe
+      </Button>
     )
   }
 }
