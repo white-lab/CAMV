@@ -14,6 +14,7 @@ class SpectrumBox extends React.Component {
     super(props)
     this.state = {
       chartLoaded: false,
+      exporting: false,
     }
     this.handleResize = this.handleResize.bind(this);
     this.handleHotkey = this.handleHotkey.bind(this)
@@ -184,16 +185,22 @@ class SpectrumBox extends React.Component {
   }
 
   handleResize(e) {
-    if (this.state.chartLoaded) {
-      this.drawChart();
-    }
+    this.drawChart();
   }
 
   render() {
     return (
       <div>
-        <div id="fragmentGoogleChart" />
-        <div id="updateBox">
+        <div
+          id="fragmentGoogleChart"
+          style={{
+            height: this.state.exporting ? "100%" : "92.5%"
+          }}
+        />
+        <div
+          id="updateBox"
+          style={{display: this.state.exporting ? 'none' : null}}
+        >
           <div className="setMinMZ">
             <SetMinMZ
               callback={this.props.updateMinMZ}

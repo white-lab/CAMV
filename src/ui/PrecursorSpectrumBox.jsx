@@ -144,9 +144,7 @@ class PrecursorSpectrumBox extends React.Component {
   }
 
   handleResize() {
-    if (this.state.chartLoaded) {
-      this.drawChart();
-    }
+    this.drawChart();
   }
 
   render() {

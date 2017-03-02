@@ -90,6 +90,16 @@ class ViewBox extends React.Component {
       minMZ: 0,
       maxMZ: null,
     })
+
+    if ((modsId != null) || [proteinId, peptideId, scanId, modsId].every(i => i != null)) {
+      this.redrawCharts()
+    }
+  }
+
+  redrawCharts() {
+    this.refs["fragmentSpectrum"].drawChart();
+    this.refs["precursorSpectrum"].drawChart();
+    this.refs["quantSpectrum"].drawChart();
   }
 
   updateMinMZ(newMinMZ) {
@@ -317,6 +327,8 @@ class ViewBox extends React.Component {
     win.setResizable(false);
 
     let scan_list = this.refs["scanSelectionList"];
+    let spectrum = this.refs["fragmentSpectrum"];
+    spectrum.setState({exporting: true})
 
     let current_node = [
       scan_list.props.selectedProtein,
@@ -341,22 +353,14 @@ class ViewBox extends React.Component {
 
       this.refs["scanSelectionList"].update(...nodes);
 
-      this.refs["fragmentSpectrum"].drawChart();
-      this.refs["precursorSpectrum"].drawChart();
-      this.refs["quantSpectrum"].drawChart();
-
-      // domtoimage.toSvg(
+      // let dataUrl = await domtoimage.toSvg(
       let dataUrl = await domtoimage.toPng(
         document.getElementById('viewBox'),
         {
-          width: 1147,
-          height: 522,
+          width: 770,
+          height: 595,
           bgcolor: 'red',
-          filter: node =>
-            !~[
-              "scanSelectionList", "exportSave", "setMinMZ", "setMaxMZ",
-              "rejectButton", "maybeButton", "acceptButton"
-            ].indexOf(node.id)
+          dpi: 600,
         },
         function () {}
       )
@@ -364,7 +368,7 @@ class ViewBox extends React.Component {
         fs.writeFile(
           // path.join(dirName, out_name + ".svg"),
           // '<?xml version="1.0" encoding="UTF-8" standalone="no"?>' +
-          // dataUrl.slice("data:image/svg+xml;charset=utf-8,".length)
+          // dataUrl.slice("data:image/svg+xml;charset=utf-8,".length),
           path.join(dirName, out_name + ".png"),
           this.decodeBase64Image(dataUrl).data,
           function () {}
@@ -378,6 +382,7 @@ class ViewBox extends React.Component {
         win.setSize(sizes.width, sizes.height);
         win.setResizable(true);
         this.refs["scanSelectionList"].update(...current_node);
+        spectrum.setState({exporting: false})
       }.bind(this)
     )
   }
@@ -593,6 +598,7 @@ class ViewBox extends React.Component {
       <div
         className="panel panel-default"
         id="viewBox"
+        style={{margin: this.state.exporting ? '0px' : '10px'}}
       >
         <ModalFragmentBox
           showModal={this.state.fragmentSelectionModalIsOpen}
@@ -617,6 +623,7 @@ class ViewBox extends React.Component {
         <div
           className="panel panel-default"
           id="scanSelectionList"
+          style={{display: this.state.exporting ? 'none' : null}}
         >
           <ScanSelectionList
             ref="scanSelectionList"
@@ -688,12 +695,14 @@ class ViewBox extends React.Component {
                 <Button
                   id="save"
                   onClick={this.save.bind(this)}
+                  style={{display: this.state.exporting ? 'none' : null}}
                 >
                   Save
                 </Button>
                 <Button
                   id="openExport"
                   onClick={this.openExport.bind(this)}
+                  style={{display: this.state.exporting ? 'none' : null}}
                 >
                   Export
                 </Button>
