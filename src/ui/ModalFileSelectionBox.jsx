@@ -13,7 +13,7 @@ class ModalFileSelectionBox extends React.Component {
       fileChosen: false,
       data: [],
       peptideData: [],
-      fileName: '',
+      fileName: null,
     }
   }
 
