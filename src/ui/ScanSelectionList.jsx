@@ -6,17 +6,12 @@ hotkey.activate();
 import ProteinListItem from './ProteinListItem'
 
 class ScanSelectionList extends React.Component {
-  constructor(props) {
-    super(props)
-    this.handleHotkey = this.handleHotkey.bind(this)
-  }
-
   componentDidMount() {
-    hotkey.addHandler(this.handleHotkey)
+    hotkey.addHandler(this.handleHotkey.bind(this))
   }
 
   componentWillUnmount() {
-    hotkey.removeHandler(this.handleHotkey)
+    hotkey.removeHandler(this.handleHotkey.bind(this))
   }
 
   update(proteinId, peptideId, scanId, modsId) {
@@ -138,9 +133,11 @@ class ScanSelectionList extends React.Component {
       case 'ArrowRight':
         node = this.selectRight(node);
         break;
+      case 'k':
       case 'ArrowUp':
         node = this.selectUp(node);
         break;
+      case 'j':
       case 'ArrowDown':
         node = this.selectDown(node);
         break;
