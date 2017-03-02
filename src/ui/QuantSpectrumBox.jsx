@@ -99,17 +99,23 @@ class QuantSpectrumBox extends React.Component {
       hAxis: {
         // title: 'mz',
         gridlines: { color: 'transparent' },
-        minValue: minMZ,
-        maxValue: maxMZ,
+        minValue: this.props.spectrumData.length > 0 ? minMZ : 0,
+        maxValue: this.props.spectrumData.length > 0 ? maxMZ : 100,
       },
       vAxis: {
         // title: 'Intensity'
         gridlines: { color: 'transparent' },
         format: 'scientific',
+        maxValue: this.props.spectrumData.length > 0 ? null : 100,
       },
       annotations: { textStyle: { }, stemColor: 'none' },
       legend: 'none',
-      tooltip: {trigger: 'none'}
+      tooltip: {trigger: 'none'},
+      explorer: {
+        actions: ['dragToZoom', 'rightClickToReset'],
+        axis: 'horizontal',
+        maxZoomIn: 0.01,
+      },
     };
 
     var chart = new google.visualization.LineChart(

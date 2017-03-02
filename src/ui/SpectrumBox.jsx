@@ -109,14 +109,14 @@ class SpectrumBox extends React.Component {
               var match = this.props.matchData[matchId]
               ppm = Math.abs(match.mz - mz) / mz * 1000000
               name = match.name
-              // TO DO: change these conditions to match color coding
+              // TODO: change these conditions to match color coding
               if (into == 0) {
                 // Plot intermediate line-plot points along x-axis
                 style = null
               } else if (ppm < 10) {
                 style = 'point {size: 3; fill-color: green; visible: true}'
               }
-            } else if (into < max_y / 10) {
+            } else if (into < max_y / 20) {
               style = null
             }
         }
@@ -137,20 +137,25 @@ class SpectrumBox extends React.Component {
       hAxis: {
         title: 'mz',
         gridlines: { color: 'transparent' },
-        minValue: minMZ,
-        maxValue: maxMZ
+        minValue: this.props.spectrumData.length > 0 ? minMZ : 0,
+        maxValue: this.props.spectrumData.length > 0 ? maxMZ : 100,
       },
       vAxis: {
         title: 'Intensity',
         format: 'scientific',
         gridlines: { color: 'transparent' },
         minValue: 0,
-        maxValue: max_y
+        maxValue: this.props.spectrumData.length > 0 ? null : 100,
       },
       annotations: { style: 'line', stemColor: 'none' },
       chartArea: { width: "80%", height: "80%" },
       legend: 'none',
-      tooltip: {trigger: 'none'}
+      tooltip: {trigger: 'none'},
+      explorer: {
+        actions: ['dragToZoom', 'rightClickToReset'],
+        axis: 'horizontal',
+        maxZoomIn: 0.01,
+      },
     };
 
     var chart = new google.visualization.LineChart(document.getElementById('fragmentGoogleChart'));

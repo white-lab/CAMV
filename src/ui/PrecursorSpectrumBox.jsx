@@ -71,8 +71,8 @@ class PrecursorSpectrumBox extends React.Component {
 
       /* Draw a box for the isolation window, if data is available */
       if (this.props.isolationWindow != null) {
-        var lower_window = precursorMz - this.props.isolationWindow[0];
-        var upper_window = precursorMz + this.props.isolationWindow[1];
+        let lower_window = precursorMz - this.props.isolationWindow[0];
+        let upper_window = precursorMz + this.props.isolationWindow[1];
 
         data.addRows([
           [lower_window, 0, null, null, 0],
@@ -83,13 +83,11 @@ class PrecursorSpectrumBox extends React.Component {
       }
 
       this.props.spectrumData.forEach(function(peak) {
-        var mz = peak.mz
-        var into = peak.into
-        var name = ''
-
-        var found = false
-
-        var ionSeries = [0,1,2,3,4,5]
+        let mz = peak.mz
+        let into = peak.into
+        let name = ''
+        let found = false
+        let ionSeries = [0, 1, 2, 3, 4, 5]
 
         ionSeries.forEach(function(val) {
           var currPPM = 1000000 * (mz - precursorMz - 1.0079 * val / chargeState) / mz
@@ -98,10 +96,17 @@ class PrecursorSpectrumBox extends React.Component {
           }
         })
 
-        var style = ''
+        let contaminant = !found && this.props.isolationWindow != null && (
+          mz >= precursorMz - this.props.isolationWindow[0] &&
+          mz <= precursorMz + this.props.isolationWindow[1]
+        )
+
+        let style = ''
 
         if (found) {
           style = 'point {size: 5; fill-color: green; visible: true}'
+        } else if (contaminant) {
+          style = 'point {size: 3; fill-color: red; visible: true}'
         } else {
           style = 'point {size: 5; fill-color: green; visible: false}'
         }
@@ -111,7 +116,7 @@ class PrecursorSpectrumBox extends React.Component {
           [mz, into, style, name, null],
           [mz, 0,    null,  null, null]
         ])
-      })
+      }.bind(this))
 
       data.addRows([
         [maxMZ, 0, null, null, null]
@@ -123,19 +128,24 @@ class PrecursorSpectrumBox extends React.Component {
       hAxis: {
         // title: 'mz',
         gridlines: { color: 'transparent' },
-        minValue: minMZ,
-        maxValue: maxMZ
+        minValue: this.props.spectrumData.length > 0 ? minMZ : 0,
+        maxValue: this.props.spectrumData.length > 0 ? maxMZ : 100,
       },
       vAxis: {
         // title: 'Intensity',
         gridlines: { color: 'transparent' },
         format: 'scientific',
         minValue: 0,
-        maxValue: max_y * 1.1
+        maxValue: this.props.spectrumData.length > 0 ? null : 100,
       },
       annotations: { textStyle: { }, stemColor: 'none' },
       legend: 'none',
-      tooltip: {trigger: 'none'}
+      tooltip: {trigger: 'none'},
+      explorer: {
+        actions: ['dragToZoom', 'rightClickToReset'],
+        axis: 'horizontal',
+        maxZoomIn: 0.01,
+      },
     };
 
     var chart = new google.visualization.AreaChart(document.getElementById('precursorGoogleChart'));
