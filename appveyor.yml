@@ -11,16 +11,12 @@ environment:
 
 install:
     - ps: Install-Product node $env:nodejs_version
-    - "cd src/"
     - "npm install"
     - "npm install bower -g"
     - "bower install"
-    - "cd .."
 
 # test_script:
-#     - cd src/
 #     - npm test
-#     - cd ..
 
 build_script:
     - npm run package
