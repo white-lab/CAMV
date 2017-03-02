@@ -1,7 +1,8 @@
 #viewBox {
-  height: 96%;
-  width: 98%;
-  margin: 1%;
+  height: 100%;
+  /*width: 98%;*/
+  /*margin: 100px 500px;*/
+  /*overflow:hidden;*/
 }
 
 #scanSelectionList {
@@ -19,11 +20,22 @@
   margin-bottom: 0%;
 }
 
-#sequence {
+#scanDataContainer {
+  float: left;
   position: relative;
-  padding-left: 10%;
-  left: 50%; top: 50%; /*move the object to the center of the parent object*/
-  transform: translate(-50%, -50%);
+  top: 50%;
+  transform: translate(5%, -50%);
+}
+
+#scanData p {
+  margin: 0px;
+}
+
+#sequenceContainer {
+  float: right;
+  position: relative;
+  top: 50%;
+  transform: translate(-10%, -50%);
 }
 
 #spectra {
@@ -34,6 +46,7 @@
 
 #sequenceSpectraContainer {
   height: 100%;
+  width: 80%;
   float: right;
 }
 
@@ -120,30 +133,6 @@
   float: right;
 }
 
-#acceptButton:enabled {
-  background-color: green;
-}
-
-#acceptButton:disabled {
-  background-color: LightGray;
-}
-
-#maybeButton:enabled {
-  background-color: yellow;
-}
-
-#maybeButton:disabled {
-  background-color: LightGray;
-}
-
-#rejectButton:enabled {
-  background-color: red;
-}
-
-#rejectButton:disabled {
-  background-color: LightGray;
-}
-
 #setMinMZ {
   float: left;
   margin-right: 1%;
@@ -189,8 +178,4 @@ li::before {
   bottom: 8;
   position: relative;
   border-bottom: 1px solid #333;
-}
-
-body {
-    margin: 2px 0px;
 }

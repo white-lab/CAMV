@@ -15,6 +15,7 @@ import ModalFileSelectionBox from './ModalFileSelectionBox'
 import ModalFragmentBox from './ModalFragmentBox'
 import PrecursorSpectrumBox from './PrecursorSpectrumBox'
 import QuantSpectrumBox from './QuantSpectrumBox'
+import ScanDataBox from './ScanDataBox'
 import ScanSelectionList from './ScanSelectionList'
 import SequenceBox from './SequenceBox'
 import SpectrumBox from './SpectrumBox'
@@ -25,7 +26,7 @@ class ViewBox extends React.Component {
     super(props)
     this.state = {
       selectedRun: null,
-      selectedSearch:null,
+      selectedSearch: null,
       submitted: false,
       selectedProtein: null,
       selectedPeptide: null,
@@ -569,6 +570,9 @@ class ViewBox extends React.Component {
     let yFound = []
     let peptideSequence = null
     let inputDisabled = true
+    let protName = null
+    let scanNumber = null
+    let fileName = null
 
     if (this.state.selectedProtein != null) {
       let protein = this.state.data[this.state.selectedProtein]
@@ -586,6 +590,9 @@ class ViewBox extends React.Component {
           chargeState = scan.chargeState
           quantSpectrumData = scan.quantScanData
           quantMz = scan.quantMz
+          protName = protein.proteinName
+          scanNumber = scan.scanNumber
+          fileName = scan.fileName
 
           if (this.state.selectedPTMPlacement != null) {
             inputDisabled = false
@@ -666,11 +673,25 @@ class ViewBox extends React.Component {
             className="panel panel-default"
             id="sequenceBox"
           >
-            <SequenceBox
-              bFound={bFound}
-              sequence={peptideSequence}
-              yFound={yFound}
-            />
+            <div
+              id="scanDataContainer"
+            >
+              <ScanDataBox
+                protName={protName}
+                chargeState={chargeState}
+                scanNumber={scanNumber}
+                fileName={fileName}
+              />
+            </div>
+            <div
+              id="sequenceContainer"
+            >
+              <SequenceBox
+                bFound={bFound}
+                sequence={peptideSequence}
+                yFound={yFound}
+              />
+            </div>
           </div>
           <div
             className="panel panel-default"
@@ -714,6 +735,7 @@ class ViewBox extends React.Component {
                   id="save"
                   onClick={this.save.bind(this)}
                   style={{display: this.state.exporting ? 'none' : null}}
+                  disabled={this.state.data.length < 1}
                 >
                   Save
                 </Button>
@@ -721,6 +743,7 @@ class ViewBox extends React.Component {
                   id="openExport"
                   onClick={this.openExport.bind(this)}
                   style={{display: this.state.exporting ? 'none' : null}}
+                  disabled={this.state.data.length < 1}
                 >
                   Export
                 </Button>
