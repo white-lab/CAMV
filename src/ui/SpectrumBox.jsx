@@ -16,13 +16,11 @@ class SpectrumBox extends React.Component {
       chartLoaded: false,
       exporting: false,
     }
-    this.handleResize = this.handleResize.bind(this);
-    this.handleHotkey = this.handleHotkey.bind(this)
   }
 
   componentDidMount() {
-    window.addEventListener('resize', this.handleResize);
-    hotkey.addHandler(this.handleHotkey)
+    window.addEventListener('resize', this.handleResize.bind(this));
+    hotkey.addHandler(this.handleHotkey.bind(this))
 
     var component = this;
 
@@ -56,8 +54,8 @@ class SpectrumBox extends React.Component {
   }
 
   componentWillUnmount() {
-    window.removeEventListener('resize', this.handleResize);
-    hotkey.removeHandler(this.handleHotkey)
+    window.removeEventListener('resize', this.handleResize.bind(this));
+    hotkey.removeHandler(this.handleHotkey.bind(this))
   }
 
   drawChart() {
@@ -144,6 +142,7 @@ class SpectrumBox extends React.Component {
       },
       vAxis: {
         title: 'Intensity',
+        format: 'scientific',
         gridlines: { color: 'transparent' },
         minValue: 0,
         maxValue: max_y

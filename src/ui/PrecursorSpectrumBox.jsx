@@ -6,11 +6,10 @@ class PrecursorSpectrumBox extends React.Component {
     this.state = {
       chartLoaded: false,
     }
-    this.handleResize = this.handleResize.bind(this);
   }
 
   componentDidMount() {
-    window.addEventListener('resize', this.handleResize);
+    window.addEventListener('resize', this.handleResize.bind(this));
 
     var component = this;
 
@@ -40,7 +39,7 @@ class PrecursorSpectrumBox extends React.Component {
   }
 
   componentWillUnmount() {
-    window.removeEventListener('resize', this.handleResize);
+    window.removeEventListener('resize', this.handleResize.bind(this));
   }
 
   drawChart() {
@@ -130,6 +129,7 @@ class PrecursorSpectrumBox extends React.Component {
       vAxis: {
         // title: 'Intensity',
         gridlines: { color: 'transparent' },
+        format: 'scientific',
         minValue: 0,
         maxValue: max_y * 1.1
       },

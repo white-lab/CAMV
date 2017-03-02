@@ -6,11 +6,10 @@ class QuantSpectrumBox extends React.Component {
     this.state = {
       chartLoaded: false,
     }
-    this.handleResize = this.handleResize.bind(this);
   }
 
   componentDidMount() {
-    window.addEventListener('resize', this.handleResize);
+    window.addEventListener('resize', this.handleResize.bind(this));
 
     var component = this;
 
@@ -40,7 +39,7 @@ class QuantSpectrumBox extends React.Component {
   }
 
   componentWillUnmount() {
-    window.removeEventListener('resize', this.handleResize);
+    window.removeEventListener('resize', this.handleResize.bind(this));
   }
 
   drawChart() {
@@ -101,11 +100,12 @@ class QuantSpectrumBox extends React.Component {
         // title: 'mz',
         gridlines: { color: 'transparent' },
         minValue: minMZ,
-        maxValue: maxMZ
+        maxValue: maxMZ,
       },
       vAxis: {
         // title: 'Intensity'
-        gridlines: { color: 'transparent' }
+        gridlines: { color: 'transparent' },
+        format: 'scientific',
       },
       annotations: { textStyle: { }, stemColor: 'none' },
       legend: 'none',
