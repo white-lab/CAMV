@@ -59,20 +59,24 @@ class QuantSpectrumBox extends React.Component {
     if (this.props.spectrumData.length > 0) {
       data.addRows([[minMZ, 0, null, null]])
 
-      this.props.spectrumData.forEach(function(peak) {
+      let indices = quantMz.map(
+        function(qmz) {
+          let errs = this.props.spectrumData.map(
+            peak => 1000000 * Math.abs(qmz - peak.mz) / peak.mz
+          )
+
+          if (errs.every(val => val > ppm))
+            return null
+
+          return errs.indexOf(Math.min.apply(Math, errs))
+        }.bind(this)
+      )
+
+      this.props.spectrumData.forEach(function(peak, index) {
         var mz = peak.mz
         var into = peak.into
         var name = ''
-
-        var found = false
-
-        quantMz.forEach(function(val) {
-          var currPPM = 1000000 * Math.abs(mz - val) / val
-          if (currPPM < ppm) {
-            found = true
-          }
-        })
-
+        let found = (indices.indexOf(index) != -1)
         let style = ''
 
         if (found) {
