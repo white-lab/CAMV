@@ -108,6 +108,7 @@ class QuantSpectrumBox extends React.Component {
         format: 'scientific',
         maxValue: this.props.spectrumData.length > 0 ? null : 100,
       },
+      chartArea: { left: "15%", bottom: "15%", width: "75%", height: "75%" },
       annotations: { textStyle: { }, stemColor: 'none' },
       legend: 'none',
       tooltip: {trigger: 'none'},

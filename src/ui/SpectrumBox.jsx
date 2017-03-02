@@ -148,7 +148,7 @@ class SpectrumBox extends React.Component {
         maxValue: this.props.spectrumData.length > 0 ? null : 100,
       },
       annotations: { style: 'line', stemColor: 'none' },
-      chartArea: { width: "80%", height: "80%" },
+      chartArea: { left: "12.5%", bottom: "10%", width: "90%", height: "85%" },
       legend: 'none',
       tooltip: {trigger: 'none'},
       explorer: {
