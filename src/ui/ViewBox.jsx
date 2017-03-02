@@ -102,24 +102,37 @@ class ViewBox extends React.Component {
     this.refs["quantSpectrum"].drawChart();
   }
 
-  updateMinMZ(newMinMZ) {
-    if (newMinMZ > 0) {
-      this.setState({
-        minMZ: newMinMZ,
-      })
-    } else {
-      this.setState({
-        minMZ: 0,
-      })
+  getScanData() {
+    if (this.state.selectedProtein != null) {
+      let protein = this.state.data[this.state.selectedProtein]
+
+      if (this.state.selectedPeptide != null) {
+        let peptide = protein.peptides[this.state.selectedPeptide]
+
+        if (this.state.selectedScan != null) {
+          let scan = peptide.scans[this.state.selectedScan]
+
+          return scan.scanData
+        }
+      }
     }
+    return null
+  }
+
+  updateMinMZ(newMinMZ) {
+    this.setState({
+      minMZ: newMinMZ > 0 ? newMinMZ : 0,
+    })
   }
 
   updateMaxMZ(newMaxMZ) {
-    if (newMaxMZ > this.state.minMZ) {
-      this.setState({
-        maxMZ: newMaxMZ,
-      })
-    }
+    let scanData = this.getScanData()
+    let max_mz = Math.ceil(
+      (scanData != null) ? scanData[scanData.length - 1].mz + 1 : 100
+    )
+    this.setState({
+      maxMZ: newMaxMZ < max_mz ? newMaxMZ : max_mz,
+    })
   }
 
   updateSelectedMz(mz) {
@@ -468,12 +481,17 @@ class ViewBox extends React.Component {
   setSubmitted(submitted, fileName) {
     this.setState({
       submitted: submitted,
-      basename: fileName.split(/(\\|\/)/g).pop().split('.')[0],
     })
-    this.refs["modalExportBox"].setState({
-      exportDirectory: fileName.match(/(.*)[\/\\]/)[1] || '',
-      dirChosen: true,
-    })
+
+    if (fileName != null && fileName.length > 0) {
+      this.setState({
+        basename: fileName.split(/(\\|\/)/g).pop().split('.')[0],
+      })
+      this.refs["modalExportBox"].setState({
+        exportDirectory: fileName.match(/(.*)[\/\\]/)[1] || '',
+        dirChosen: true,
+      })
+    }
   }
 
   openExport() {

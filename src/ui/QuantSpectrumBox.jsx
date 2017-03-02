@@ -115,7 +115,7 @@ class QuantSpectrumBox extends React.Component {
       explorer: {
         actions: ['dragToZoom', 'rightClickToReset'],
         axis: 'horizontal',
-        maxZoomIn: 0.01,
+        maxZoomIn: 0.00001,
       },
     };
 

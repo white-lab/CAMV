@@ -64,15 +64,17 @@ class SpectrumBox extends React.Component {
     var max_y = 15
 
     if (this.props.spectrumData.length > 0) {
-      var scanMax = this.props.spectrumData[this.props.spectrumData.length - 1].mz + 1
+      var scanMax = Math.ceil(
+        this.props.spectrumData[this.props.spectrumData.length - 1].mz + 1
+      )
       maxMZ = this.props.maxMZ == null ? scanMax : Math.min(scanMax, this.props.maxMZ)
 
       max_y = Math.max.apply(
         null,
         this.props.spectrumData.filter(
-          (element) => { return element.mz >= minMZ && element.mz <= maxMZ }
+          element => (element.mz >= minMZ && element.mz <= maxMZ)
         ).map(
-          (element) => { return element.into }
+          element => element.into
         )
       )
     }
@@ -154,7 +156,7 @@ class SpectrumBox extends React.Component {
       explorer: {
         actions: ['dragToZoom', 'rightClickToReset'],
         axis: 'horizontal',
-        maxZoomIn: 0.01,
+        maxZoomIn: 0.00001,
       },
     };
 
@@ -218,7 +220,7 @@ class SpectrumBox extends React.Component {
               callback={this.props.updateMaxMZ}
               disabled={this.props.inputDisabled}
               maxMZ={this.props.maxMZ}
-              scanMaxMZ={this.props.spectrumData.length == 0 ? 1 : this.props.spectrumData[this.props.spectrumData.length - 1].mz + 1}
+              scanMaxMZ={Math.ceil(this.props.spectrumData.length == 0 ? 1 : this.props.spectrumData[this.props.spectrumData.length - 1].mz + 1)}
             />
           </div>
 
