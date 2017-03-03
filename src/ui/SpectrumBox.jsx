@@ -116,9 +116,9 @@ class SpectrumBox extends React.Component {
                 // Plot intermediate line-plot points along x-axis
                 style = null
               } else if (ppm < 10) {
-                style = 'point {size: 3; fill-color: green; visible: true}'
+                style = 'point {size: 3; fill-color: #5CB85C; visible: true}'
               }
-            } else if (into < max_y / 20) {
+            } else if (into < max_y / 10) {
               style = null
             }
         }
@@ -149,7 +149,7 @@ class SpectrumBox extends React.Component {
         minValue: 0,
         maxValue: this.props.spectrumData.length > 0 ? null : 100,
       },
-      annotations: { style: 'line', stemColor: 'none' },
+      annotations: { style: 'line', stemColor: 'none', auraColor: 'none' },
       chartArea: { left: "12.5%", bottom: "10%", width: "90%", height: "85%" },
       legend: 'none',
       tooltip: {trigger: 'none'},

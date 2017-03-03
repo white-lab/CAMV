@@ -151,7 +151,7 @@ input:disabled {
 }
 
 li[class=accept] > span {
-  color: green;
+  color: #5CB85C;
 }
 
 li[class=maybe] > span {

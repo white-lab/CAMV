@@ -79,9 +79,9 @@ class QuantSpectrumBox extends React.Component {
         let style = ''
 
         if (found) {
-          style = 'point {size: 5; fill-color: green; visible: true}'
+          style = 'point {size: 5; fill-color: #5CB85C; visible: true}'
         } else {
-          style = 'point {size: 5; fill-color: green; visible: false}'
+          style = 'point {size: 5; fill-color: #5CB85C; visible: false}'
         }
 
         data.addRows([
