@@ -1,6 +1,8 @@
 import React from 'react'
 import { Modal, Button } from 'react-bootstrap'
 
+import JSONStream from 'JSONStream'
+
 import fs from 'fs'
 import zlib from 'zlib'
 
@@ -11,18 +13,24 @@ class ModalFileSelectionBox extends React.Component {
     super(props)
     this.state = {
       fileChosen: false,
+      submitted: false,
       data: [],
       peptideData: [],
       fileName: null,
     }
   }
 
-  setStateFromText(data) {
-    let inputData = JSON.parse(data);
+  setStateFromJSON(data) {
     this.setState({
-      data: inputData.scanData,
-      peptideData: inputData.peptideData,
+      data: data.scanData,
+      peptideData: data.peptideData,
     });
+    
+    if (this.state.submitted) {
+      this.props.setData(this.state.data)
+      this.props.setPeptideData(this.state.peptideData)
+      this.props.setSubmitted(true, this.state.fileName)
+    }
   }
 
   update() {
@@ -39,22 +47,21 @@ class ModalFileSelectionBox extends React.Component {
         var fileName = fileNames[0];
         var compressed = fileName.endsWith(".gz");
 
-        fs.readFile(
+        let data = fs.createReadStream(
           fileName,
           (compressed ? null : 'utf-8'),
-          function (err, data) {
-            if (err) { console.log(err); }
+        )
+        if (compressed) {
+          let gunzip = zlib.createGunzip()
+          data = data.pipe(gunzip)
+        }
 
-            if (compressed) {
-              zlib.gunzip(data, (err, out) => {
-                if (err) { console.log(err); }
-                this.setStateFromText(out);
-              })
-            } else {
-              this.setStateFromText(data);
-            }
-          }.bind(this)
-        );
+        let parser = JSONStream.parse()
+        data.pipe(parser)
+        parser.on(
+          'data',
+          function(data) { console.log(data) ; this.setStateFromJSON(data) }.bind(this),
+        )
 
         this.setState({
           fileChosen: true,
@@ -65,9 +72,13 @@ class ModalFileSelectionBox extends React.Component {
   }
 
   submit() {
-    this.props.setData(this.state.data)
-    this.props.setPeptideData(this.state.peptideData)
-    this.props.setSubmitted(true, this.state.fileName)
+    this.setState({submitted: true})
+
+    if (this.state.data != null) {
+      this.props.setData(this.state.data)
+      this.props.setPeptideData(this.state.peptideData)
+      this.props.setSubmitted(true, this.state.fileName)
+    }
   }
 
   render() {
