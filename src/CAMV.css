@@ -24,7 +24,7 @@
   float: left;
   position: relative;
   top: 50%;
-  transform: translate(5%, -50%);
+  transform: translate(10px, -50%);
 }
 
 #scanData p {
@@ -35,7 +35,7 @@
   float: right;
   position: relative;
   top: 50%;
-  transform: translate(-10%, -50%);
+  transform: translate(-10px, -50%);
 }
 
 #spectra {
