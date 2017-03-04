@@ -110,7 +110,13 @@ class SpectrumBox extends React.Component {
             if (matchId != null) {
               var match = this.props.matchData[matchId]
               ppm = Math.abs(match.mz - mz) / mz * 1000000
-              name = match.name
+              name = (
+                (
+                  (into >= max_y / 10) ||
+                  (match.name != null && match.name.match(/^[abcxyz][^-]*$/) != null)
+                ) ?
+                match.name : null
+            )
               // TODO: change these conditions to match color coding
               if (into == 0) {
                 // Plot intermediate line-plot points along x-axis
