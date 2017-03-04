@@ -6,6 +6,7 @@ import path from 'path'
 import zlib from 'zlib'
 
 import domtoimage from 'dom-to-image'
+import JSONStream from 'JSONStream'
 import update from 'react-addons-update'
 const remote = require('electron').remote
 const { dialog } = require('electron').remote
@@ -506,13 +507,9 @@ class ViewBox extends React.Component {
       {
         filters: [
           {
-            name: 'compressed JSON',
-            extensions: ['camv.gz']
+            name: 'JSON',
+            extensions: ['camv', 'camv.gz']
           },
-          {
-            name: "JSON",
-            extensions: ["camv"]
-          }
         ]
       },
       function(fileName) {
@@ -521,12 +518,15 @@ class ViewBox extends React.Component {
 
         var compressed = fileName.endsWith(".gz");
 
-        var dataToSave = JSON.stringify(
-          {scanData: this.state.data, peptideData: this.state.peptideData},
-          null, 2
-        );
+        var ws = fs.createWriteStream(
+          fileName,
+          (compressed ? null : 'utf-8'),
+        )
 
-        var ws = fs.createWriteStream(fileName);
+        if (compressed) {
+          let gzip = zlib.createGzip()
+          ws = gzip.pipe(ws)
+        }
 
         ws.on('error', function(err) {
           dialog.showErrorBox("File Save Error", err.message);
@@ -539,20 +539,16 @@ class ViewBox extends React.Component {
                 buttons: ["OK"]
               }
             );
-        });
+        })
 
-        if (compressed) {
-          zlib.gzip(
-            dataToSave, (err, out) => {
-              if (err) { console.log(err); }
-              ws.write(out);
-              ws.end();
-            }
-          )
-        } else {
-          ws.write(dataToSave);
-          ws.end();
-        }
+        let writer = JSONStream.stringify('', '', '')
+        writer.pipe(ws)
+        ws.write('{\n  "scanData": ')
+        writer.write(this.state.data)
+        ws.write(',\n  "peptideData": ')
+        writer.write(this.state.peptideData)
+        ws.write(',\n}\n')
+        writer.end()
       }.bind(this)
     );
   }
