@@ -5,5 +5,5 @@
     "syntax-async-functions",
     "transform-runtime"
   ],
-  "sourceMaps": "inline",
+  "sourceMaps": "inline"
 }
