@@ -27,5 +27,5 @@ deploy:
     - "CAMV-linux-x64.zip"
   skip_cleanup: true
   on:
-    repo: naderm/CAMV
+    repo: white-lab/CAMV
     tags: true
