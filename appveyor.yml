@@ -2,9 +2,6 @@ version: Build {build}
 
 skip_non_tags: true
 
-# build:
-#     verbosity: minimal
-
 environment:
     matrix:
         - nodejs_version: "7"
@@ -19,17 +16,15 @@ install:
 #     - npm test
 
 build_script:
-    # - npm run package
-    - npm run package-win
-    - npm run package-linux
+    - npm run package-all
 
 artifacts:
-    # - path: "CAMV-darwin-x64"
-    - path: "CAMV-linux-ia32"
-    - path: "CAMV-linux-x64"
-    # - path: "CAMV-mas-x64"
-    - path: "CAMV-win32-ia32"
-    - path: "CAMV-win32-x64"
+    # - path: "out/CAMV-darwin-x64"
+    - path: "out/CAMV-linux-ia32"
+    - path: "out/CAMV-linux-x64"
+    # - path: "out/CAMV-mas-x64"
+    - path: "out/CAMV-win32-ia32"
+    - path: "out/CAMV-win32-x64"
 
 deploy:
     - provider: GitHub

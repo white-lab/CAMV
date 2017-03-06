@@ -5,17 +5,16 @@
   "productName": "CAMV",
   "dependencies": {
     "JSONStream": "^1.3.1",
-    "babel-eslint": "^7.1.1",
     "babel-plugin-syntax-async-functions": "^6.13.0",
     "babel-plugin-transform-runtime": "^6.23.0",
+    "babel-plugin-transform-async-to-generator": "^6.22.0",
+    "babel-preset-env": "^1.2.1",
     "babel-preset-es2017-node7": "^0.5.1",
     "babel-preset-react": "^6.23.0",
     "babel-register": "^6.23.0",
     "babel-runtime": "^6.23.0",
     "dom-to-image": "github:naderm/dom-to-image",
-    "electron": "^1.6.2",
     "electron-compile": "^6.1.2",
-    "electron-packager": "^8.5.2",
     "react": "^15.4.2",
     "react-addons-update": "^15.4.2",
     "react-bootstrap": "^0.30.7",
@@ -25,7 +24,9 @@
     "react-native-fs": "^2.1.0-rc.1"
   },
   "devDependencies": {
-    "electron-compilers": "^5.5.1",
+    "babel-eslint": "^7.1.1",
+    "electron-forge": "^2.8.2",
+    "electron-prebuilt-compile": "1.6.1",
     "eslint": "^3.17.0",
     "eslint-formatter-pretty": "^1.1.0",
     "eslint-plugin-import": "^2.2.0",
@@ -35,12 +36,14 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "lint": "eslint --cache --format=node_modules/eslint-formatter-pretty src/ui/*.jsx",
-    "start": "electron --js-flags='--harmony-async-await' .",
+    "start": "electron-forge start",
     "compile": "electron-compile --js-flags='--harmony-async-await' --appDir . src/",
-    "package": "electron-packager . --all",
-    "package-win": "electron-packager . --platform=win32 --arch=all",
-    "package-linux": "electron-packager . --platform=linux --arch=all",
-    "package-osx": "electron-packager . --platform=darwin --arch=all"
+    "package": "electron-forge package",
+    "package-all": "electron-forge package --platform=all --arch=all",
+    "package-win": "electron-forge package --platform=win32 --arch=all",
+    "package-linux": "electron-forge package --platform=linux --arch=all",
+    "package-osx": "electron-forge package --platform=darwin --arch=all",
+    "make": "electron-forge make"
   },
   "files": [
     "package.json",
@@ -66,5 +69,34 @@
   },
   "license": "MIT",
   "repository": "https://github.com/white-lab/CAMV",
-  "description": "Tool for validation proteomic mass spectrometry peptide assignments."
+  "description": "Tool for validation proteomic mass spectrometry peptide assignments.",
+  "config": {
+    "forge": {
+      "make_targets": {
+        "win32": [
+          "squirrel"
+        ],
+        "darwin": [
+          "zip"
+        ],
+        "linux": [
+          "deb",
+          "rpm"
+        ]
+      },
+      "electronPackagerConfig": {},
+      "electronWinstallerConfig": {
+        "name": "CAMV"
+      },
+      "electronInstallerDebian": {},
+      "electronInstallerRedhat": {},
+      "github_repository": {
+        "owner": "white-lab",
+        "name": "CAMV"
+      },
+      "windowsStoreConfig": {
+        "packageName": ""
+      }
+    }
+  }
 }

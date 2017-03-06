@@ -15,17 +15,17 @@ install:
 script:
   - npm run package-linux
   - npm run package-osx
-  - zip -qr CAMV-darwin-x64.zip CAMV-darwin-x64
-  - zip -qr CAMV-linux-ia32.zip CAMV-linux-ia32
-  - zip -qr CAMV-linux-x64.zip  CAMV-linux-x64
+  - zip -qr out/CAMV-darwin-x64.zip out/CAMV-darwin-x64
+  - zip -qr out/CAMV-linux-ia32.zip out/CAMV-linux-ia32
+  - zip -qr out/CAMV-linux-x64.zip  out/CAMV-linux-x64
 
-deploy:
-  provider: releases
-  file:
-    - "CAMV-darwin-x64.zip"
-    - "CAMV-linux-ia32.zip"
-    - "CAMV-linux-x64.zip"
-  skip_cleanup: true
-  on:
-    repo: white-lab/CAMV
-    tags: true
+# deploy:
+#   provider: releases
+#   file:
+#     - "out/CAMV-darwin-x64.zip"
+#     - "out/CAMV-linux-ia32.zip"
+#     - "out/CAMV-linux-x64.zip"
+#   skip_cleanup: true
+#   on:
+#     repo: white-lab/CAMV
+#     tags: true
