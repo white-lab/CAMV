@@ -15,19 +15,24 @@ Once those are installed, from `src/` run:
 
 ```
 npm install
+npm install bower -g
 bower install
 ```
 
 # Usage
 
-`node_modules/.bin/electron .` from `src/`
+From this directory, run:
+
+```
+npm start
+```
 
 # Deployment
 
 From this directory, run:
 
 ```
-electron-packager src/ --all
+npm run package
 ```
 
 This will generate fully-independent packages for Linux, Windows, and OS X. You
