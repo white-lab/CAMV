@@ -37,8 +37,14 @@ class ModalFragmentBox extends React.Component {
       >
         <Modal.Header>
           <Modal.Title>
-            <div>mz: {this.state.mz}</div>
-            <div>current label: {this.state.currentLabel}</div>
+            <div>
+              Observed m/z:&nbsp;
+              { this.state.mz != null ? this.state.mz.toFixed(5) : null }
+            </div>
+            <div>
+              Current Label:&nbsp;
+              {this.state.currentLabel}
+            </div>
           </Modal.Title>
         </Modal.Header>
         <Modal.Body>
@@ -54,7 +60,8 @@ class ModalFragmentBox extends React.Component {
                     >
                       {
                         object.name +
-                        ' (' + String(Math.round(object.ppm)) + ' ppm)'
+                        ' - ' + object.mz.toFixed(5) +
+                        ' (' + object.ppm.toFixed(1) + ' ppm)'
                       }
                     </option>
                   )
