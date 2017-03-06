@@ -43,6 +43,8 @@ class QuantSpectrumBox extends React.Component {
   }
 
   drawChart() {
+    if (!this.state.chartLoaded) { return; }
+
     var data = new google.visualization.DataTable();
 
     data.addColumn('number', 'mz');

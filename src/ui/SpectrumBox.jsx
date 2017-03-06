@@ -59,6 +59,8 @@ class SpectrumBox extends React.Component {
   }
 
   drawChart() {
+    if (!this.state.chartLoaded) { return; }
+
     var minMZ = Math.max(0, this.props.minMZ == null ? 0 : this.props.minMZ)
     var maxMZ = 1
     var max_y = 15
