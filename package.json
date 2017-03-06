@@ -26,7 +26,7 @@
   },
   "devDependencies": {
     "electron-compilers": "^5.5.1",
-    "eslint": "^3.16.1",
+    "eslint": "^3.17.0",
     "eslint-formatter-pretty": "^1.1.0",
     "eslint-plugin-import": "^2.2.0",
     "eslint-plugin-promise": "^3.5.0",
