@@ -109,7 +109,7 @@ class SpectrumBox extends React.Component {
 
             if (matchId != null) {
               var match = this.props.matchData[matchId]
-              ppm = Math.abs(match.mz - mz) / mz * 1000000
+              ppm = 1e6 * Math.abs(match.mz - mz) / mz
               name = (
                 (
                   (into >= max_y / 10) ||

@@ -164,16 +164,15 @@ class ViewBox extends React.Component {
     let currentLabel = ''
 
     let matchId = data.find(
-      (peak) => { return (peak.mz === mz) }
+      peak => peak.mz === mz
     ).matchInfo[this.state.selectedPTMPlacement].matchId
 
     if (matchId !== null) { currentLabel = matchData[matchId].name }
 
     let matches = matchData.filter(
       (item) => {
-        let ppm = (item.mz - mz) / mz * 1000000
-        item.ppm = ppm
-        return Math.abs(ppm) < this.state.maxPPM
+        item.ppm = 1e6 * Math.abs(item.mz - mz) / mz
+        return item.ppm < this.state.maxPPM
       }
     )
 

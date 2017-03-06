@@ -86,7 +86,7 @@ class PrecursorSpectrumBox extends React.Component {
       let indices = ionSeries.map(
         function(val) {
           let errs = this.props.spectrumData.map(
-            peak => 1000000 * Math.abs(peak.mz - precursorMz - 1.0079 * val / chargeState) / peak.mz
+            peak => 1e6 * Math.abs(peak.mz - precursorMz - 1.0079 * val / chargeState) / peak.mz
           )
 
           if (errs.every(val => val > ppm))

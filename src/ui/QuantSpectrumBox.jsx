@@ -61,7 +61,7 @@ class QuantSpectrumBox extends React.Component {
       let indices = quantMz.map(
         function(qmz) {
           let errs = this.props.spectrumData.map(
-            peak => 1000000 * Math.abs(qmz - peak.mz) / peak.mz
+            peak => 1e6 * Math.abs(qmz - peak.mz) / peak.mz
           )
 
           if (errs.every(val => val > ppm))
