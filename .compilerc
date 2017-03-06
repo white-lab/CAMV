@@ -1,10 +1,13 @@
 {
   "application/javascript": {
-    "presets": ["es2017-node7", "react"],
+    "presets": [
+      "es2017-node7",
+      "react"
+    ],
     "plugins": [
-        "react-hot-loader/babel",
-        "syntax-async-functions",
-        "transform-runtime"
+      "react-hot-loader/babel",
+      "syntax-async-functions",
+      "transform-runtime"
     ],
     "sourceMaps": "inline"
   }
