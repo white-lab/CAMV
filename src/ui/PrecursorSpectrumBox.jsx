@@ -82,19 +82,25 @@ class PrecursorSpectrumBox extends React.Component {
         ]);
       }
 
-      this.props.spectrumData.forEach(function(peak) {
+      let ionSeries = [0, 1, 2, 3, 4, 5]
+      let indices = ionSeries.map(
+        function(val) {
+          let errs = this.props.spectrumData.map(
+            peak => 1000000 * Math.abs(peak.mz - precursorMz - 1.0079 * val / chargeState) / peak.mz
+          )
+
+          if (errs.every(val => val > ppm))
+            return null
+
+          return errs.indexOf(Math.min.apply(Math, errs))
+        }.bind(this)
+      )
+
+      this.props.spectrumData.forEach(function(peak, index) {
         let mz = peak.mz
         let into = peak.into
         let name = ''
-        let found = false
-        let ionSeries = [0, 1, 2, 3, 4, 5]
-
-        ionSeries.forEach(function(val) {
-          var currPPM = 1000000 * (mz - precursorMz - 1.0079 * val / chargeState) / mz
-          if (Math.abs(currPPM) < ppm) {
-            found = true
-          }
-        })
+        let found = (indices.indexOf(index) != -1)
 
         let contaminant = !found && this.props.isolationWindow != null && (
           mz >= precursorMz - this.props.isolationWindow[0] &&
