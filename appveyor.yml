@@ -19,13 +19,15 @@ install:
 #     - npm test
 
 build_script:
-    - npm run package
+    # - npm run package
+    - npm run package-win
+    - npm run package-linux
 
 artifacts:
-    - path: "CAMV-darwin-x64"
+    # - path: "CAMV-darwin-x64"
     - path: "CAMV-linux-ia32"
     - path: "CAMV-linux-x64"
-    - path: "CAMV-mas-x64"
+    # - path: "CAMV-mas-x64"
     - path: "CAMV-win32-ia32"
     - path: "CAMV-win32-x64"
 
