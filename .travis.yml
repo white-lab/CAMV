@@ -13,6 +13,7 @@ install:
   - bower install
 
 script:
+  - npm run make
   - npm run package-linux
   - npm run package-osx
   - zip -qr out/CAMV-darwin-x64.zip out/CAMV-darwin-x64
