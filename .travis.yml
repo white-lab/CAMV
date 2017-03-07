@@ -13,21 +13,17 @@ install:
   - bower install
 
 script:
-  - npm run make
-  - ls -l out/make/
-  - npm run package-linux
-  - npm run package-osx
-  - zip -qr out/CAMV-darwin-x64.zip out/CAMV-darwin-x64
-  - zip -qr out/CAMV-linux-ia32.zip out/CAMV-linux-ia32
-  - zip -qr out/CAMV-linux-x64.zip  out/CAMV-linux-x64
+  - npm run make-linux
+  # - npm run make-osx
 
-# deploy:
-#   provider: releases
-#   file:
-#     - "out/CAMV-darwin-x64.zip"
-#     - "out/CAMV-linux-ia32.zip"
-#     - "out/CAMV-linux-x64.zip"
-#   skip_cleanup: true
-#   on:
-#     repo: white-lab/CAMV
-#     tags: true
+deploy:
+  provider: releases
+  api_key:
+    secure: ww62j7qd9QQd2MaGiiVNWAF3P/P+csXvZ1SLf+/9Yc8AF3n8lzyqOut3xFCUvggPvIgmx8HZ0LEyxjwAQXfJXbLcy0xCjppRRI0tjjpjdPMQKEo0MvXpLSF2phAoBwWKtIEHOhXEGCgUQLx50eTLPB6LlZPj6LN+XhEa8ZxKMJN50jGEfAUXewePCuOw3cCjw+gPgM5Hxl4F08WFAyWw2lh8ULpt+36w4VACyyJmHY0L56vUsTM6lxLAOhz8xFjHB9+2HjPxSXBDcDhVYtgIMhTDgwu8eKsO11FQgj7niki/wpzuLbLhdCTnzcAmIeyHzp12dhNdS5hVOAIkzlKKKd7VBbgDIav88rRlar+ZDqsUcHCj+TtRZv3w2UVWH2ogbJxKt2Mtneg8aIbeuXxcTdyEWoUMQoW2Y1QLzHaVny3RoIxhdGFBkWsBESCUOn10SRjxV0Jz4T7BkJEP5PazfUiXPAVaqW/+bEpr7rvCi4Dri8hrUQWPz010LsqH3wYW0eRoj1XBIRTD4GFGm6nmX0oqVw5LKJ5Hg5P8abADTBgDtZMK+HR7mrZITuXHH6uC1vMyjbv473X9a5QeHL8wWcjKNd9VkLdeyrmhl640Aye1O0bAVpn/KhwfaPHp6UwtNvjv852VJVyrGqCuVpDo7GQyINpiDORPCh58Jekqw7E=
+  file:
+    # - "out/make/CAMV-darwin-x64.zip"
+    - "out/make/CAMV-linux-x64.zip"
+  skip_cleanup: true
+  on:
+    repo: white-lab/CAMV
+    tags: true
