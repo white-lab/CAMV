@@ -8,8 +8,8 @@ os:
   - linux
   - osx
 
-before_script:
-  - export PATH=$(pwd)/node_modules/.bin:$PATH
+# before_script:
+#   - export PATH=$(pwd)/node_modules/.bin:$PATH
 
 install:
   - npm install
