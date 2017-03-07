@@ -33,11 +33,11 @@
     "lint": "eslint --cache --format=node_modules/eslint-formatter-pretty src/ui/*.jsx",
     "start": "electron-forge start",
     "package": "electron-forge package",
-    "make-all": "electron-forge make --targets=win32,darwin,linux",
-    "make-win": "electron-forge make --targets=win32",
-    "make-linux": "electron-forge make --targets=linux",
-    "make-osx": "electron-forge make --targets=darwin",
-    "make": "electron-forge make"
+    "make-all": "electron-forge make --targets=win32,darwin,linux --arch=x64",
+    "make-win": "electron-forge make --targets=win32 --arch=x64",
+    "make-linux": "electron-forge make --targets=linux --arch=x64",
+    "make-osx": "electron-forge make --targets=darwin --arch=x64",
+    "make": "electron-forge make --arch=x64"
   },
   "files": [
     "package.json",
