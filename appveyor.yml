@@ -5,9 +5,7 @@ skip_non_tags: true
 environment:
     matrix:
         - nodejs_version: "7"
-
-platform:
-    - x64
+          platform: x64
 
 install:
     - ps: Install-Product node $env:nodejs_version
