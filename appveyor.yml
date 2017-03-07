@@ -8,7 +8,7 @@ environment:
           platform: x64
 
 install:
-    - ps: Install-Product node $env:nodejs_version
+    - ps: Install-Product node $env:nodejs_version $env:platform
     - "npm install"
     - "npm install bower -g"
     - "bower install"
