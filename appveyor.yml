@@ -24,12 +24,11 @@ artifacts:
 
 deploy:
     - provider: GitHub
-      auth_token:
-        secure: Vt90BNYB5BI/GtFTilnFdNNEC8T+/szE6cmO3M3gpMaMRXzE4p+XNdAHyymTxnJN
       description: "Computer Assisted Manual Validation for Mass Spectrometry Proteomics"
       artifact: /CAMV-.*\.zip/
       draft: false
       prerelease: false
       on:
-        branch: master
         appveyor_repo_tag: true
+      auth_token:
+        secure: Vt90BNYB5BI/GtFTilnFdNNEC8T+/szE6cmO3M3gpMaMRXzE4p+XNdAHyymTxnJN
