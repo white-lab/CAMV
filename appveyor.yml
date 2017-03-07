@@ -17,6 +17,7 @@ install:
 
 build_script:
     - npm run package-all
+    - npm run make
 
 artifacts:
     # - path: "out/CAMV-darwin-x64"
