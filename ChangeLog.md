@@ -1,5 +1,10 @@
 # Change Log
 
+## 0.1.2 (2017-03-06)
+
+Several changes to the building pipeline. Relies only on electron-forge /
+electron-prebuilt-compile now.
+
 ## 0.1.1 (2017-03-06)
 
 Fixed several bugs based on testing with real data sets
