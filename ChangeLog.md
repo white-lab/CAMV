@@ -1,6 +1,6 @@
 # Change Log
 
-## 0.1.3 (2017-03-06)
+## 0.1.4 (2017-03-06)
 
 Fixed several CI bugs, should deploy on Windows, Linux, and OS X now.
 

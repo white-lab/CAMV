@@ -8,9 +8,6 @@ os:
   - linux
   - osx
 
-# before_script:
-#   - export PATH=$(pwd)/node_modules/.bin:$PATH
-
 install:
   - npm install
   - npm install bower -g
@@ -19,7 +16,6 @@ install:
 script:
   - npm run make
   - ls -l out/make/
-  # - npm run make-osx
 
 deploy:
   provider: releases
