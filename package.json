@@ -67,11 +67,10 @@
     "forge": {
       "make_targets": {
         "win32": [
-          "squirrel"
+          "zip"
         ],
         "darwin": [
-          "zip",
-          "dmg"
+          "zip"
         ],
         "linux": [
           "zip"

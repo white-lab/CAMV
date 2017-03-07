@@ -16,16 +16,10 @@ install:
 #     - npm test
 
 build_script:
-    - npm run package-all
     - npm run make
 
 artifacts:
-    # - path: "out/CAMV-darwin-x64"
-    - path: "out/CAMV-linux-ia32"
-    - path: "out/CAMV-linux-x64"
-    # - path: "out/CAMV-mas-x64"
-    - path: "out/CAMV-win32-ia32"
-    - path: "out/CAMV-win32-x64"
+    - path: "out/make/CAMV-win32-x64.zip"
 
 deploy:
     - provider: GitHub
