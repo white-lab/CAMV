@@ -568,6 +568,7 @@ class ViewBox extends React.Component {
     let protName = null
     let scanNumber = null
     let fileName = null
+    let collisionType = null
 
     if (this.state.selectedProtein != null) {
       let protein = this.state.data[this.state.selectedProtein]
@@ -588,6 +589,7 @@ class ViewBox extends React.Component {
           protName = protein.proteinName
           scanNumber = scan.scanNumber
           fileName = scan.fileName
+          collisionType = scan.collisionType
 
           if (this.state.selectedPTMPlacement != null) {
             inputDisabled = false
@@ -708,6 +710,7 @@ class ViewBox extends React.Component {
                   precursorMz={precursorMz}
                   isolationWindow={isolationWindow}
                   chargeState={chargeState}
+                  collisionType={collisionType}
                   ppm={50}
                 />
               </div>

@@ -110,26 +110,41 @@ class SpectrumBox extends React.Component {
             var matchId = matchInfo.matchId
 
             if (matchId != null) {
-              var match = this.props.matchData[matchId]
+              let match = this.props.matchData[matchId]
+              let isotope = (
+                match.name != null &&
+                match.name.includes("¹³C")
+              )
+              let by_ion = (
+                match.name != null &&
+                match.name.match(/^[abcxyz][^-]*$/) != null
+              )
               ppm = 1e6 * Math.abs(match.mz - mz) / mz
               name = (
                 (
-                  (into >= max_y / 10) ||
-                  (match.name != null && match.name.match(/^[abcxyz][^-]*$/) != null)
-                ) ?
-                match.name : null
+                  !isotope && ((into >= max_y / 10) || by_ion)
+                ) ? match.name : null
               )
 
-              // TODO: change these conditions to match color coding
-              if (name != null && name.includes("C13")) {
-                style = 'point {size: 3; fill-color: yellow; visible: true}'
+              if (self.props.collisionType == "CID") {
+                ppm_cutoff = 1000
+              } else if (self.props.collisionType == "HCD") {
+                ppm_cutoff = 10
+              } else {
+                ppm_cutoff = 10
               }
 
               if (into == 0) {
                 // Plot intermediate line-plot points along x-axis
                 style = null
-              } else if (ppm < 10) {
-                style = 'point {size: 3; fill-color: #5CB85C; visible: true}'
+              } else if (ppm < ppm_cutoff) {
+                if (isotope) {
+                  style = 'point {size: 3; fill-color: yellow; visible: true}'
+                } else {
+                  style = 'point {size: 3; fill-color: #5CB85C; visible: true}'
+                }
+              } else {
+                style = 'star {size: 3; fill-color: magenta; visible: true}'
               }
             } else if (into < max_y / 10) {
               style = null
@@ -274,6 +289,7 @@ SpectrumBox.propTypes = {
   inputDisabled: React.PropTypes.bool,
   selectedPTMPlacement: React.PropTypes.number,
   matchData: React.PropTypes.array.isRequired,
+  collisionType: React.PropTypes.string,
 }
 
 SpectrumBox.defaultProps = {
@@ -282,6 +298,7 @@ SpectrumBox.defaultProps = {
   spectrumData: null,
   inputDisabled: true,
   selectedPTMPlacement: null,
+  collisionType: null,
 }
 
 module.exports = SpectrumBox
