@@ -84,11 +84,16 @@ class PrecursorSpectrumBox extends React.Component {
         ]);
       }
 
-      let ionSeries = [0, 1, 2, 3, 4, 5]
+      let ionSeries = []
+
+      for (let i = -this.props.c13Num; i <= 5; i++) {
+        ionSeries.push(i)
+      }
+
       let indices = ionSeries.map(
         function(val) {
           let errs = this.props.spectrumData.map(
-            peak => 1e6 * Math.abs(peak.mz - precursorMz - 1.0079 * val / chargeState) / peak.mz
+            peak => 1e6 * Math.abs(peak.mz - (precursorMz + 1.003355 * val / chargeState)) / peak.mz
           )
 
           if (errs.every(val => val > ppm))
@@ -178,6 +183,7 @@ class PrecursorSpectrumBox extends React.Component {
 PrecursorSpectrumBox.propTypes = {
   chargeState: React.PropTypes.number,
   isolationWindow: React.PropTypes.array,
+  c13Num: React.PropTypes.number,
   ppm: React.PropTypes.number,
   precursorMz: React.PropTypes.number,
   spectrumData: React.PropTypes.array,
@@ -186,6 +192,7 @@ PrecursorSpectrumBox.propTypes = {
 PrecursorSpectrumBox.defaultProps = {
   chargeState: 2,
   isolationWindow: null,
+  c13Num: 0,
   ppm: 20,
   precursorMz: 0,
   spectrumData: [],
