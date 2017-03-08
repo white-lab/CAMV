@@ -126,11 +126,11 @@ class SpectrumBox extends React.Component {
                 ) ? match.name : null
               )
 
-              if (self.props.collisionType == "CID") {
+              let ppm_cutoff = 10
+
+              if (this.props.collisionType == "CID") {
                 ppm_cutoff = 1000
-              } else if (self.props.collisionType == "HCD") {
-                ppm_cutoff = 10
-              } else {
+              } else if (this.props.collisionType == "HCD") {
                 ppm_cutoff = 10
               }
 
