@@ -118,8 +118,13 @@ class SpectrumBox extends React.Component {
                   (match.name != null && match.name.match(/^[abcxyz][^-]*$/) != null)
                 ) ?
                 match.name : null
-            )
+              )
+
               // TODO: change these conditions to match color coding
+              if (name != null && name.includes("C13")) {
+                style = 'point {size: 3; fill-color: yellow; visible: true}'
+              }
+
               if (into == 0) {
                 // Plot intermediate line-plot points along x-axis
                 style = null
