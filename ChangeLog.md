@@ -1,5 +1,12 @@
 # Change Log
 
+## 0.1.5 (2017-03-10)
+
+Features
+
+  - Color isotope peaks yellow as in CAMV-matlab
+  - Label peaks with magenta star when ppm > CID / HCD_TOL
+
 ## 0.1.4 (2017-03-06)
 
 Fixed several CI bugs, should deploy on Windows, Linux, and OS X now.
