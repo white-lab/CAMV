@@ -10,6 +10,7 @@
     "babel-preset-es2017-node7": "^0.5.2",
     "babel-preset-react": "^6.23.0",
     "dom-to-image": "github:naderm/dom-to-image",
+    "electron-compile": "^6.1.3",
     "react": "^15.4.2",
     "react-addons-update": "^15.4.2",
     "react-bootstrap": "^0.30.8",
@@ -75,7 +76,9 @@
           "zip"
         ]
       },
-      "electronPackagerConfig": {},
+      "electronPackagerConfig": {
+        "icon": "assets/CAMV.ico"
+      },
       "electronWinstallerConfig": {
         "name": "CAMV"
       },
