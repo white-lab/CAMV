@@ -1,5 +1,15 @@
 # Change Log
 
+## 0.1.6 (2017-03-13)
+
+Features
+
+  - Added a icon to CAMV packaged executable
+
+Bugfixes
+
+  - Include electron-compile to fix windows error
+
 ## 0.1.5 (2017-03-10)
 
 Features
