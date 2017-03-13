@@ -4,11 +4,17 @@ sudo: false
 node_js:
   - '7'
 
+os:
+  - linux
+  - osx
+
 matrix:
   include:
     - os: linux
+      node_js: '7'
       env: DEPLOY_FILE=out/make/CAMV-linux-x64.zip
     - os: osx
+      node_js: '7'
       env: DEPLOY_FILE=out/make/CAMV-darwin-x64.zip
 
 install:
