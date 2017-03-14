@@ -12,7 +12,7 @@ const remote = require('electron').remote
 const { dialog } = require('electron').remote
 
 import ModalExportBox from './ModalExportBox'
-import ModalFileSelectionBox from './ModalFileSelectionBox'
+import ModalImportBox from './ModalImportBox'
 import ModalFragmentBox from './ModalFragmentBox'
 import PrecursorSpectrumBox from './PrecursorSpectrumBox'
 import QuantSpectrumBox from './QuantSpectrumBox'
@@ -26,24 +26,36 @@ class ViewBox extends React.Component {
   constructor(props) {
     super(props)
     this.state = {
+      /* Unused */
       selectedRun: null,
       selectedSearch: null,
-      submitted: false,
+
+      modalImportOpen: false,
+      exporting: false,
+
+      /* Selected PTM / Scan / Peptide / Protein */
       selectedProtein: null,
       selectedPeptide: null,
       selectedScan: null,
       selectedPTMPlacement: null,
-      selectedMz: null,
-      currentLabel: null,
-      fragmentSelectionModalIsOpen: false,
-      modalExportIsOpen: false,
-      fragmentMatches: [],
-      maxPPM: 100,
+
+      /* Spectrum interface states */
       minMZ: 0,
       maxMZ: null,
+
+      /* Peak labeling states */
+      selectedMz: null,
+      currentLabel: null,
+      fragmentMatches: [],
+      maxPPM: 100,  /* Max window for fragments that can be candidates */
+
+      /* Modal Windows */
+      modalFragmentSelectionOpen: false,
+      modalExportOpen: false,
+
+      /* Validatoin data */
       data: [],
       peptideData: [],
-      exporting: false,
       basename: null,
     }
   }
@@ -178,7 +190,7 @@ class ViewBox extends React.Component {
 
     this.setState({
       selectedMz: mz,
-      fragmentSelectionModalIsOpen: true,
+      modalFragmentSelectionOpen: true,
       fragmentMatches: matches,
       currentLabel: currentLabel
     })
@@ -186,7 +198,7 @@ class ViewBox extends React.Component {
 
   closeFragmentSelectionModal() {
     this.setState({
-      fragmentSelectionModalIsOpen: false,
+      modalFragmentSelectionOpen: false,
       fragmentMatches: [],
       selectedMz: null,
       currentLabel: ''
@@ -252,7 +264,7 @@ class ViewBox extends React.Component {
 
   closeExportModal() {
     this.setState({
-      modalExportIsOpen: false,
+      modalExportOpen: false,
     })
   }
 
@@ -401,9 +413,9 @@ class ViewBox extends React.Component {
     )
   }
 
-  exportCallback(dirName, export_spectras, export_tables) {
+  runExport(dirName, export_spectras, export_tables) {
     this.setState({
-      modalExportIsOpen: false,
+      modalExportOpen: false,
     })
 
     if (export_tables || export_spectras.some(i => i)) {
@@ -463,7 +475,7 @@ class ViewBox extends React.Component {
 
   goButtonClicked() {
     this.setState({
-      submitted: true,
+      modalImportOpen: true,
     })
   }
 
@@ -479,9 +491,9 @@ class ViewBox extends React.Component {
     })
   }
 
-  setSubmitted(submitted, fileName) {
+  runImport(submitted, fileName) {
     this.setState({
-      submitted: submitted,
+      modalImportOpen: modalImportOpen,
     })
 
     if (fileName != null && fileName.length > 0) {
@@ -497,7 +509,7 @@ class ViewBox extends React.Component {
 
   openExport() {
     this.setState({
-      modalExportIsOpen: true,
+      modalExportOpen: true,
     })
   }
 
@@ -625,24 +637,26 @@ class ViewBox extends React.Component {
         style={{margin: this.state.exporting ? '0px' : '10px'}}
       >
         <ModalFragmentBox
-          showModal={this.state.fragmentSelectionModalIsOpen}
-          closeCallback={this.closeFragmentSelectionModal.bind(this)}
-          updateCallback={this.updateSelectedFragment.bind(this)}
+          ref="modalFragmentBox"
+          showModal={this.state.modalFragmentSelectionOpen}
           mz={this.state.selectedMz}
           fragmentMatches={this.state.fragmentMatches}
           currentLabel={this.state.currentLabel}
+          updateCallback={this.updateSelectedFragment.bind(this)}
+          closeCallback={this.closeFragmentSelectionModal.bind(this)}
         />
-        <ModalFileSelectionBox
-          showModal={!this.state.submitted}
+        <ModalImportBox
+          ref="modalImportBox"
+          showModal={!this.state.modalImportOpen}
           setPeptideData={this.setPeptideData.bind(this)}
           setData={this.setData.bind(this)}
-          setSubmitted={this.setSubmitted.bind(this)}
+          importCallback={this.runImport.bind(this)}
         />
         <ModalExportBox
           ref="modalExportBox"
-          showModal={this.state.modalExportIsOpen}
+          showModal={this.state.modalExportOpen}
           closeCallback={this.closeExportModal.bind(this)}
-          exportCallback={this.exportCallback.bind(this)}
+          exportCallback={this.runExport.bind(this)}
         />
         <div
           className="panel panel-default"

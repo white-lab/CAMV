@@ -8,7 +8,7 @@ import zlib from 'zlib'
 
 const { dialog } = require('electron').remote
 
-class ModalFileSelectionBox extends React.Component {
+class ModalImportBox extends React.Component {
   constructor(props) {
     super(props)
     this.state = {
@@ -29,7 +29,7 @@ class ModalFileSelectionBox extends React.Component {
     if (this.state.submitted) {
       this.props.setData(this.state.data)
       this.props.setPeptideData(this.state.peptideData)
-      this.props.setSubmitted(true, this.state.fileName)
+      this.props.importCallback(true, this.state.fileName)
     }
   }
 
@@ -77,7 +77,7 @@ class ModalFileSelectionBox extends React.Component {
     if (this.state.data != null) {
       this.props.setData(this.state.data)
       this.props.setPeptideData(this.state.peptideData)
-      this.props.setSubmitted(true, this.state.fileName)
+      this.props.importCallback(true, this.state.fileName)
     }
   }
 
@@ -114,11 +114,11 @@ class ModalFileSelectionBox extends React.Component {
   }
 }
 
-ModalFileSelectionBox.propTypes = {
+ModalImportBox.propTypes = {
   setData: React.PropTypes.func.isRequired,
   setPeptideData: React.PropTypes.func.isRequired,
-  setSubmitted: React.PropTypes.func.isRequired,
+  importCallback: React.PropTypes.func.isRequired,
   showModal: React.PropTypes.bool.isRequired,
 }
 
-module.exports = ModalFileSelectionBox
+module.exports = ModalImportBox
