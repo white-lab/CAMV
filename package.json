@@ -21,6 +21,7 @@
   },
   "devDependencies": {
     "babel-eslint": "^7.1.1",
+    "electron-compilers": "^5.5.1",
     "electron-forge": "^2.8.3",
     "electron-prebuilt-compile": "1.6.1",
     "eslint": "^3.17.0",
