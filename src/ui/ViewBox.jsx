@@ -34,7 +34,7 @@ class ViewBox extends React.Component {
       selectedRun: null,
       selectedSearch: null,
 
-      modalImportOpen: false,
+      modalImportOpen: true,
       exporting: false,
 
       /* Selected PTM / Scan / Peptide / Protein */
@@ -368,7 +368,7 @@ class ViewBox extends React.Component {
     })
   }
 
-  goButtonClicked() {
+  openImport() {
     this.setState({
       modalImportOpen: true,
     })
@@ -388,7 +388,7 @@ class ViewBox extends React.Component {
 
   runImport(fileName) {
     this.setState({
-      modalImportOpen: true,
+      modalImportOpen: false,
     })
 
     if (fileName != null && fileName.length > 0) {
@@ -514,7 +514,7 @@ class ViewBox extends React.Component {
         />
         <ModalImportBox
           ref="modalImportBox"
-          showModal={!this.state.modalImportOpen}
+          showModal={this.state.modalImportOpen}
           setPeptideData={this.setPeptideData.bind(this)}
           setScanData={this.setScanData.bind(this)}
           importCallback={this.runImport.bind(this)}
@@ -614,7 +614,15 @@ class ViewBox extends React.Component {
               </div>
               <div id="exportSave">
                 <Button
-                  id="save"
+                  id="openImport"
+                  onClick={this.openImport.bind(this)}
+                  style={{display: this.state.exporting ? 'none' : null}}
+                  disabled={this.state.scanData.length > 0}
+                >
+                  Open
+                </Button>
+                <Button
+                  id="openSave"
                   onClick={this.save.bind(this)}
                   style={{display: this.state.exporting ? 'none' : null}}
                   disabled={this.state.scanData.length < 1}
