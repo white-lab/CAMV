@@ -304,12 +304,13 @@ class ViewBox extends React.Component {
               scan.scanId,
               match.modsId,
             ];
+            let mod = this.state.peptideData[peptide.peptideDataId]
+              .modificationStates[peptide.modificationStateId]
+              .mods[match.modsId]
             yield [
               nodes,
               protein.proteinName,
-              this.state.peptideData[peptide.peptideDataId]
-                .modificationStates[peptide.modificationStateId]
-                .mods[match.modsId].name,
+              mod != null ? mod.name : '',
               scan.scanNumber,
               state,
             ];
