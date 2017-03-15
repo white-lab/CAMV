@@ -235,39 +235,41 @@ class SpectrumBox extends React.Component {
           id="updateBox"
           style={{display: this.state.exporting ? 'none' : null}}
         >
-          <div className="setMinMZ">
-            <SetMinMZ
-              callback={this.props.updateMinMZ}
-              disabled={this.props.inputDisabled}
-              minMZ={this.props.minMZ}
-            />
+          <div id="mzBox">
+            <div className="setMinMZ">
+              <SetMinMZ
+                callback={this.props.updateMinMZ}
+                disabled={this.props.inputDisabled}
+                minMZ={this.props.minMZ}
+              />
+            </div>
+
+            <div className="setMaxMZ">
+              <SetMaxMZ
+                callback={this.props.updateMaxMZ}
+                disabled={this.props.inputDisabled}
+                maxMZ={this.props.maxMZ}
+                scanMaxMZ={
+                  Math.ceil(
+                    this.props.spectrumData.length == 0 ?
+                    1 :
+                    this.props.spectrumData[this.props.spectrumData.length - 1].mz + 1
+                  )
+                }
+              />
+            </div>
           </div>
 
-          <div className="setMaxMZ">
-            <SetMaxMZ
-              callback={this.props.updateMaxMZ}
-              disabled={this.props.inputDisabled}
-              maxMZ={this.props.maxMZ}
-              scanMaxMZ={Math.ceil(this.props.spectrumData.length == 0 ? 1 : this.props.spectrumData[this.props.spectrumData.length - 1].mz + 1)}
-            />
-          </div>
-
-          <div className="rejectButton">
-            <RejectButton
+          <div id="choiceBox">
+            <AcceptButton
               callback={this.props.updateChoice}
               disabled={this.props.inputDisabled}
             />
-          </div>
-
-          <div className="maybeButton">
             <MaybeButton
               callback={this.props.updateChoice}
               disabled={this.props.inputDisabled}
             />
-          </div>
-
-          <div className="acceptButton">
-            <AcceptButton
+            <RejectButton
               callback={this.props.updateChoice}
               disabled={this.props.inputDisabled}
             />
