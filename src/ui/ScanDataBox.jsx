@@ -8,7 +8,7 @@ class ScanDataBox extends React.Component {
       >
         {
           this.props.protName != null &&
-          <p style={{margin: 0}}>{this.props.protName}</p>
+          <p>{this.props.protName}</p>
         }
         {
           this.props.chargeState != null &&
