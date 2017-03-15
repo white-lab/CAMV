@@ -12,13 +12,13 @@ function decodeBase64Image(dataString) {
   let response = {}
 
   if (matches.length !== 3) {
-    return new Error('Invalid input string');
+    return new Error('Invalid input string')
   }
 
-  response.type = matches[1];
-  response.scanData = new Buffer(matches[2], 'base64');
+  response.type = matches[1]
+  response.data = new Buffer(matches[2], 'base64')
 
-  return response;
+  return response
 }
 
 
@@ -26,8 +26,10 @@ exports.spectraToImage = async function(vb, dirName, export_spectras) {
   vb.setState({exporting: true});
   var win = remote.getCurrentWindow();
   var sizes = win.getBounds();
+  var maximized = win.isMaximized();
 
-  win.setSize(800, 650);
+  // win.setSize(800, 650);
+  win.setSize(1188, 840);
   win.setResizable(false);
   win.closeDevTools()
 
@@ -62,9 +64,9 @@ exports.spectraToImage = async function(vb, dirName, export_spectras) {
     let dataUrl = await domtoimage.toPng(
       document.getElementById('viewBox'),
       {
-        width: 770,
-        height: 595,
-        bgcolor: 'red',
+        width: 1157,
+        height: 783,
+        bgcolor: 'white',
         dpi: 600,
       },
       function () {}
@@ -84,8 +86,14 @@ exports.spectraToImage = async function(vb, dirName, export_spectras) {
   Promise.all(promises).then(
     function() {
       vb.setState({exporting: false});
-      win.setSize(sizes.width, sizes.height);
       win.setResizable(true);
+
+      if (maximized) {
+        win.maximize()
+      } else {
+        win.setSize(sizes.width, sizes.height)
+      }
+
       vb.refs["scanSelectionList"].update(...current_node);
       spectrum.setState({exporting: false})
     }.bind(vb)
