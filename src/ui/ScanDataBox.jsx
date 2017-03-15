@@ -20,7 +20,7 @@ class ScanDataBox extends React.Component {
         }
         {
           this.props.fileName != null &&
-          <p>File Name: {this.props.fileName}</p>
+          <p>File Name: {this.props.fileName.replace(/^.*[\\\/]/, '')}</p>
         }
       </div>
     )
