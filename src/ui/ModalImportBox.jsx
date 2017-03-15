@@ -8,105 +8,91 @@ import zlib from 'zlib'
 
 const { dialog } = require('electron').remote
 
+import { loadCAMV } from '../io/camv'
+
 class ModalImportBox extends React.Component {
   constructor(props) {
     super(props)
     this.state = {
-      fileChosen: false,
-      submitted: false,
-      data: [],
-      peptideData: [],
-      fileName: null,
+      ready: false,
+      imported: false,
+      importing: false,
+      camvFileName: null,
     }
   }
 
-  setStateFromJSON(data) {
-    this.setState({
-      data: data.scanData,
-      peptideData: data.peptideData,
-    });
-
-    if (this.state.submitted) {
-      this.props.setData(this.state.data)
-      this.props.setPeptideData(this.state.peptideData)
-      this.props.importCallback(true, this.state.fileName)
-    }
-  }
-
-  update() {
+  updateCAMVFile() {
     dialog.showOpenDialog(
       {
         filters: [{
-          name: 'text',
+          name: 'JSON',
           extensions: ['camv', 'camv.gz']
         }]
       },
       function (fileNames) {
         if (fileNames === undefined) return;
 
-        var fileName = fileNames[0];
-        var compressed = fileName.endsWith(".gz");
-
-        let data = fs.createReadStream(
-          fileName,
-          (compressed ? null : 'utf-8'),
-        )
-        if (compressed) {
-          let gunzip = zlib.createGunzip()
-          data = data.pipe(gunzip)
-        }
-
-        let parser = JSONStream.parse()
-        data.pipe(parser)
-        parser.on(
-          'data',
-          function(data) { this.setStateFromJSON(data) }.bind(this),
-        )
-
         this.setState({
-          fileChosen: true,
-          fileName: fileName,
+          ready: true,
+          camvFileName: fileNames[0],
         })
       }.bind(this)
     )
   }
 
-  submit() {
-    this.setState({submitted: true})
+  runImport() {
+    this.setState({
+      importing: true,
+    })
 
-    if (this.state.data != null) {
-      this.props.setData(this.state.data)
-      this.props.setPeptideData(this.state.peptideData)
-      this.props.importCallback(true, this.state.fileName)
-    }
+    loadCAMV(
+      this.state.camvFileName,
+      function(data) {
+        this.props.setScanData(data.scanData)
+        this.props.setPeptideData(data.peptideData)
+        this.props.importCallback(this.state.camvFileName)
+
+        this.setState({
+          imported: true,
+          importing: false,
+        })
+      }.bind(this)
+    )
   }
 
   render() {
     return (
       <Modal
-        onHide={this.submit.bind(this)}
+        onHide={this.props.closeCallback.bind(this)}
         show={this.props.showModal}
       >
         <Modal.Header>
           <Modal.Title>
-            <div>Load CAMV Data Set</div>
+            <div>
+              Load CAMV Data Set
+            </div>
           </Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <button
+          <Button
             id="fileSelect"
-            onClick={this.update.bind(this)}
+            onClick={this.updateCAMVFile.bind(this)}
+            disabled={this.state.importing}
           >
             Choose File
-          </button>
-          {this.state.fileName}
+          </Button>
+          {this.state.camvFileName}
         </Modal.Body>
         <Modal.Footer>
           <Button
-            disabled={!this.state.fileChosen}
-            onClick={this.submit.bind(this)}
+            disabled={!this.state.ready || this.state.importing}
+            onClick={this.runImport.bind(this)}
           >
-            Done
+            {
+              this.state.importing ?
+              ("importing...") :
+              ("Open")
+            }
           </Button>
         </Modal.Footer>
       </Modal>
@@ -115,9 +101,10 @@ class ModalImportBox extends React.Component {
 }
 
 ModalImportBox.propTypes = {
-  setData: React.PropTypes.func.isRequired,
+  setScanData: React.PropTypes.func.isRequired,
   setPeptideData: React.PropTypes.func.isRequired,
   importCallback: React.PropTypes.func.isRequired,
+  closeCallback: React.PropTypes.func.isRequired,
   showModal: React.PropTypes.bool.isRequired,
 }
 

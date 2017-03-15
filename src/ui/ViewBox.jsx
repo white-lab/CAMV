@@ -21,6 +21,10 @@ import ScanSelectionList from './ScanSelectionList'
 import SequenceBox from './SequenceBox'
 import SpectrumBox from './SpectrumBox'
 
+import { saveCAMV } from '../io/camv.jsx'
+import { exportCSV } from '../io/csv.jsx'
+import { spectraToImage } from '../io/spectra.jsx'
+
 
 class ViewBox extends React.Component {
   constructor(props) {
@@ -54,7 +58,7 @@ class ViewBox extends React.Component {
       modalExportOpen: false,
 
       /* Validatoin data */
-      data: [],
+      scanData: [],
       peptideData: [],
       basename: null,
     }
@@ -118,7 +122,7 @@ class ViewBox extends React.Component {
 
   getScanData() {
     if (this.state.selectedProtein != null) {
-      let protein = this.state.data[this.state.selectedProtein]
+      let protein = this.state.scanData[this.state.selectedProtein]
 
       if (this.state.selectedPeptide != null) {
         let peptide = protein.peptides[this.state.selectedPeptide]
@@ -150,11 +154,11 @@ class ViewBox extends React.Component {
   }
 
   updateSelectedMz(mz) {
-    let data = this.state.data[this.state.selectedProtein]
+    let data = this.state.scanData[this.state.selectedProtein]
       .peptides[this.state.selectedPeptide]
       .scans[this.state.selectedScan]
       .scanData
-    let peptide = this.state.data[this.state.selectedProtein]
+    let peptide = this.state.scanData[this.state.selectedProtein]
       .peptides[this.state.selectedPeptide]
     let peptideDataId = peptide.peptideDataId
     let modificationStateId = peptide.modificationStateId
@@ -217,7 +221,7 @@ class ViewBox extends React.Component {
 
     let peak_targets = {}
 
-    let peptide = this.state.data[this.state.selectedProtein]
+    let peptide = this.state.scanData[this.state.selectedProtein]
       .peptides[this.state.selectedPeptide]
 
     let matchData = this.state.peptideData[peptide.peptideDataId]
@@ -225,7 +229,7 @@ class ViewBox extends React.Component {
       .mods[this.state.selectedPTMPlacement]
       .matchData
 
-    let scanData = this.state.data[this.state.selectedProtein]
+    let scanData = this.state.scanData[this.state.selectedProtein]
       .peptides[this.state.selectedPeptide]
       .scans[this.state.selectedScan]
       .scanData
@@ -258,7 +262,13 @@ class ViewBox extends React.Component {
     protein_target[this.state.selectedProtein] = peptides_target;
 
     this.setState({
-      data: update(this.state.data, protein_target)
+      scanData: update(this.state.scanData, protein_target)
+    })
+  }
+
+  closeImportModal() {
+    this.setState({
+      modalImportOpen: false,
     })
   }
 
@@ -268,47 +278,12 @@ class ViewBox extends React.Component {
     })
   }
 
-  export_tables(dirName) {
-    // Export spectra as csv file
-    let dataOut = []
-    dataOut.push([
-      "Scan",
-      "Protein",
-      // "Accession",
-      "Sequence",
-      // "Score",
-      "Status",
-    ])
-
-    for (let vals of this.iterate_spectra([true, true, true, true])) {
-      let [nodes, prot, pep, scan, state] = vals;
-
-      dataOut.push([
-        scan,
-        prot,
-        pep,
-        state,
-      ])
-    }
-
-    let rows = []
-    for (let row of dataOut) {
-      rows.push(row.join(", "))
-    }
-
-    fs.writeFile(
-      path.join(dirName, this.state.basename + ".csv"),
-      rows.join("\n"),
-      function () {}
-    )
-  }
-
   *iterate_spectra(export_spectras) {
     while (export_spectras.length < 4) {
       export_spectras.push(false);
     }
 
-    for (let protein of this.state.data) {
+    for (let protein of this.state.scanData) {
       for (let peptide of protein.peptides) {
         for (let scan of peptide.scans) {
           for (let match of scan.choiceData) {
@@ -344,93 +319,27 @@ class ViewBox extends React.Component {
     }
   }
 
-  async spectraToImage(dirName, export_spectras) {
-    this.setState({exporting: true});
-    var win = remote.getCurrentWindow();
-    var sizes = win.getBounds();
-
-    win.setSize(800, 650);
-    win.setResizable(false);
-
-    let scan_list = this.refs["scanSelectionList"];
-    let spectrum = this.refs["fragmentSpectrum"];
-    spectrum.setState({exporting: true})
-
-    let current_node = [
-      scan_list.props.selectedProtein,
-      scan_list.props.selectedPeptide,
-      scan_list.props.selectedScan,
-      scan_list.props.selectedPTMPlacement
-    ];
-
-    /* Dummy call to force interface to redraw */
-    this.refs["scanSelectionList"].update(...[null, null, null, null])
-
-    await domtoimage.toPng(
-      document.getElementById('viewBox'),
-      function () {}
-    )
-
-    let promises = [];
-
-    for (let vals of this.iterate_spectra(export_spectras)) {
-      let [nodes, prot, pep, scan, score, state] = vals;
-      let out_name = prot + " - " + pep + " - " + scan;
-
-      this.refs["scanSelectionList"].update(...nodes);
-
-      // let dataUrl = await domtoimage.toSvg(
-      let dataUrl = await domtoimage.toPng(
-        document.getElementById('viewBox'),
-        {
-          width: 770,
-          height: 595,
-          bgcolor: 'red',
-          dpi: 600,
-        },
-        function () {}
-      )
-      promises.push(
-        fs.writeFile(
-          // path.join(dirName, out_name + ".svg"),
-          // '<?xml version="1.0" encoding="UTF-8" standalone="no"?>' +
-          // dataUrl.slice("data:image/svg+xml;charset=utf-8,".length),
-          path.join(dirName, out_name + ".png"),
-          this.decodeBase64Image(dataUrl).data,
-          function () {}
-        )
-      )
-    }
-
-    Promise.all(promises).then(
-      function() {
-        this.setState({exporting: false});
-        win.setSize(sizes.width, sizes.height);
-        win.setResizable(true);
-        this.refs["scanSelectionList"].update(...current_node);
-        spectrum.setState({exporting: false})
-      }.bind(this)
-    )
-  }
-
-  runExport(dirName, export_spectras, export_tables) {
+  runExport(dirName, export_spectras, exportTables) {
     this.setState({
       modalExportOpen: false,
     })
 
-    if (export_tables || export_spectras.some(i => i)) {
+    if (exportTables || export_spectras.some(i => i)) {
       fs.mkdir(
         dirName,
         function() {
-          if (export_tables) {
-            this.export_tables(dirName);
+          if (exportTables) {
+            exportCSV(
+              this,
+              path.join(dirName, this.state.basename + ".csv")
+            );
           }
 
           if (!export_spectras.some(i => i)) {
             return;
           }
 
-          this.spectraToImage(dirName, export_spectras)
+          spectraToImage(this, dirName, export_spectras)
         }.bind(this)
       )
     }
@@ -455,22 +364,8 @@ class ViewBox extends React.Component {
        on large files.
      */
     this.setState({
-      data: update(this.state.data, protein_target)
+      scanData: update(this.state.scanData, protein_target)
     })
-  }
-
-  decodeBase64Image(dataString) {
-    let matches = dataString.match(/^data:([A-Za-z-+\/]+);base64,(.+)$/)
-    let response = {}
-
-    if (matches.length !== 3) {
-      return new Error('Invalid input string');
-    }
-
-    response.type = matches[1];
-    response.data = new Buffer(matches[2], 'base64');
-
-    return response;
   }
 
   goButtonClicked() {
@@ -479,9 +374,9 @@ class ViewBox extends React.Component {
     })
   }
 
-  setData(data) {
+  setScanData(scanData) {
     this.setState({
-      data: data,
+      scanData: scanData,
     })
   }
 
@@ -491,9 +386,9 @@ class ViewBox extends React.Component {
     })
   }
 
-  runImport(submitted, fileName) {
+  runImport(fileName) {
     this.setState({
-      modalImportOpen: modalImportOpen,
+      modalImportOpen: true,
     })
 
     if (fileName != null && fileName.length > 0) {
@@ -527,39 +422,11 @@ class ViewBox extends React.Component {
         if (fileName === undefined)
           return;
 
-        var compressed = fileName.endsWith(".gz");
-
-        var ws = fs.createWriteStream(
+        saveCAMV(
           fileName,
-          (compressed ? null : 'utf-8'),
+          this.state.scanData,
+          this.state.peptideData
         )
-
-        if (compressed) {
-          let gzip = zlib.createGzip()
-          ws = gzip.pipe(ws)
-        }
-
-        ws.on('error', function(err) {
-          dialog.showErrorBox("File Save Error", err.message);
-        });
-
-        ws.on('finish', function() {
-            dialog.showMessageBox(
-              {
-                message: "The file has been saved!",
-                buttons: ["OK"]
-              }
-            );
-        })
-
-        let writer = JSONStream.stringify('', '', '')
-        writer.pipe(ws)
-        ws.write('{\n  "scanData": ')
-        writer.write(this.state.data)
-        ws.write(',\n  "peptideData": ')
-        writer.write(this.state.peptideData)
-        ws.write(',\n}\n')
-        writer.end()
       }.bind(this)
     );
   }
@@ -584,7 +451,7 @@ class ViewBox extends React.Component {
     let c13Num = 0
 
     if (this.state.selectedProtein != null) {
-      let protein = this.state.data[this.state.selectedProtein]
+      let protein = this.state.scanData[this.state.selectedProtein]
 
       if (this.state.selectedPeptide != null) {
         let peptide = protein.peptides[this.state.selectedPeptide]
@@ -649,8 +516,9 @@ class ViewBox extends React.Component {
           ref="modalImportBox"
           showModal={!this.state.modalImportOpen}
           setPeptideData={this.setPeptideData.bind(this)}
-          setData={this.setData.bind(this)}
+          setScanData={this.setScanData.bind(this)}
           importCallback={this.runImport.bind(this)}
+          closeCallback={this.closeImportModal.bind(this)}
         />
         <ModalExportBox
           ref="modalExportBox"
@@ -665,7 +533,7 @@ class ViewBox extends React.Component {
         >
           <ScanSelectionList
             ref="scanSelectionList"
-            data={this.state.data}
+            scanData={this.state.scanData}
             peptideData={this.state.peptideData}
             updateSelectedProteinCallback={this.updateSelectedProtein.bind(this)}
             updateSelectedPeptideCallback={this.updateSelectedPeptide.bind(this)}
@@ -749,7 +617,7 @@ class ViewBox extends React.Component {
                   id="save"
                   onClick={this.save.bind(this)}
                   style={{display: this.state.exporting ? 'none' : null}}
-                  disabled={this.state.data.length < 1}
+                  disabled={this.state.scanData.length < 1}
                 >
                   Save
                 </Button>
@@ -757,7 +625,7 @@ class ViewBox extends React.Component {
                   id="openExport"
                   onClick={this.openExport.bind(this)}
                   style={{display: this.state.exporting ? 'none' : null}}
-                  disabled={this.state.data.length < 1}
+                  disabled={this.state.scanData.length < 1}
                 >
                   Export
                 </Button>

@@ -44,22 +44,22 @@ class ScanSelectionList extends React.Component {
   getMaxLength(node) {
     switch (node.length) {
       case 1:
-        var proteins = this.props.data;
+        var proteins = this.props.scanData;
         return proteins.length;
 
       case 2:
-        var proteins = this.props.data;
+        var proteins = this.props.scanData;
         var peptides = proteins[node[0]].peptides;
         return peptides.length;
 
       case 3:
-        var proteins = this.props.data;
+        var proteins = this.props.scanData;
         var peptides = proteins[node[0]].peptides;
         var scans = peptides[node[1]].scans;
         return scans.length;
 
       case 4:
-        var proteins = this.props.data;
+        var proteins = this.props.scanData;
         var peptides = proteins[node[0]].peptides;
         var peptide = peptides[node[1]];
         var ptms = this.props.peptideData[peptide.peptideDataId]
@@ -155,7 +155,7 @@ class ScanSelectionList extends React.Component {
     return (
       <ul className="tree">
         {
-          this.props.data.map(
+          this.props.scanData.map(
             (protein) => {
               return (
                 <ProteinListItem
@@ -178,7 +178,7 @@ class ScanSelectionList extends React.Component {
 }
 
 ScanSelectionList.propTypes = {
-  data: React.PropTypes.array,
+  scanData: React.PropTypes.array,
   peptideData: React.PropTypes.array,
   selectedProtein: React.PropTypes.number,
   selectedPeptide: React.PropTypes.number,
@@ -188,7 +188,7 @@ ScanSelectionList.propTypes = {
 }
 
 ScanSelectionList.defaultProps = {
-  data: null,
+  scanData: null,
   peptideData: null,
   selectedProtein: null,
   selectedPeptide: null,
