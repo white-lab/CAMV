@@ -1,19 +1,8 @@
 import React from 'react'
-import hotkey from 'react-hotkey'
-
-hotkey.activate();
 
 import ProteinListItem from './ProteinListItem'
 
 class ScanSelectionList extends React.Component {
-  componentDidMount() {
-    hotkey.addHandler(this.handleHotkey.bind(this))
-  }
-
-  componentWillUnmount() {
-    hotkey.removeHandler(this.handleHotkey.bind(this))
-  }
-
   update(proteinId, peptideId, scanId, modsId) {
     this.props.updateAllCallback(
       proteinId,
@@ -123,7 +112,7 @@ class ScanSelectionList extends React.Component {
     node = node.filter((i) => { return i != null; })
 
     if (node.length < 1) {
-      return;
+      node = [0]
     }
 
     switch (e.key) {

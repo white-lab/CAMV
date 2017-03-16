@@ -76,28 +76,42 @@ class ViewBox extends React.Component {
   }
 
   handleHotkey(e) {
-    if (this.state.scanData != null) {
+    if (this.state.scanData != null && !this.anyModalOpen()) {
       if (e.getModifierState("Control")) {
         switch (e.key) {
           case 'f':
             this.setState({modalSearchOpen: !this.state.modalSearchOpen})
             break;
         }
-      }
-
-      switch(e.key) {
-        case 'a':
-          this.updateChoice('accept')
-          break;
-        case 's':
-          this.updateChoice('maybe')
-          break;
-        case 'd':
-          this.updateChoice('reject')
-          break;
+      } else {
+        switch(e.key) {
+          case 'a':
+            this.updateChoice('accept')
+            break;
+          case 's':
+            this.updateChoice('maybe')
+            break;
+          case 'd':
+            this.updateChoice('reject')
+            break;
+          default:
+            let scanList = this.refs["scanSelectionList"]
+            scanList.handleHotkey(e)
+            break;
         }
       }
     }
+  }
+
+  anyModalOpen() {
+    return [
+      this.state.modalImportOpen,
+      this.state.modalExportOpen,
+      this.state.modalSearchOpen,
+      this.state.modalFragmentSelectionOpen,
+    ].some(i => i != false)
+  }
+
 
   updateSelectedProtein(proteinId) {
     this.setState({

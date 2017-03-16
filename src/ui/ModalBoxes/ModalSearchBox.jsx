@@ -57,7 +57,7 @@ class ModalSearchBox extends React.Component {
   }
 
   updateScan(e) {
-    this.setState({scanNumber: e.target.value})
+    this.setState({scanMatch: e.target.value})
   }
 
   validateScan(text) {
@@ -74,7 +74,7 @@ class ModalSearchBox extends React.Component {
   render() {
     return (
       <Modal
-        onHide={this.closeCallback}
+        onHide={this.closeCallback.bind(this)}
         show={this.props.showModal}
       >
         <Modal.Header>
@@ -85,10 +85,7 @@ class ModalSearchBox extends React.Component {
           </Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <FormGroup
-            // controlId="formBasicText"
-            // validationState={this.getValidationState()}
-          >
+          <FormGroup>
             <ControlLabel>
               Protein Name
             </ControlLabel>
@@ -98,13 +95,8 @@ class ModalSearchBox extends React.Component {
               placeholder="Protein Name (i.e. EGFR)"
               onChange={this.updateProtein.bind(this)}
             />
-            // <FormControl.Feedback />
-            // <HelpBlock>Validation is based on string length.</HelpBlock>
           </FormGroup>
-          <FormGroup
-            // controlId="formBasicText"
-            // validationState={this.getValidationState()}
-          >
+          <FormGroup>
             <ControlLabel>
               Peptide Sequence
             </ControlLabel>
@@ -114,29 +106,18 @@ class ModalSearchBox extends React.Component {
               placeholder="Peptide Sequence (i.e. QyQ)"
               onChange={this.updatePeptide.bind(this)}
             />
-            // <FormControl.Feedback />
-            <HelpBlock>
-              Upper: match any residue. Lower: match modified residue. Dot: Match any.
-              (i.e. T..QyQ => T-V-V-Q-pY-Q, pT-A-A-Q-pY-Q)
-            </HelpBlock>
           </FormGroup>
 
-          <FormGroup
-            // controlId="formBasicText"
-            // validationState={this.validateScan()}
-          >
+          <FormGroup>
             <ControlLabel>
               Scan Number
             </ControlLabel>
             <FormControl
               type="text"
               value={this.state.scanNumber}
-              placeholder="Scan Number"
+              placeholder="Scan Number (i.e. 24117)"
               onChange={this.updateScan.bind(this)}
             />
-            // <FormControl.Feedback />
-            // <HelpBlock>
-            // </HelpBlock>
           </FormGroup>
 
         </Modal.Body>
