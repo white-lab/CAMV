@@ -11,7 +11,6 @@ class PTMPlacementListItem extends React.Component {
   }
 
   render() {
-    console.log(this.props.ptmPlacement.exactModsId)
     var selected = (
       this.props.selectedProtein == this.props.proteinId &&
       this.props.selectedPeptide == this.props.peptideId &&
