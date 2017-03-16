@@ -6,16 +6,17 @@ class PTMPlacementListItem extends React.Component {
       this.props.proteinId,
       this.props.peptideId,
       this.props.scanId,
-      this.props.ptmPlacement.id
+      this.props.ptmPlacement.exactModsId
     )
   }
 
   render() {
+    console.log(this.props.ptmPlacement.exactModsId)
     var selected = (
       this.props.selectedProtein == this.props.proteinId &&
       this.props.selectedPeptide == this.props.peptideId &&
       this.props.selectedScan == this.props.scanId &&
-      this.props.selectedPTMPlacement == this.props.ptmPlacement.id
+      this.props.selectedPTMPlacement == this.props.ptmPlacement.exactModsId
     )
     let className = this.props.choice
     return (

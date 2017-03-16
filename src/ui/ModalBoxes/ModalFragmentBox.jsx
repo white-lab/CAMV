@@ -56,7 +56,7 @@ class ModalFragmentBox extends React.Component {
                   return (
                     <option
                       key={i}
-                      value={object.id}
+                      value={object.ionId}
                     >
                       {
                         object.name +

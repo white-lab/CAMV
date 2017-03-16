@@ -59,7 +59,7 @@ class ScanNumberListItem extends React.Component {
                   return (
                     <PTMPlacementListItem
                       choice={this.props.scan.choiceData[i].state}
-                      key={ptmPlacement.id}
+                      key={ptmPlacement.exactModsId}
                       proteinId={this.props.proteinId}
                       peptideId={this.props.peptideId}
                       scanId={this.props.scan.scanId}
