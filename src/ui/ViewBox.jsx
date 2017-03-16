@@ -35,10 +35,6 @@ class ViewBox extends React.Component {
   constructor(props) {
     super(props)
     this.state = {
-      /* Unused */
-      selectedRun: null,
-      selectedSearch: null,
-
       /* Selected PTM / Scan / Peptide / Protein */
       selectedProtein: null,
       selectedPeptide: null,
@@ -77,15 +73,6 @@ class ViewBox extends React.Component {
 
   componentWillUnmount() {
     hotkey.removeHandler(this.handleHotkey.bind(this))
-  }
-
-  componentDidUpdate(prevProps, prevState) {
-    if (prevState.selectedRun != this.state.selectedRun) {
-      // console.log('New run: ' + this.state.selectedRun)
-    }
-    if (prevState.selectedSearch != this.state.selectedSearch) {
-      // console.log('New search: ' + this.state.selectedSearch)
-    }
   }
 
   handleHotkey(e) {
