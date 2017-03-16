@@ -409,9 +409,9 @@ class ViewBox extends React.Component {
     for (let [i, protein] of prot_range.entries()) {
       if (
         proteinMatch != '' &&
-        protein.proteinName.includes(proteinMatch)
+        protein.proteinName.toLowerCase().includes(proteinMatch.toLowerCase())
       ) {
-        this.updateAll(i, null, null, null)
+        this.updateAll(i, 0, 0, 0)
         return
       }
 
@@ -422,9 +422,9 @@ class ViewBox extends React.Component {
 
         if (
           peptideMatch != '' &&
-          pepData.peptideSequence.includes(peptideMatch)
+          pepData.peptideSequence.includes(peptideMatch.toUpperCase())
         ) {
-          this.updateAll(i, j, null, null)
+          this.updateAll(i, j, 0, 0)
           return
         }
 
@@ -435,7 +435,7 @@ class ViewBox extends React.Component {
             scanMatch != '' &&
             String(scan.scanNumber) == scanMatch
           ) {
-            this.updateAll(i, j, k, null)
+            this.updateAll(i, j, k, 0)
             return
           }
 
@@ -450,7 +450,7 @@ class ViewBox extends React.Component {
               peptideMatch != '' &&
               ptmData.name.includes(peptideMatch)
             ) {
-              this.updateAll(i, j, null, null)
+              this.updateAll(i, j, k, l)
               return
             }
           }

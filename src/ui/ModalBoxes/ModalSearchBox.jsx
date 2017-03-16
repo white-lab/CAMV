@@ -1,5 +1,9 @@
 import React from 'react'
 import { Modal, Button, FormGroup, ControlLabel, FormControl, HelpBlock } from 'react-bootstrap'
+import hotkey from 'react-hotkey'
+
+
+hotkey.activate();
 
 
 class ModalSearchBox extends React.Component {
@@ -9,6 +13,22 @@ class ModalSearchBox extends React.Component {
       proteinMatch: '',
       peptideMatch: '',
       scanMatch: '',
+    }
+  }
+
+  componentDidMount() {
+    hotkey.addHandler(this.handleHotkey.bind(this))
+  }
+
+  componentWillUnmount() {
+    hotkey.removeHandler(this.handleHotkey.bind(this))
+  }
+
+  handleHotkey(e) {
+    switch (e.key) {
+      case 'Enter':
+        this.runSearch()
+        break
     }
   }
 
@@ -103,7 +123,7 @@ class ModalSearchBox extends React.Component {
 
           <FormGroup
             // controlId="formBasicText"
-            validationState={this.validateScan()}
+            // validationState={this.validateScan()}
           >
             <ControlLabel>
               Scan Number
