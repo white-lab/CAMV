@@ -40,6 +40,12 @@ class ModalImportBox extends React.Component {
     )
   }
 
+  closeCallback() {
+    if (!this.state.importing && this.props.closeCallback != null) {
+      this.props.closeCallback()
+    }
+  }
+
   runImport() {
     this.setState({
       importing: true,
@@ -63,7 +69,7 @@ class ModalImportBox extends React.Component {
   render() {
     return (
       <Modal
-        onHide={this.props.closeCallback.bind(this)}
+        onHide={this.closeCallback.bind(this)}
         show={this.props.showModal}
       >
         <Modal.Header>
@@ -104,8 +110,12 @@ ModalImportBox.propTypes = {
   setScanData: React.PropTypes.func.isRequired,
   setPeptideData: React.PropTypes.func.isRequired,
   importCallback: React.PropTypes.func.isRequired,
-  closeCallback: React.PropTypes.func.isRequired,
+  closeCallback: React.PropTypes.func,
   showModal: React.PropTypes.bool.isRequired,
+}
+
+ModalImportBox.defaultProps = {
+  closeCallback: null,
 }
 
 module.exports = ModalImportBox
