@@ -407,7 +407,6 @@ class ViewBox extends React.Component {
     let prot_range = this.state.scanData
 
     for (let [i, protein] of prot_range.entries()) {
-      console.log(protein)
       if (
         proteinMatch != '' &&
         protein.proteinName.includes(proteinMatch)
@@ -419,7 +418,6 @@ class ViewBox extends React.Component {
       let pep_range = protein.peptides
 
       for (let [j, peptide] of pep_range.entries()) {
-        console.log(peptide)
         let pepData = this.state.peptideData[peptide.peptideDataId]
 
         if (
@@ -433,7 +431,6 @@ class ViewBox extends React.Component {
         let scan_range = peptide.scans
 
         for (let [k, scan] of scan_range.entries()) {
-          console.log(scan)
           if (
             scanMatch != '' &&
             String(scan.scanNumber) == scanMatch
@@ -445,7 +442,6 @@ class ViewBox extends React.Component {
           let ptm_range = scan.choiceData
 
           for (let [l, ptm] of ptm_range.entries()) {
-            console.log(ptm)
             let ptmData = this.state.peptideData[peptide.peptideDataId]
               .modificationStates[peptide.modificationStateId]
               .mods[ptm.modsId]
@@ -457,8 +453,6 @@ class ViewBox extends React.Component {
               this.updateAll(i, j, null, null)
               return
             }
-
-            let state = match.state
           }
         }
       }
