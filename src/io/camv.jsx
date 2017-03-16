@@ -24,11 +24,11 @@ exports.loadCAMV = function(fileName, cb) {
   data.pipe(parser)
   parser.on(
     'data',
-    function(data) { if (cb != null) cb(data) },
+    function(data) { console.log(data); if (cb != null) cb(data) },
   )
 }
 
-exports.saveCAMV = function(fileName, scanData, peptideData, cb) {
+exports.saveCAMV = function(fileName, pycamverterVersion, scanData, peptideData, cb) {
   var compressed = fileName.endsWith(".gz");
 
   var ws = fs.createWriteStream(
@@ -51,10 +51,24 @@ exports.saveCAMV = function(fileName, scanData, peptideData, cb) {
 
   let writer = JSONStream.stringify('', '', '')
   writer.pipe(ws)
-  ws.write('{\n  "scanData": ')
+  ws.write('{\n')
+
+  ws.write('  "pycamverterVersion": ')
+  writer.write(pycamverterVersion)
+  ws.write(',\n')
+
+  ws.write('  "CAMVVersion": ')
+  writer.write("0.1.6")
+  ws.write(',\n')
+
+  ws.write('  "scanData": ')
   writer.write(scanData)
-  ws.write(',\n  "peptideData": ')
+  ws.write(',\n')
+
+  ws.write('  "peptideData": ')
   writer.write(peptideData)
-  ws.write(',\n}\n')
+  ws.write(',\n')
+
+  ws.write('}\n')
   writer.end()
 }

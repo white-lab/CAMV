@@ -1,9 +1,9 @@
 import React from 'react'
 import hotkey from 'react-hotkey'
 
-import AcceptButton from './AcceptButton'
-import MaybeButton from './MaybeButton'
-import RejectButton from './RejectButton'
+import AcceptButton from './Buttons/AcceptButton'
+import MaybeButton from './Buttons/MaybeButton'
+import RejectButton from './Buttons/RejectButton'
 import SetMaxMZ from './SetMaxMZ'
 import SetMinMZ from './SetMinMZ'
 

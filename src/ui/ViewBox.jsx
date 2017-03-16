@@ -11,15 +11,18 @@ import update from 'react-addons-update'
 const remote = require('electron').remote
 const { dialog } = require('electron').remote
 
-import ModalExportBox from './ModalExportBox'
-import ModalImportBox from './ModalImportBox'
-import ModalFragmentBox from './ModalFragmentBox'
-import PrecursorSpectrumBox from './PrecursorSpectrumBox'
-import QuantSpectrumBox from './QuantSpectrumBox'
-import ScanDataBox from './ScanDataBox'
-import ScanSelectionList from './ScanSelectionList'
-import SequenceBox from './SequenceBox'
-import SpectrumBox from './SpectrumBox'
+import ModalExportBox from './ModalBoxes/ModalExportBox'
+import ModalImportBox from './ModalBoxes/ModalImportBox'
+import ModalFragmentBox from './ModalBoxes/ModalFragmentBox'
+
+import SpectrumBox from './SpectrumBoxes/SpectrumBox'
+import PrecursorSpectrumBox from './SpectrumBoxes/PrecursorSpectrumBox'
+import QuantSpectrumBox from './SpectrumBoxes/QuantSpectrumBox'
+
+import ScanSelectionList from './ScanList/ScanSelectionList'
+
+import ScanDataBox from './ScanInfo/ScanDataBox'
+import SequenceBox from './ScanInfo/SequenceBox'
 
 import { saveCAMV } from '../io/camv.jsx'
 import { exportCSV } from '../io/csv.jsx'
@@ -58,6 +61,7 @@ class ViewBox extends React.Component {
       modalExportOpen: false,
 
       /* Validatoin data */
+      pycamverterVersion: null,
       scanData: [],
       peptideData: [],
       basename: null,
@@ -304,6 +308,14 @@ class ViewBox extends React.Component {
               scan.scanId,
               match.modsId,
             ];
+            if (
+              this.state.peptideData[peptide.peptideDataId] == null ||
+              this.state.peptideData[peptide.peptideDataId].modificationStates[peptide.modificationStateId] == null ||
+              this.state.peptideData[peptide.peptideDataId].modificationStates[peptide.modificationStateId].mods[match.modsId] == null
+            ) {
+              console.log(this.state.peptideData)
+              console.log(peptide.peptideDataId, protein.proteinName, peptide.peptideId, scan.scanId, match.modsId)
+            }
             let mod = this.state.peptideData[peptide.peptideDataId]
               .modificationStates[peptide.modificationStateId]
               .mods[match.modsId]
@@ -375,6 +387,12 @@ class ViewBox extends React.Component {
     })
   }
 
+  setPycamverterVersion(pycamverterVersion) {
+    this.setState({
+      pycamverterVersion: pycamverterVersion,
+    })
+  }
+
   setScanData(scanData) {
     this.setState({
       scanData: scanData,
@@ -425,6 +443,7 @@ class ViewBox extends React.Component {
 
         saveCAMV(
           fileName,
+          this.state.pycamverterVersion,
           this.state.scanData,
           this.state.peptideData
         )
