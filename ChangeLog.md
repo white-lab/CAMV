@@ -1,5 +1,11 @@
 # Change Log
 
+## 0.2.0 (2017=-3-\*)
+
+Features
+  - Added search functionality
+  - Use A4 ratio for export images
+
 ## 0.1.6 (2017-03-13)
 
 Features
