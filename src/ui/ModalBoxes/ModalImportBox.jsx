@@ -8,7 +8,7 @@ import zlib from 'zlib'
 
 const { dialog } = require('electron').remote
 
-import { loadCAMV } from '../io/camv'
+import { loadCAMV } from '../../io/camv'
 
 class ModalImportBox extends React.Component {
   constructor(props) {
