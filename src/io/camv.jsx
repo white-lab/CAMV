@@ -55,9 +55,11 @@ exports.saveCAMV = function(fileName, pycamverterVersion, scanData, peptideData,
   writer.pipe(ws)
   ws.write('{\n')
 
-  ws.write('  "pycamverterVersion": ')
-  writer.write(pycamverterVersion)
-  ws.write(',\n')
+  if (pycamverterVersion != null) {
+    ws.write('  "pycamverterVersion": ')
+    writer.write(pycamverterVersion)
+    ws.write(',\n')
+  }
 
   ws.write('  "CAMVVersion": ')
   writer.write(pjson.version)
