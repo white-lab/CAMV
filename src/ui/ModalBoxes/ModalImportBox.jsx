@@ -54,10 +54,7 @@ class ModalImportBox extends React.Component {
     loadCAMV(
       this.state.camvFileName,
       function(data) {
-        this.props.setPycamverterVersion(data.pycamverterVersion)
-        this.props.setScanData(data.scanData)
-        this.props.setPeptideData(data.peptideData)
-        this.props.importCallback(this.state.camvFileName)
+        this.props.importCallback(data, this.state.camvFileName)
 
         this.setState({
           imported: true,
@@ -108,14 +105,13 @@ class ModalImportBox extends React.Component {
 }
 
 ModalImportBox.propTypes = {
-  setScanData: React.PropTypes.func.isRequired,
-  setPeptideData: React.PropTypes.func.isRequired,
-  importCallback: React.PropTypes.func.isRequired,
+  importCallback: React.PropTypes.func,
   closeCallback: React.PropTypes.func,
   showModal: React.PropTypes.bool.isRequired,
 }
 
 ModalImportBox.defaultProps = {
+  importCallback: null,
   closeCallback: null,
 }
 

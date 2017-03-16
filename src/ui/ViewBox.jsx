@@ -387,26 +387,11 @@ class ViewBox extends React.Component {
     })
   }
 
-  setPycamverterVersion(pycamverterVersion) {
+  runImport(data, fileName) {
     this.setState({
-      pycamverterVersion: pycamverterVersion,
-    })
-  }
-
-  setScanData(scanData) {
-    this.setState({
-      scanData: scanData,
-    })
-  }
-
-  setPeptideData(peptideData) {
-    this.setState({
-      peptideData: peptideData,
-    })
-  }
-
-  runImport(fileName) {
-    this.setState({
+      pycamverterVersion: data.pycamverterVersion,
+      scanData: data.scanData,
+      peptideData: data.peptideData,
       modalImportOpen: false,
     })
 
@@ -535,8 +520,6 @@ class ViewBox extends React.Component {
         <ModalImportBox
           ref="modalImportBox"
           showModal={this.state.modalImportOpen}
-          setPeptideData={this.setPeptideData.bind(this)}
-          setScanData={this.setScanData.bind(this)}
           importCallback={this.runImport.bind(this)}
           closeCallback={this.closeImportModal.bind(this)}
         />
