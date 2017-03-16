@@ -7,6 +7,8 @@ const { dialog } = require('electron').remote
 
 import JSONStream from 'JSONStream'
 
+var pjson = require('../../package.json');
+
 
 exports.loadCAMV = function(fileName, cb) {
   var compressed = fileName.endsWith(".gz");
@@ -58,7 +60,7 @@ exports.saveCAMV = function(fileName, pycamverterVersion, scanData, peptideData,
   ws.write(',\n')
 
   ws.write('  "CAMVVersion": ')
-  writer.write("0.1.6")
+  writer.write(pjson.version)
   ws.write(',\n')
 
   ws.write('  "scanData": ')
