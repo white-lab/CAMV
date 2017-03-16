@@ -1,12 +1,10 @@
 import React from 'react'
+import hotkey from 'react-hotkey'
 import { Button } from 'react-bootstrap'
 
 import fs from 'fs'
 import path from 'path'
-import zlib from 'zlib'
 
-import domtoimage from 'dom-to-image'
-import JSONStream from 'JSONStream'
 import update from 'react-addons-update'
 const remote = require('electron').remote
 const { dialog } = require('electron').remote
@@ -14,6 +12,7 @@ const { dialog } = require('electron').remote
 import ModalExportBox from './ModalBoxes/ModalExportBox'
 import ModalImportBox from './ModalBoxes/ModalImportBox'
 import ModalFragmentBox from './ModalBoxes/ModalFragmentBox'
+import ModalSearchBox from './ModalBoxes/ModalSearchBox'
 
 import SpectrumBox from './SpectrumBoxes/SpectrumBox'
 import PrecursorSpectrumBox from './SpectrumBoxes/PrecursorSpectrumBox'
@@ -29,6 +28,9 @@ import { exportCSV } from '../io/csv.jsx'
 import { spectraToImage } from '../io/spectra.jsx'
 
 
+hotkey.activate();
+
+
 class ViewBox extends React.Component {
   constructor(props) {
     super(props)
@@ -36,9 +38,6 @@ class ViewBox extends React.Component {
       /* Unused */
       selectedRun: null,
       selectedSearch: null,
-
-      modalImportOpen: true,
-      exporting: false,
 
       /* Selected PTM / Scan / Peptide / Protein */
       selectedProtein: null,
@@ -59,13 +58,25 @@ class ViewBox extends React.Component {
       /* Modal Windows */
       modalFragmentSelectionOpen: false,
       modalExportOpen: false,
+      modalSearchOpen: false,
+      modalImportOpen: true,
 
-      /* Validatoin data */
+      exporting: false,
+
+      /* Validation data */
       pycamverterVersion: null,
       scanData: [],
       peptideData: [],
       basename: null,
     }
+  }
+
+  componentDidMount() {
+    hotkey.addHandler(this.handleHotkey.bind(this))
+  }
+
+  componentWillUnmount() {
+    hotkey.removeHandler(this.handleHotkey.bind(this))
   }
 
   componentDidUpdate(prevProps, prevState) {
@@ -76,6 +87,30 @@ class ViewBox extends React.Component {
       // console.log('New search: ' + this.state.selectedSearch)
     }
   }
+
+  handleHotkey(e) {
+    if (this.state.scanData != null) {
+      if (e.getModifierState("Control")) {
+        switch (e.key) {
+          case 'f':
+            this.setState({modalSearchOpen: !this.state.modalSearchOpen})
+            break;
+        }
+      }
+
+      switch(e.key) {
+        case 'a':
+          this.updateChoice('accept')
+          break;
+        case 's':
+          this.updateChoice('maybe')
+          break;
+        case 'd':
+          this.updateChoice('reject')
+          break;
+        }
+      }
+    }
 
   updateSelectedProtein(proteinId) {
     this.setState({
@@ -282,6 +317,12 @@ class ViewBox extends React.Component {
     })
   }
 
+  closeSearchModal() {
+    this.setState({
+      modalSearchOpen: false,
+    })
+  }
+
   *iterate_spectra(export_spectras) {
     while (export_spectras.length < 4) {
       export_spectras.push(false);
@@ -358,27 +399,100 @@ class ViewBox extends React.Component {
     }
   }
 
-  updateChoice(choice) {
-    /* Messy solution because javascript doesn't allow variables as dict keys */
-    let state_target = {state: {$set: choice}};
-    let ptm_target = {};
-    ptm_target[this.state.selectedPTMPlacement] = state_target;
-    let choice_target = {choiceData: ptm_target};
-    let scan_target = {}
-    scan_target[this.state.selectedScan] = choice_target;
-    let scans_target = {scans: scan_target};
-    let peptide_target = {}
-    peptide_target[this.state.selectedPeptide] = scans_target;
-    let peptides_target = {peptides: peptide_target};
-    let protein_target = {}
-    protein_target[this.state.selectedProtein] = peptides_target;
-
-    /* However, doing it this way keeps from cloning data, saving a lot of time
-       on large files.
-     */
+  runSearch(proteinMatch, peptideMatch, scanMatch) {
     this.setState({
-      scanData: update(this.state.scanData, protein_target)
+      modalSearchOpen: false,
     })
+
+    let prot_range = this.state.scanData
+
+    for (let [i, protein] of prot_range.entries()) {
+      console.log(protein)
+      if (
+        proteinMatch != '' &&
+        protein.proteinName.includes(proteinMatch)
+      ) {
+        this.updateAll(i, null, null, null)
+        return
+      }
+
+      let pep_range = protein.peptides
+
+      for (let [j, peptide] of pep_range.entries()) {
+        console.log(peptide)
+        let pepData = this.state.peptideData[peptide.peptideDataId]
+
+        if (
+          peptideMatch != '' &&
+          pepData.peptideSequence.includes(peptideMatch)
+        ) {
+          this.updateAll(i, j, null, null)
+          return
+        }
+
+        let scan_range = peptide.scans
+
+        for (let [k, scan] of scan_range.entries()) {
+          console.log(scan)
+          if (
+            scanMatch != '' &&
+            String(scan.scanNumber) == scanMatch
+          ) {
+            this.updateAll(i, j, k, null)
+            return
+          }
+
+          let ptm_range = scan.choiceData
+
+          for (let [l, ptm] of ptm_range.entries()) {
+            console.log(ptm)
+            let ptmData = this.state.peptideData[peptide.peptideDataId]
+              .modificationStates[peptide.modificationStateId]
+              .mods[ptm.modsId]
+
+            if (
+              peptideMatch != '' &&
+              ptmData.name.includes(peptideMatch)
+            ) {
+              this.updateAll(i, j, null, null)
+              return
+            }
+
+            let state = match.state
+          }
+        }
+      }
+    }
+  }
+
+  updateChoice(choice) {
+    if (
+      this.state.selectedProtein != null &&
+      this.state.selectedPeptide != null &&
+      this.state.selectedScan != null &&
+      this.state.selectedPTMPlacement != null
+    ) {
+      /* Messy solution because javascript doesn't allow variables as dict keys */
+      let state_target = {state: {$set: choice}};
+      let ptm_target = {};
+      ptm_target[this.state.selectedPTMPlacement] = state_target;
+      let choice_target = {choiceData: ptm_target};
+      let scan_target = {}
+      scan_target[this.state.selectedScan] = choice_target;
+      let scans_target = {scans: scan_target};
+      let peptide_target = {}
+      peptide_target[this.state.selectedPeptide] = scans_target;
+      let peptides_target = {peptides: peptide_target};
+      let protein_target = {}
+      protein_target[this.state.selectedProtein] = peptides_target;
+
+      /* However, doing it this way keeps from cloning data, saving a lot of time
+         on large files.
+       */
+      this.setState({
+        scanData: update(this.state.scanData, protein_target)
+      })
+    }
   }
 
   openImport() {
@@ -528,6 +642,12 @@ class ViewBox extends React.Component {
           showModal={this.state.modalExportOpen}
           closeCallback={this.closeExportModal.bind(this)}
           exportCallback={this.runExport.bind(this)}
+        />
+        <ModalSearchBox
+          ref="modalSearchBox"
+          showModal={this.state.modalSearchOpen}
+          closeCallback={this.closeSearchModal.bind(this)}
+          searchCallback={this.runSearch.bind(this)}
         />
         <div
           className="panel panel-default"

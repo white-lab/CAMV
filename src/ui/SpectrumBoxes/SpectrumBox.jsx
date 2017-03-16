@@ -1,13 +1,10 @@
 import React from 'react'
-import hotkey from 'react-hotkey'
 
 import AcceptButton from './Buttons/AcceptButton'
 import MaybeButton from './Buttons/MaybeButton'
 import RejectButton from './Buttons/RejectButton'
 import SetMaxMZ from './SetMaxMZ'
 import SetMinMZ from './SetMinMZ'
-
-hotkey.activate();
 
 class SpectrumBox extends React.Component {
   constructor(props) {
@@ -20,7 +17,6 @@ class SpectrumBox extends React.Component {
 
   componentDidMount() {
     window.addEventListener('resize', this.handleResize.bind(this));
-    hotkey.addHandler(this.handleHotkey.bind(this))
 
     var component = this;
 
@@ -55,7 +51,6 @@ class SpectrumBox extends React.Component {
 
   componentWillUnmount() {
     window.removeEventListener('resize', this.handleResize.bind(this));
-    hotkey.removeHandler(this.handleHotkey.bind(this))
   }
 
   drawChart() {
@@ -200,22 +195,6 @@ class SpectrumBox extends React.Component {
       }
     }
     chart.draw(data, options);
-  }
-
-  handleHotkey(e) {
-    if (!this.props.inputDisabled) {
-      switch (e.key) {
-        case 'a':
-          this.props.updateChoice('accept');
-          break;
-        case 's':
-          this.props.updateChoice('maybe');
-          break;
-        case 'd':
-          this.props.updateChoice('reject');
-          break;
-      }
-    }
   }
 
   handleResize(e) {

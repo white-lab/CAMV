@@ -1,11 +1,6 @@
 import React from 'react'
 import { Modal, Button } from 'react-bootstrap'
 
-import JSONStream from 'JSONStream'
-
-import fs from 'fs'
-import zlib from 'zlib'
-
 const { dialog } = require('electron').remote
 
 import { loadCAMV } from '../../io/camv'
