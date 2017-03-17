@@ -118,7 +118,7 @@ class ModalExportBox extends React.Component {
                   })
                 }}
             >
-              Export Excel Table
+              Export CSV Table
             </Checkbox>
           </div>
         </Modal.Body>
