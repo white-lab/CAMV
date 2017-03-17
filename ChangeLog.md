@@ -1,6 +1,6 @@
 # Change Log
 
-## 0.2.0 (2017=-3-\*)
+## 0.2.0 (2017-3-17)
 
 Features
   - Added search functionality
