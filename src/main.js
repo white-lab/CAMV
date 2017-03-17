@@ -1,9 +1,9 @@
 const electron = require('electron')
 const {app} = electron
 const {BrowserWindow} = electron
-import {enableLiveReload} from 'electron-compile'
 
 if (process.env.NODE_ENV === 'development') {
+  var enableLiveReload = require('electron-compile').enableLiveReload
   enableLiveReload()
 }
 
