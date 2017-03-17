@@ -6,6 +6,7 @@ Features
   - Added search functionality
   - Use A4 ratio for export images
   - Track version of CAMV / pycamverter used to generate files.
+  - Added modal view for determining which b/y ions were identified in a peptide.
 
 ## 0.1.6 (2017-03-13)
 
