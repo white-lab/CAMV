@@ -8,6 +8,12 @@ class ModalBYBox extends React.Component {
     }
   }
 
+  onClick(element) {
+    if (this.props.clickCallback != null) {
+      this.props.clickCallback(element[0])
+    }
+  }
+
   render() {
     return (
       <Modal
@@ -26,7 +32,12 @@ class ModalBYBox extends React.Component {
               <div id="modalBIons">
                 {
                   this.props.bIons.map(
-                    (name, i) => <p key={i}>{name}</p>
+                    (element, index) =>
+                    <p key={index}>
+                      <a onClick={this.onClick.bind(this, element)}>
+                        {element[1]}
+                      </a>
+                    </p>
                   )
                 }
               </div>
@@ -38,7 +49,12 @@ class ModalBYBox extends React.Component {
               <div id="modalYIons">
                 {
                   this.props.yIons.map(
-                    (name, i) => <p key={i}>{name}</p>
+                    (element, index) =>
+                    <p key={index}>
+                      <a onClick={this.onClick.bind(this, element)}>
+                        {element[1]}
+                      </a>
+                    </p>
                   )
                 }
               </div>
@@ -58,12 +74,14 @@ class ModalBYBox extends React.Component {
 }
 
 ModalBYBox.propTypes = {
+  clickCallback: React.PropTypes.func,
   closeCallback: React.PropTypes.func,
   bIons: React.PropTypes.array,
   yIons: React.PropTypes.array,
 }
 
 ModalBYBox.defaultProps = {
+  clickCallback: null,
   closeCallback: null,
   bIons: [],
   yIons: [],

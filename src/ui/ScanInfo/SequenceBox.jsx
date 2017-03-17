@@ -14,8 +14,8 @@ class SequenceBox extends React.Component {
         yindex = index
       }
 
-      let bions = this.props.bFound.filter(i => i[0] == bindex).map(i => i[1])
-      let yions = this.props.yFound.filter(i => i[0] == yindex).map(i => i[1])
+      let bions = this.props.bFound.filter(i => i[0] == bindex).map(i => i.slice(1))
+      let yions = this.props.yFound.filter(i => i[0] == yindex).map(i => i.slice(1))
 
       this.props.clickCallback(bions, yions)
     }

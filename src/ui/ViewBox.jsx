@@ -203,6 +203,15 @@ class ViewBox extends React.Component {
       .peptides[this.state.selectedPeptide]
       .scans[this.state.selectedScan]
       .scanData
+
+    let matchId = data.find(
+      peak => peak.mz === mz
+    ).matchInfo[this.state.selectedPTMPlacement].matchId
+
+    this.updateSelectedMatchId(matchId)
+  }
+
+  updateSelectedMatchId(matchId) {
     let peptide = this.state.scanData[this.state.selectedProtein]
       .peptides[this.state.selectedPeptide]
     let peptideDataId = peptide.peptideDataId
@@ -224,12 +233,9 @@ class ViewBox extends React.Component {
 
     let currentLabel = ''
 
-    let matchId = data.find(
-      peak => peak.mz === mz
-    ).matchInfo[this.state.selectedPTMPlacement].matchId
-
     if (matchId !== null) { currentLabel = matchData[matchId].name }
 
+    let mz = matchData[matchId].mz
     let matches = matchData.filter(
       (item) => {
         item.ppm = 1e6 * Math.abs(item.mz - mz) / mz
@@ -260,6 +266,13 @@ class ViewBox extends React.Component {
       bIons: bIons,
       yIons: yIons,
     })
+  }
+
+  clickBYModal(matchId) {
+    this.setState({
+      modalBYOpen: false,
+    })
+    this.updateSelectedMatchId(matchId)
   }
 
   closeBYModal() {
@@ -620,9 +633,9 @@ class ViewBox extends React.Component {
               if (matchId) {
                 let match = matchData[matchId]
                 if (match.ionType == 'b') {
-                  bFound.push([match.ionPosition, match.name])
+                  bFound.push([match.ionPosition, matchId, match.name])
                 } else if (matchData[matchId].ionType == 'y') {
-                  yFound.push([match.ionPosition, match.name])
+                  yFound.push([match.ionPosition, matchId, match.name])
                 }
               }
             }.bind(this))
@@ -667,6 +680,7 @@ class ViewBox extends React.Component {
         <ModalBYBox
           ref="modalBYBox"
           showModal={this.state.modalBYOpen}
+          clickCallback={this.clickBYModal.bind(this)}
           closeCallback={this.closeBYModal.bind(this)}
           bIons={this.state.bIons}
           yIons={this.state.yIons}
