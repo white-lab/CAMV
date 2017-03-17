@@ -21,12 +21,18 @@ class ModalFragmentBox extends React.Component {
 
   update() {
     var matchId = $( "#fragmentSelect" ).val()
-    this.props.updateCallback(matchId);
+
+    if (this.props.updateCallback != null) {
+      this.props.updateCallback(matchId)
+    }
+
     this.close()
   }
 
   close() {
-    this.props.closeCallback();
+    if (this.props.closeCallback != null) {
+      this.props.closeCallback()
+    }
   }
 
   render() {
@@ -89,8 +95,13 @@ class ModalFragmentBox extends React.Component {
 }
 
 ModalFragmentBox.propTypes = {
-  updateCallback: React.PropTypes.func.isRequired,
-  closeCallback: React.PropTypes.func.isRequired,
+  updateCallback: React.PropTypes.func,
+  closeCallback: React.PropTypes.func,
+}
+
+ModalFragmentBox.defaultProps = {
+  updateCallback: null,
+  closeCallback: null,
 }
 
 module.exports = ModalFragmentBox
