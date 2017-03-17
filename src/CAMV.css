@@ -20,6 +20,12 @@
   margin-bottom: 0%;
 }
 
+#modalBIons, #modalYIons {
+  display: inline-block;
+  vertical-align: top;
+  width: 50%;
+}
+
 #scanDataContainer {
   float: left;
   position: relative;

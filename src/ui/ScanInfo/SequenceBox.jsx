@@ -4,6 +4,23 @@ import IonElement from './IonElement'
 import SequenceElement from './SequenceElement'
 
 class SequenceBox extends React.Component {
+  byClick(bion, index) {
+    if (this.props.clickCallback != null) {
+      let bindex = index
+      let yindex = this.props.sequence.length - index
+
+      if (!bion) {
+        bindex = this.props.sequence.length - index
+        yindex = index
+      }
+
+      let bions = this.props.bFound.filter(i => i[0] == bindex).map(i => i[1])
+      let yions = this.props.yFound.filter(i => i[0] == yindex).map(i => i[1])
+
+      this.props.clickCallback(bions, yions)
+    }
+  }
+
   render() {
     if (this.props.sequence != null) {
       var sequence = this.props.sequence.split('')
@@ -14,12 +31,16 @@ class SequenceBox extends React.Component {
 
       sequence.slice(0, -1).forEach(
         function (item, i) {
-          let found = this.props.bFound.indexOf(i + 1) > -1
+          let found = this.props.bFound.map(i => i[0])
+            .indexOf(i + 1) > -1
+
           bs.push(
             <IonElement
               bion
               found={found}
               key={i * 2 + 1}
+              index={i + 1}
+              clickCallback={this.byClick.bind(this)}
             />
           )
           bs.push(<td key={i * 2 + 2} />)
@@ -40,12 +61,16 @@ class SequenceBox extends React.Component {
 
       sequence.slice(0, -1).forEach(
         function (item, i) {
-          let found = this.props.yFound.indexOf(this.props.sequence.length - i - 1) > -1
+          let found = this.props.yFound.map(i => i[0])
+            .indexOf(this.props.sequence.length - i - 1) > -1
+
           ys.push(
             <IonElement
               bion={false}
               found={found}
               key={i * 2 + 1}
+              index={this.props.sequence.length - i - 1}
+              clickCallback={this.byClick.bind(this)}
             />
           )
           ys.push(<td key={i * 2 + 2} />)
@@ -77,14 +102,16 @@ class SequenceBox extends React.Component {
 
 SequenceBox.propTypes = {
   sequence: React.PropTypes.string,
-  bFound: React.PropTypes.arrayOf(React.PropTypes.number),
-  yFound: React.PropTypes.arrayOf(React.PropTypes.number),
+  bFound: React.PropTypes.array,
+  yFound: React.PropTypes.array,
+  clickCallback: React.PropTypes.func,
 }
 
 SequenceBox.defaultProps = {
   sequence: null,
   bFound: [],
   yFound: [],
+  clickCallback: null,
 }
 
 module.exports = SequenceBox

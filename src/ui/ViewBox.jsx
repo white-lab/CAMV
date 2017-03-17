@@ -11,8 +11,9 @@ const { dialog } = require('electron').remote
 
 import ModalExportBox from './ModalBoxes/ModalExportBox'
 import ModalImportBox from './ModalBoxes/ModalImportBox'
-import ModalFragmentBox from './ModalBoxes/ModalFragmentBox'
 import ModalSearchBox from './ModalBoxes/ModalSearchBox'
+import ModalFragmentBox from './ModalBoxes/ModalFragmentBox'
+import ModalBYBox from './ModalBoxes/ModalBYBox'
 
 import SpectrumBox from './SpectrumBoxes/SpectrumBox'
 import PrecursorSpectrumBox from './SpectrumBoxes/PrecursorSpectrumBox'
@@ -50,12 +51,15 @@ class ViewBox extends React.Component {
       currentLabel: null,
       fragmentMatches: [],
       maxPPM: 100,  /* Max window for fragments that can be candidates */
+      bIons: [],
+      yIons: [],
 
       /* Modal Windows */
-      modalFragmentSelectionOpen: false,
       modalExportOpen: false,
       modalSearchOpen: false,
       modalImportOpen: true,
+      modalFragmentSelectionOpen: false,
+      modalBYOpen: false,
 
       exporting: false,
 
@@ -109,6 +113,7 @@ class ViewBox extends React.Component {
       this.state.modalExportOpen,
       this.state.modalSearchOpen,
       this.state.modalFragmentSelectionOpen,
+      this.state.modalBYOpen,
     ].some(i => i != false)
   }
 
@@ -246,6 +251,20 @@ class ViewBox extends React.Component {
       fragmentMatches: [],
       selectedMz: null,
       currentLabel: ''
+    })
+  }
+
+  handleBYClick(bIons, yIons) {
+    this.setState({
+      modalBYOpen: true,
+      bIons: bIons,
+      yIons: yIons,
+    })
+  }
+
+  closeBYModal() {
+    this.setState({
+      modalBYOpen: false,
     })
   }
 
@@ -599,10 +618,11 @@ class ViewBox extends React.Component {
                 .matchId
 
               if (matchId) {
-                if (matchData[matchId].ionType == 'b') {
-                  bFound.push(matchData[matchId].ionPosition)
+                let match = matchData[matchId]
+                if (match.ionType == 'b') {
+                  bFound.push([match.ionPosition, match.name])
                 } else if (matchData[matchId].ionType == 'y') {
-                  yFound.push(matchData[matchId].ionPosition)
+                  yFound.push([match.ionPosition, match.name])
                 }
               }
             }.bind(this))
@@ -617,15 +637,6 @@ class ViewBox extends React.Component {
         id="viewBox"
         style={{margin: this.state.exporting ? '0px' : '10px'}}
       >
-        <ModalFragmentBox
-          ref="modalFragmentBox"
-          showModal={this.state.modalFragmentSelectionOpen}
-          mz={this.state.selectedMz}
-          fragmentMatches={this.state.fragmentMatches}
-          currentLabel={this.state.currentLabel}
-          updateCallback={this.updateSelectedFragment.bind(this)}
-          closeCallback={this.closeFragmentSelectionModal.bind(this)}
-        />
         <ModalImportBox
           ref="modalImportBox"
           showModal={this.state.modalImportOpen}
@@ -643,6 +654,22 @@ class ViewBox extends React.Component {
           showModal={this.state.modalSearchOpen}
           closeCallback={this.closeSearchModal.bind(this)}
           searchCallback={this.runSearch.bind(this)}
+        />
+        <ModalFragmentBox
+          ref="modalFragmentBox"
+          showModal={this.state.modalFragmentSelectionOpen}
+          mz={this.state.selectedMz}
+          fragmentMatches={this.state.fragmentMatches}
+          currentLabel={this.state.currentLabel}
+          updateCallback={this.updateSelectedFragment.bind(this)}
+          closeCallback={this.closeFragmentSelectionModal.bind(this)}
+        />
+        <ModalBYBox
+          ref="modalBYBox"
+          showModal={this.state.modalBYOpen}
+          closeCallback={this.closeBYModal.bind(this)}
+          bIons={this.state.bIons}
+          yIons={this.state.yIons}
         />
         <div
           className="panel panel-default"
@@ -686,9 +713,10 @@ class ViewBox extends React.Component {
               id="sequenceContainer"
             >
               <SequenceBox
-                bFound={bFound}
                 sequence={peptideSequence}
+                bFound={bFound}
                 yFound={yFound}
+                clickCallback={this.handleBYClick.bind(this)}
               />
             </div>
           </div>
