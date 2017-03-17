@@ -17,7 +17,17 @@ After opening your processed CAMV file, you should see a list of proteins with i
 
 ### Shortcuts
 
+CAMV supports several shortcuts for navigating a data set:
 
+```
+Down / j: Next spectrum
+Up / k: Previous spectrum
+Left / Right: Expand / collapse tree
+a: Accept spectra
+s: Maybe spectra
+d: Reject spectra
+Contrl-F: Search proteins / peptides / scans
+```
 
 ## Development
 
