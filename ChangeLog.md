@@ -5,6 +5,7 @@
 Features
   - Added search functionality
   - Use A4 ratio for export images
+  - Track version of CAMV / pycamverter used to generate files.
 
 ## 0.1.6 (2017-03-13)
 
