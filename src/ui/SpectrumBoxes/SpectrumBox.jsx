@@ -134,7 +134,7 @@ class SpectrumBox extends React.Component {
                 style = null
               } else if (ppm < ppm_cutoff) {
                 if (isotope) {
-                  style = 'point {size: 3; fill-color: yellow; visible: true}'
+                  style = 'point {size: 3; fill-color: #F0AD4E; visible: true}'
                 } else {
                   style = 'point {size: 3; fill-color: #5CB85C; visible: true}'
                 }
