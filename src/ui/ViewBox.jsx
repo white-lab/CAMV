@@ -210,10 +210,10 @@ class ViewBox extends React.Component {
       peak => peak.mz === mz
     ).matchInfo[this.state.selectedPTMPlacement].matchId
 
-    this.updateSelectedMatchId(matchId)
+    this.updateSelectedMatchId(matchId, mz)
   }
 
-  updateSelectedMatchId(matchId) {
+  updateSelectedMatchId(matchId, mz) {
     if (this.state.selectedPTMPlacement == null) {
       return
     }
@@ -225,7 +225,10 @@ class ViewBox extends React.Component {
       ptm.matchData[matchId].name : ''
     )
 
-    let mz = ptm.matchData[matchId].mz
+    if (mz == null) {
+      mz = ptm.matchData[matchId].mz
+    }
+
     let matches = ptm.matchData.filter(
       (item) => {
         item.ppm = 1e6 * Math.abs(item.mz - mz) / mz
@@ -262,7 +265,7 @@ class ViewBox extends React.Component {
     this.setState({
       modalBYOpen: false,
     })
-    this.updateSelectedMatchId(matchId)
+    this.updateSelectedMatchId(matchId, null)
   }
 
   closeBYModal() {
