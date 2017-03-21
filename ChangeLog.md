@@ -1,6 +1,12 @@
 # Change Log
 
-## 0.2.0 (2017-3-17)
+## 0.3.0 (2017-\*-\*)
+
+Bugfixes
+
+  - Fixed bug on selecting peaks with no matches.
+
+## 0.2.0 (2017-03-17)
 
 Features
   - Added search functionality
