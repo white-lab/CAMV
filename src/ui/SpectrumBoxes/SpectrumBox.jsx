@@ -276,7 +276,7 @@ SpectrumBox.propTypes = {
 SpectrumBox.defaultProps = {
   minMZ: null,
   maxMZ: null,
-  spectrumData: null,
+  spectrumData: [],
   inputDisabled: true,
   selectedPTMPlacement: null,
   collisionType: null,

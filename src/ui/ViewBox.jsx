@@ -628,6 +628,15 @@ class ViewBox extends React.Component {
     return this.state.nodeTree
   }
 
+  getSelectedNode() {
+    return [
+      this.state.selectedProtein,
+      this.state.selectedPeptide,
+      this.state.selectedScan,
+      this.state.selectedPTMPlacement,
+    ]
+  }
+
   getNodeData() {
     let protein = (
       this.state.selectedProtein != null ?
@@ -652,50 +661,7 @@ class ViewBox extends React.Component {
   }
 
   render() {
-    let spectrumData = []
-    let precursorSpectrumData = []
-    let precursorMz = null
-    let isolationWindow = null
-    let quantSpectrumData = []
-    let quantMz = null
-    let chargeState = null
-    let matchData = []
-    let inputDisabled = true
-    let protName = null
-    let scanNumber = null
-    let fileName = null
-    let collisionType = null
-    let c13Num = 0
-
-    let tree = this.getNodeTree()
     let [protein, peptide, scan, ptm] = this.getNodeData()
-
-    if (scan != null) {
-      spectrumData = scan.scanData
-      precursorSpectrumData = scan.precursorScanData
-      precursorMz = scan.precursorMz
-      isolationWindow = scan.precursorIsolationWindow
-      chargeState = scan.chargeState
-      quantSpectrumData = scan.quantScanData
-      quantMz = scan.quantMz
-      protName = protein.proteinName
-      scanNumber = scan.scanNumber
-      fileName = scan.fileName
-      collisionType = scan.collisionType
-      c13Num = scan.c13Num
-
-      if (ptm != null) {
-        inputDisabled = false
-        matchData = ptm.matchData
-      }
-    }
-
-    let selectedNode = [
-      this.state.selectedProtein,
-      this.state.selectedPeptide,
-      this.state.selectedScan,
-      this.state.selectedPTMPlacement,
-    ]
 
     return (
       <div
@@ -745,11 +711,11 @@ class ViewBox extends React.Component {
         >
           <ScanSelectionList
             ref="scanSelectionList"
-            tree={tree}
+            tree={this.getNodeTree()}
 
             updateAllCallback={this.updateAll.bind(this)}
 
-            selectedNode={selectedNode}
+            selectedNode={this.getSelectedNode()}
           />
         </div>
         <div
@@ -760,26 +726,32 @@ class ViewBox extends React.Component {
             className="panel panel-default"
             id="sequenceBox"
           >
-            <div
-              id="scanDataContainer"
-            >
-              <ScanDataBox
-                protName={protName}
-                chargeState={chargeState}
-                scanNumber={scanNumber}
-                fileName={fileName}
-              />
-            </div>
-            <div
-              id="sequenceContainer"
-            >
-              <SequenceBox
-                ptm={ptm}
-                spectrumData={spectrumData}
-                matchData={matchData}
-                clickCallback={this.handleBYClick.bind(this)}
-              />
-            </div>
+            {
+              (scan != null && protein != null) &&
+              <div
+                id="scanDataContainer"
+              >
+                <ScanDataBox
+                  protName={protein.proteinName}
+                  chargeState={scan.chargeState}
+                  scanNumber={scan.scanNumber}
+                  fileName={scan.fileName}
+                />
+              </div>
+            }
+            {
+              (scan != null && ptm != null) &&
+              <div
+                id="sequenceContainer"
+              >
+                <SequenceBox
+                  ptm={ptm}
+                  spectrumData={scan.spectrumData}
+                  matchData={ptm.matchData}
+                  clickCallback={this.handleBYClick.bind(this)}
+                />
+              </div>
+            }
           </div>
           <div
             className="panel panel-default"
@@ -797,11 +769,11 @@ class ViewBox extends React.Component {
               >
                 <PrecursorSpectrumBox
                   ref="precursorSpectrum"
-                  spectrumData={precursorSpectrumData}
-                  precursorMz={precursorMz}
-                  isolationWindow={isolationWindow}
-                  c13Num={c13Num}
-                  chargeState={chargeState}
+                  spectrumData={scan != null ? scan.precursorSpectrumData : []}
+                  precursorMz={scan != null ? scan.precursorMz : null}
+                  isolationWindow={scan != null ? scan.isolationWindow : null}
+                  c13Num={scan != null ? scan.c13Num : 0}
+                  chargeState={scan != null ? scan.chargeState : null}
                   ppm={50}
                 />
               </div>
@@ -814,8 +786,8 @@ class ViewBox extends React.Component {
               >
                 <QuantSpectrumBox
                   ref="quantSpectrum"
-                  spectrumData={quantSpectrumData}
-                  quantMz={quantMz}
+                  spectrumData={scan != null ? scan.quantSpectrumData : []}
+                  quantMz={scan != null ? scan.quantMz : null}
                   ppm={50}
                 />
               </div>
@@ -851,15 +823,16 @@ class ViewBox extends React.Component {
             >
               <SpectrumBox
                 ref="fragmentSpectrum"
-                spectrumData={spectrumData}
+                spectrumData={scan != null ? scan.scanData : []}
+                matchData={ptm != null ? ptm.matchData : []}
                 minMZ={this.state.minMZ}
                 maxMZ={this.state.maxMZ}
+                collisionType={scan != null ? scan.collisionType : null}
+                inputDisabled={ptm != null}
+                selectedPTMPlacement={this.state.selectedPTMPlacement}
+
                 updateMinMZ={this.updateMinMZ.bind(this)}
                 updateMaxMZ={this.updateMaxMZ.bind(this)}
-                collisionType={collisionType}
-                inputDisabled={inputDisabled}
-                matchData={matchData}
-                selectedPTMPlacement={this.state.selectedPTMPlacement}
                 updateChoice={this.setChoice.bind(this)}
                 pointChosenCallback={this.updateSelectedMz.bind(this)}
               />
