@@ -6,32 +6,58 @@ import SequenceElement from './SequenceElement'
 class SequenceBox extends React.Component {
   byClick(bion, index) {
     if (this.props.clickCallback != null) {
+      let sequence = this.props.ptm.name
       let bindex = index
-      let yindex = this.props.sequence.length - index
+      let yindex = sequence.length - index
 
       if (!bion) {
-        bindex = this.props.sequence.length - index
+        bindex = sequence.length - index
         yindex = index
       }
 
-      let bions = this.props.bFound.filter(i => i[0] == bindex).map(i => i.slice(1))
-      let yions = this.props.yFound.filter(i => i[0] == yindex).map(i => i.slice(1))
+      let [bFound, yFound] = this.getBYFound()
+
+      let bions = bFound.filter(i => i[0] == bindex).map(i => i.slice(1))
+      let yions = yFound.filter(i => i[0] == yindex).map(i => i.slice(1))
 
       this.props.clickCallback(bions, yions)
     }
   }
 
-  render() {
-    if (this.props.sequence != null) {
-      var sequence = this.props.sequence.split('')
+  getBYFound() {
+    let bFound = []
+    let yFound = []
 
-      var bs = [<td key={0} />]
-      var seq = []
-      var ys = [<td key={0} />]
+    this.props.spectrumData.forEach(function(peak) {
+      let modsId = this.props.ptm.modsId || this.props.ptm.id
+      let matchId = peak.matchInfo[modsId].matchId
+
+      if (matchId) {
+        let match = this.props.matchData[matchId]
+
+        if (match.ionType == 'b') {
+          bFound.push([match.ionPosition, matchId, match.name])
+        } else if (matchData[matchId].ionType == 'y') {
+          yFound.push([match.ionPosition, matchId, match.name])
+        }
+      }
+    }.bind(this))
+
+    return [bFound, yFound]
+  }
+
+  render() {
+    if (this.props.ptm != null) {
+      let sequence = this.props.ptm.name.split('')
+      let [bFound, yFound] = this.getBYFound()
+
+      let bs = [<td key={0} />]
+      let seq = []
+      let ys = [<td key={0} />]
 
       sequence.slice(0, -1).forEach(
         function (item, i) {
-          let found = this.props.bFound.map(i => i[0])
+          let found = bFound.map(i => i[0])
             .indexOf(i + 1) > -1
 
           bs.push(
@@ -61,15 +87,15 @@ class SequenceBox extends React.Component {
 
       sequence.slice(0, -1).forEach(
         function (item, i) {
-          let found = this.props.yFound.map(i => i[0])
-            .indexOf(this.props.sequence.length - i - 1) > -1
+          let found = yFound.map(i => i[0])
+            .indexOf(sequence.length - i - 1) > -1
 
           ys.push(
             <IonElement
               bion={false}
               found={found}
               key={i * 2 + 1}
-              index={this.props.sequence.length - i - 1}
+              index={sequence.length - i - 1}
               clickCallback={this.byClick.bind(this)}
             />
           )
@@ -77,7 +103,7 @@ class SequenceBox extends React.Component {
         }.bind(this)
       )
 
-      var rows = [bs, seq, ys]
+      let rows = [bs, seq, ys]
 
       return (
         <div id="sequence">
@@ -101,16 +127,16 @@ class SequenceBox extends React.Component {
 }
 
 SequenceBox.propTypes = {
-  sequence: React.PropTypes.string,
-  bFound: React.PropTypes.array,
-  yFound: React.PropTypes.array,
+  ptm: React.PropTypes.object,
+  spectrumData: React.PropTypes.array,
+  matchData: React.PropTypes.array,
   clickCallback: React.PropTypes.func,
 }
 
 SequenceBox.defaultProps = {
-  sequence: null,
-  bFound: [],
-  yFound: [],
+  ptm: null,
+  spectrumData: [],
+  matchData: [],
   clickCallback: null,
 }
 

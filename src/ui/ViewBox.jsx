@@ -63,6 +63,7 @@ class ViewBox extends React.Component {
 
       loaded: false,
       exporting: false,
+      nodeTree: null,
 
       /* Validation data */
       pycamverterVersion: null,
@@ -521,6 +522,7 @@ class ViewBox extends React.Component {
       peptideData: data.peptideData,
       loaded: true,
       modalImportOpen: false,
+      nodeTree: this.buildNodeTree(data.scanData, data.peptideData),
     })
 
     if (fileName != null && fileName.length > 0) {
@@ -565,24 +567,23 @@ class ViewBox extends React.Component {
     )
   }
 
-  getNodeTree() {
-    if (!this.state.loaded) { return [] }
+  buildNodeTree(scanData, peptideData) {
     let proteins = []
 
-    for (let prot of this.state.scanData) {
+    for (let prot of scanData) {
       let peptides = []
 
       for (let peptide of prot.peptides) {
         let scans = []
-        let modDesc = this.state.peptideData[peptide.peptideDataId]
+        let modDesc = peptideData[peptide.peptideDataId]
           .modificationStates[peptide.modificationStateId]
           .modDesc
-        let pepSeq = this.state.peptideData[peptide.peptideDataId]
+        let pepSeq = peptideData[peptide.peptideDataId]
           .peptideSequence
 
         for (let scan of peptide.scans) {
           let ptmList = []
-          let ptmPlacements = this.state.peptideData[peptide.peptideDataId]
+          let ptmPlacements = peptideData[peptide.peptideDataId]
             .modificationStates[peptide.modificationStateId]
             .mods
 
@@ -619,6 +620,14 @@ class ViewBox extends React.Component {
     return proteins
   }
 
+  getNodeTree() {
+    if (!this.state.loaded || this.state.nodeTree == null) {
+      return []
+    }
+
+    return this.state.nodeTree
+  }
+
   getNodeData() {
     let protein = (
       this.state.selectedProtein != null ?
@@ -651,9 +660,6 @@ class ViewBox extends React.Component {
     let quantMz = null
     let chargeState = null
     let matchData = []
-    let bFound = []
-    let yFound = []
-    let peptideSequence = null
     let inputDisabled = true
     let protName = null
     let scanNumber = null
@@ -681,22 +687,6 @@ class ViewBox extends React.Component {
       if (ptm != null) {
         inputDisabled = false
         matchData = ptm.matchData
-        peptideSequence = ptm.name
-
-        spectrumData.forEach(function(peak) {
-          let matchId = peak.matchInfo[this.state.selectedPTMPlacement]
-            .matchId
-
-          if (matchId) {
-            let match = matchData[matchId]
-
-            if (match.ionType == 'b') {
-              bFound.push([match.ionPosition, matchId, match.name])
-            } else if (matchData[matchId].ionType == 'y') {
-              yFound.push([match.ionPosition, matchId, match.name])
-            }
-          }
-        }.bind(this))
       }
     }
 
@@ -784,9 +774,9 @@ class ViewBox extends React.Component {
               id="sequenceContainer"
             >
               <SequenceBox
-                sequence={peptideSequence}
-                bFound={bFound}
-                yFound={yFound}
+                ptm={ptm}
+                spectrumData={spectrumData}
+                matchData={matchData}
                 clickCallback={this.handleBYClick.bind(this)}
               />
             </div>
