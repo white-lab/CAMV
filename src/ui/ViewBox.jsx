@@ -42,10 +42,6 @@ class ViewBox extends React.Component {
       selectedScan: null,
       selectedPTMPlacement: null,
 
-      /* Spectrum interface states */
-      minMZ: 0,
-      maxMZ: null,
-
       /* Peak labeling states */
       selectedMz: null,
       currentLabel: null,
@@ -135,8 +131,6 @@ class ViewBox extends React.Component {
   updateSelectedScan(scanId) {
     this.setState({
       selectedScan: scanId,
-      minMZ: 0,
-      maxMZ: null,
     })
   }
 
@@ -154,8 +148,6 @@ class ViewBox extends React.Component {
       selectedPeptide: nodes[1],
       selectedScan: nodes[2],
       selectedPTMPlacement: nodes[3],
-      minMZ: 0,
-      maxMZ: null,
     })
 
 
@@ -181,22 +173,6 @@ class ViewBox extends React.Component {
         .scans[this.state.selectedScan]
         .scanData
     ) : null
-  }
-
-  updateMinMZ(newMinMZ) {
-    this.setState({
-      minMZ: newMinMZ > 0 ? newMinMZ : 0,
-    })
-  }
-
-  updateMaxMZ(newMaxMZ) {
-    let scanData = this.getScanData()
-    let max_mz = Math.ceil(
-      (scanData != null) ? scanData[scanData.length - 1].mz + 1 : 100
-    )
-    this.setState({
-      maxMZ: newMaxMZ < max_mz ? newMaxMZ : max_mz,
-    })
   }
 
   updateSelectedMz(mz) {
@@ -769,9 +745,9 @@ class ViewBox extends React.Component {
               >
                 <PrecursorSpectrumBox
                   ref="precursorSpectrum"
-                  spectrumData={scan != null ? scan.precursorSpectrumData : []}
+                  spectrumData={scan != null ? scan.precursorScanData : []}
                   precursorMz={scan != null ? scan.precursorMz : null}
-                  isolationWindow={scan != null ? scan.isolationWindow : null}
+                  isolationWindow={scan != null ? scan.precursorIsolationWindow : null}
                   c13Num={scan != null ? scan.c13Num : 0}
                   chargeState={scan != null ? scan.chargeState : null}
                   ppm={50}
@@ -786,7 +762,7 @@ class ViewBox extends React.Component {
               >
                 <QuantSpectrumBox
                   ref="quantSpectrum"
-                  spectrumData={scan != null ? scan.quantSpectrumData : []}
+                  spectrumData={scan != null ? scan.quantScanData : []}
                   quantMz={scan != null ? scan.quantMz : null}
                   ppm={50}
                 />
@@ -825,14 +801,12 @@ class ViewBox extends React.Component {
                 ref="fragmentSpectrum"
                 spectrumData={scan != null ? scan.scanData : []}
                 matchData={ptm != null ? ptm.matchData : []}
-                minMZ={this.state.minMZ}
-                maxMZ={this.state.maxMZ}
                 collisionType={scan != null ? scan.collisionType : null}
-                inputDisabled={ptm != null}
+                inputDisabled={ptm == null}
+
+                selectedScan={this.state.selectedScan}
                 selectedPTMPlacement={this.state.selectedPTMPlacement}
 
-                updateMinMZ={this.updateMinMZ.bind(this)}
-                updateMaxMZ={this.updateMaxMZ.bind(this)}
                 updateChoice={this.setChoice.bind(this)}
                 pointChosenCallback={this.updateSelectedMz.bind(this)}
               />

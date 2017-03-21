@@ -9,9 +9,9 @@ class QuantSpectrumBox extends React.Component {
   }
 
   componentDidMount() {
-    window.addEventListener('resize', this.handleResize.bind(this));
+    window.addEventListener('resize', this.handleResize.bind(this))
 
-    var component = this;
+    let component = this
 
     // Load the chart API
     return jQuery.ajax({
@@ -23,39 +23,39 @@ class QuantSpectrumBox extends React.Component {
         google.load("visualization", "1", {
           packages:["corechart"],
           callback: function () {
-            component.drawChart();
+            component.drawChart()
             component.setState({chartLoaded: true})
           },
-        });
-      });
+        })
+      })
   }
 
   componentDidUpdate(prevProps, prevState) {
     if (this.state.chartLoaded) {
       if (prevProps.spectrumData != this.props.spectrumData) {
-        this.drawChart();
+        this.drawChart()
       }
     }
   }
 
   componentWillUnmount() {
-    window.removeEventListener('resize', this.handleResize.bind(this));
+    window.removeEventListener('resize', this.handleResize.bind(this))
   }
 
   drawChart() {
-    if (!this.state.chartLoaded) { return; }
+    if (!this.state.chartLoaded) { return }
 
-    var data = new google.visualization.DataTable();
+    let data = new google.visualization.DataTable()
 
-    data.addColumn('number', 'mz');
-    data.addColumn('number', 'Intensity');
+    data.addColumn('number', 'mz')
+    data.addColumn('number', 'Intensity')
     data.addColumn({'type': 'string', 'role': 'style'})
     data.addColumn({'type': 'string', 'role': 'annotation'})
 
-    var quantMz = this.props.quantMz
-    var minMZ = Math.round(2 * Math.min.apply(null, quantMz)) / 2 - 1
-    var maxMZ = Math.round(2 * Math.max.apply(null, quantMz)) / 2 + 1
-    var ppm = this.props.ppm
+    let quantMz = this.props.quantMz
+    let minMZ = Math.round(2 * Math.min.apply(null, quantMz)) / 2 - 1
+    let maxMZ = Math.round(2 * Math.max.apply(null, quantMz)) / 2 + 1
+    let ppm = this.props.ppm
 
     if (this.props.spectrumData.length > 0) {
       data.addRows([[minMZ, 0, null, null]])
@@ -74,9 +74,9 @@ class QuantSpectrumBox extends React.Component {
       )
 
       this.props.spectrumData.forEach(function(peak, index) {
-        var mz = peak.mz
-        var into = peak.into
-        var name = ''
+        let mz = peak.mz
+        let into = peak.into
+        let name = ''
         let found = (indices.indexOf(index) != -1)
         let style = ''
 
@@ -96,7 +96,7 @@ class QuantSpectrumBox extends React.Component {
       data.addRows([[maxMZ, 0, null, null]])
     }
 
-    var options = {
+    let options = {
       title: 'Quantification',
       hAxis: {
         // title: 'mz',
@@ -119,17 +119,17 @@ class QuantSpectrumBox extends React.Component {
         axis: 'horizontal',
         maxZoomIn: 0.00001,
       },
-    };
+    }
 
-    var chart = new google.visualization.LineChart(
+    let chart = new google.visualization.LineChart(
       document.getElementById('quantGoogleChart')
-    );
+    )
 
-    chart.draw(data, options);
+    chart.draw(data, options)
   }
 
   handleResize() {
-    this.drawChart();
+    this.drawChart()
   }
 
   render() {
@@ -137,7 +137,7 @@ class QuantSpectrumBox extends React.Component {
       <div>
         <div id="quantGoogleChart" />
       </div>
-    );
+    )
   }
 }
 

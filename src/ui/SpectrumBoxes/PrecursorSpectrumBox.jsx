@@ -9,9 +9,9 @@ class PrecursorSpectrumBox extends React.Component {
   }
 
   componentDidMount() {
-    window.addEventListener('resize', this.handleResize.bind(this));
+    window.addEventListener('resize', this.handleResize.bind(this))
 
-    var component = this;
+    let component = this
 
     // Load the chart API
     return jQuery.ajax({
@@ -23,65 +23,67 @@ class PrecursorSpectrumBox extends React.Component {
         google.load("visualization", "1", {
           packages:["corechart"],
           callback: function () {
-            component.drawChart();
+            component.drawChart()
             component.setState({chartLoaded: true})
           },
-        });
-      });
+        })
+      })
   }
 
   componentDidUpdate(prevProps, prevState) {
     if (this.state.chartLoaded) {
       if (prevProps.spectrumData != this.props.spectrumData) {
-        this.drawChart();
+        this.drawChart()
       }
     }
   }
 
   componentWillUnmount() {
-    window.removeEventListener('resize', this.handleResize.bind(this));
+    window.removeEventListener('resize', this.handleResize.bind(this))
   }
 
   drawChart() {
-    if (!this.state.chartLoaded) { return; }
+    if (!this.state.chartLoaded) { return }
 
-    var data = new google.visualization.DataTable();
+    let data = new google.visualization.DataTable()
 
-    data.addColumn('number', 'mz');
-    data.addColumn('number', 'Intensity');
+    data.addColumn('number', 'mz')
+    data.addColumn('number', 'Intensity')
     data.addColumn({'type': 'string', 'role': 'style'})
     data.addColumn({'type': 'string', 'role': 'annotation'})
-    data.addColumn('number', 'Isolation');
+    data.addColumn('number', 'Isolation')
 
-    var precursorMz = this.props.precursorMz
-    var minMZ = precursorMz - 1
-    var maxMZ = precursorMz + 1
-    var chargeState = this.props.chargeState
-    var ppm = this.props.ppm
+    let precursorMz = this.props.precursorMz
+    let minMZ = precursorMz - 1
+    let maxMZ = precursorMz + 1
+    let chargeState = this.props.chargeState
+    let ppm = this.props.ppm
+
+    console.log(this.props.spectrumData)
 
     if (this.props.spectrumData.length > 0) {
-      var max_y = Math.max.apply(
+      let max_y = Math.max.apply(
         null,
         this.props.spectrumData.filter(
           (element) => { return element.mz >= minMZ && element.mz <= maxMZ }
         ).map(
           (element) => { return element.into }
         )
-      );
+      )
 
-      data.addRows([[minMZ, 0, null, null, null]]);
+      data.addRows([[minMZ, 0, null, null, null]])
 
       /* Draw a box for the isolation window, if data is available */
       if (this.props.isolationWindow != null) {
-        let lower_window = precursorMz - this.props.isolationWindow[0];
-        let upper_window = precursorMz + this.props.isolationWindow[1];
+        let lower_window = precursorMz - this.props.isolationWindow[0]
+        let upper_window = precursorMz + this.props.isolationWindow[1]
 
         data.addRows([
           [lower_window, 0, null, null, 0],
           [lower_window, 0, null, null, max_y * 1.1],
           [upper_window, 0, null, null, max_y * 1.1],
           [upper_window, 0, null, null, 0]
-        ]);
+        ])
       }
 
       let ionSeries = []
@@ -136,7 +138,7 @@ class PrecursorSpectrumBox extends React.Component {
       ])
     }
 
-    var options = {
+    let options = {
       title: 'Precursor',
       hAxis: {
         // title: 'mz',
@@ -160,15 +162,17 @@ class PrecursorSpectrumBox extends React.Component {
         axis: 'horizontal',
         maxZoomIn: 0.01,
       },
-    };
+    }
 
-    var chart = new google.visualization.AreaChart(document.getElementById('precursorGoogleChart'));
+    let chart = new google.visualization.AreaChart(
+      document.getElementById('precursorGoogleChart')
+    )
 
-    chart.draw(data, options);
+    chart.draw(data, options)
   }
 
   handleResize() {
-    this.drawChart();
+    this.drawChart()
   }
 
   render() {
@@ -176,7 +180,7 @@ class PrecursorSpectrumBox extends React.Component {
       <div>
         <div id="precursorGoogleChart" />
       </div>
-    );
+    )
   }
 }
 

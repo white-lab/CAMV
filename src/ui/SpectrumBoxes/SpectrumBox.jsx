@@ -12,13 +12,15 @@ class SpectrumBox extends React.Component {
     this.state = {
       chartLoaded: false,
       exporting: false,
+      minMZ: 0,
+      maxMZ: null,
     }
   }
 
   componentDidMount() {
-    window.addEventListener('resize', this.handleResize.bind(this));
+    window.addEventListener('resize', this.handleResize.bind(this))
 
-    var component = this;
+    let component = this
 
     // Load the chart API
     return jQuery.ajax({
@@ -31,40 +33,61 @@ class SpectrumBox extends React.Component {
           packages:["corechart"],
           callback: function () {
             component.setState({chartLoaded: true})
-            component.drawChart();
+            component.drawChart()
           },
-        });
-      });
+        })
+      })
   }
 
   componentDidUpdate(prevProps, prevState) {
     if (this.state.chartLoaded) {
-      if (prevProps.spectrumData != this.props.spectrumData) {
-        this.drawChart();
-      } else if (prevProps.selectedPTMPlacement != this.props.selectedPTMPlacement) {
-        this.drawChart();
-      } else if (prevProps.minMZ != this.props.minMZ || prevProps.maxMZ != this.props.maxMZ) {
-        this.drawChart();
+      if (
+        prevProps.spectrumData != this.props.spectrumData ||
+        prevProps.selectedScan != this.props.selectedScan ||
+        prevProps.selectedPTMPlacement != this.props.selectedPTMPlacement ||
+        prevState.minMZ != this.state.minMZ ||
+        prevState.maxMZ != this.state.maxMZ
+      ) {
+        this.drawChart()
       }
     }
   }
 
   componentWillUnmount() {
-    window.removeEventListener('resize', this.handleResize.bind(this));
+    window.removeEventListener('resize', this.handleResize.bind(this))
+  }
+
+  updateMinMZ(newMinMZ) {
+    this.setState({
+      minMZ: newMinMZ > 0 ? newMinMZ : 0,
+    })
+  }
+
+  updateMaxMZ(newMaxMZ) {
+    let scanData = this.getScanData()
+    let max_mz = Math.ceil(
+      (scanData != null) ? scanData[scanData.length - 1].mz + 1 : 100
+    )
+    this.setState({
+      maxMZ: newMaxMZ < max_mz ? newMaxMZ : max_mz,
+    })
   }
 
   drawChart() {
-    if (!this.state.chartLoaded) { return; }
+    if (!this.state.chartLoaded) { return }
 
-    var minMZ = Math.max(0, this.props.minMZ == null ? 0 : this.props.minMZ)
-    var maxMZ = 1
-    var max_y = 15
+    let minMZ = Math.max(0, this.state.minMZ == null ? 0 : this.state.minMZ)
+    let maxMZ = 1
+    let max_y = 15
 
     if (this.props.spectrumData.length > 0) {
-      var scanMax = Math.ceil(
+      let scanMax = Math.ceil(
         this.props.spectrumData[this.props.spectrumData.length - 1].mz + 1
       )
-      maxMZ = this.props.maxMZ == null ? scanMax : Math.min(scanMax, this.props.maxMZ)
+      maxMZ = (
+        this.props.maxMZ == null ?
+        scanMax : Math.min(scanMax, this.props.maxMZ)
+      )
 
       max_y = Math.max.apply(
         null,
@@ -76,16 +99,17 @@ class SpectrumBox extends React.Component {
       )
     }
 
-    var data = new google.visualization.DataTable();
-    data.addColumn('number', 'mz');
-    data.addColumn('number', 'Intensity');
+    let data = new google.visualization.DataTable()
+
+    data.addColumn('number', 'mz')
+    data.addColumn('number', 'Intensity')
     data.addColumn({'type': 'string', 'role': 'style'})
     data.addColumn({'type': 'string', 'role': 'annotation'})
 
     if (this.props.spectrumData.length > 0) {
       data.addRows([[minMZ, 0, null, null]])
 
-      this.props.spectrumData.forEach(function(peak) {
+      this.props.spectrumData.forEach(function (peak) {
         let mz = peak.mz
         let into = peak.into
         let name = ''
@@ -99,10 +123,10 @@ class SpectrumBox extends React.Component {
             style = 'point {size: 3; fill-color: red; visible: false}'
           }
 
-          var matchInfo = peak.matchInfo[this.props.selectedPTMPlacement]
+          let matchInfo = peak.matchInfo[this.props.selectedPTMPlacement]
 
           if (matchInfo != null) {
-            var matchId = matchInfo.matchId
+            let matchId = matchInfo.matchId
 
             if (matchId != null) {
               let match = this.props.matchData[matchId]
@@ -144,7 +168,7 @@ class SpectrumBox extends React.Component {
             } else if (into < max_y / 10) {
               style = null
             }
-        }
+          }
 
           data.addRows([
             [mz, 0, null, null],
@@ -157,7 +181,7 @@ class SpectrumBox extends React.Component {
       data.addRows([[maxMZ, 0, null, null]])
     }
 
-    var options = {
+    let options = {
       // title: 'Age vs. Weight comparison',
       hAxis: {
         title: 'mz',
@@ -181,24 +205,32 @@ class SpectrumBox extends React.Component {
         axis: 'horizontal',
         maxZoomIn: 0.00001,
       },
-    };
-
-    var chart = new google.visualization.LineChart(document.getElementById('fragmentGoogleChart'));
-
-    google.visualization.events.addListener(chart, 'select', selectHandler.bind(this));
-
-    function selectHandler(e) {
-      var selectedItem = chart.getSelection()[0];
-      if (selectedItem) {
-        var mz = data.getValue(selectedItem.row, 0)
-        this.props.pointChosenCallback(mz)
-      }
     }
-    chart.draw(data, options);
+
+    let chart = new google.visualization.LineChart(
+      document.getElementById('fragmentGoogleChart')
+    )
+
+    if (this.props.pointChosenCallback != null) {
+      google.visualization.events.addListener(
+        chart, 'select',
+        function (e) {
+          let selectedItem = chart.getSelection()[0]
+
+          if (selectedItem) {
+            this.props.pointChosenCallback(
+              data.getValue(selectedItem.row, 0)
+            )
+          }
+        }.bind(this)
+      )
+    }
+
+    chart.draw(data, options)
   }
 
   handleResize(e) {
-    this.drawChart();
+    this.drawChart()
   }
 
   render() {
@@ -217,17 +249,17 @@ class SpectrumBox extends React.Component {
           <div id="mzBox">
             <div className="setMinMZ">
               <SetMinMZ
-                callback={this.props.updateMinMZ}
+                callback={this.updateMinMZ.bind(this)}
                 disabled={this.props.inputDisabled}
-                minMZ={this.props.minMZ}
+                minMZ={this.state.minMZ}
               />
             </div>
 
             <div className="setMaxMZ">
               <SetMaxMZ
-                callback={this.props.updateMaxMZ}
+                callback={this.updateMaxMZ.bind(this)}
                 disabled={this.props.inputDisabled}
-                maxMZ={this.props.maxMZ}
+                maxMZ={this.state.maxMZ}
                 scanMaxMZ={
                   Math.ceil(
                     this.props.spectrumData.length == 0 ?
@@ -255,31 +287,33 @@ class SpectrumBox extends React.Component {
           </div>
         </div>
       </div>
-    );
+    )
   }
 }
 
 SpectrumBox.propTypes = {
-  minMZ: React.PropTypes.number,
-  maxMZ: React.PropTypes.number,
   spectrumData: React.PropTypes.array,
-  updateChoice: React.PropTypes.func.isRequired,
-  updateMinMZ: React.PropTypes.func.isRequired,
-  updateMaxMZ: React.PropTypes.func.isRequired,
-  pointChosenCallback: React.PropTypes.func.isRequired,
   inputDisabled: React.PropTypes.bool,
-  selectedPTMPlacement: React.PropTypes.number,
   matchData: React.PropTypes.array.isRequired,
   collisionType: React.PropTypes.string,
+
+  selectedScan: React.PropTypes.number,
+  selectedPTMPlacement: React.PropTypes.number,
+
+  updateChoice: React.PropTypes.func,
+  pointChosenCallback: React.PropTypes.func,
 }
 
 SpectrumBox.defaultProps = {
-  minMZ: null,
-  maxMZ: null,
   spectrumData: [],
   inputDisabled: true,
-  selectedPTMPlacement: null,
   collisionType: null,
+
+  selectedScan: null,
+  selectedPTMPlacement: null,
+
+  updateChoice: null,
+  pointChosenCallback: null,
 }
 
 module.exports = SpectrumBox
