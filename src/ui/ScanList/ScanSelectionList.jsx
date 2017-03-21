@@ -1,115 +1,84 @@
-import React from 'react'
+  import React from 'react'
 
-import ProteinListItem from './ProteinListItem'
+import ScanListItem from './ScanListItem'
 
 class ScanSelectionList extends React.Component {
-  update(proteinId, peptideId, scanId, modsId) {
-    this.props.updateAllCallback(
-      proteinId,
-      peptideId,
-      scanId,
-      modsId,
-    );
+  update(nodes) {
+    if (this.props.updateAllCallback != null) {
+      this.props.updateAllCallback(nodes)
+    }
   }
 
   selectLeft(node) {
     if (node.length <= 1) {
-      return node;
+      return node
     }
 
-    node.pop();
-    return node;
+    node.pop()
+    return node
   }
 
   selectRight(node) {
     if (node.length >= 4) {
-      return node;
+      return node
     }
 
-    node.push(0);
-    return node;
+    node.push(0)
+    return node
   }
 
   getMaxLength(node) {
-    switch (node.length) {
-      case 1:
-        var proteins = this.props.scanData;
-        return proteins.length;
-
-      case 2:
-        var proteins = this.props.scanData;
-        var peptides = proteins[node[0]].peptides;
-        return peptides.length;
-
-      case 3:
-        var proteins = this.props.scanData;
-        var peptides = proteins[node[0]].peptides;
-        var scans = peptides[node[1]].scans;
-        return scans.length;
-
-      case 4:
-        var proteins = this.props.scanData;
-        var peptides = proteins[node[0]].peptides;
-        var peptide = peptides[node[1]];
-        var ptms = this.props.peptideData[peptide.peptideDataId]
-          .modificationStates[peptide.modificationStateId]
-          .mods;
-        return ptms.length;
-
-      default:
-        console.log("Unexpected node length: " + node.length)
-        return 0;
+    let children = this.props.tree
+    for (let i = 0; i < node.length - 1; i++) {
+      children = children[node[i]].children
     }
+
+    return children.length
   }
 
   selectUp(node) {
     if (node[node.length - 1] == 0) {
       if (node.length > 1) {
-        node.pop();
+        node.pop()
       }
 
-      return node;
+      return node
     }
 
-    node[node.length - 1] -= 1;
+    node[node.length - 1] -= 1
 
     while(node.length < 4) {
-      node.push(0);
-      node[node.length - 1] = this.getMaxLength(node) - 1;
+      node.push(0)
+      node[node.length - 1] = this.getMaxLength(node) - 1
     }
 
-    return node;
+    return node
   }
 
   selectDown(node) {
-    var init = node.slice(0);
+    let init = node.slice(0)
 
     if (node.length >= 4) {
-      node[node.length - 1] += 1;
+      node[node.length - 1] += 1
     } else {
-      node.push(0);
+      node.push(0)
     }
 
     while (node[node.length - 1] >= this.getMaxLength(node)) {
       if (node.length <= 1) {
-        return init;
+        return init
       }
 
-      node.pop();
-      node[node.length - 1] += 1;
+      node.pop()
+      node[node.length - 1] += 1
     }
 
-    return node;
+    return node
   }
 
   handleHotkey(e) {
-    var node = [
-      this.props.selectedProtein,
-      this.props.selectedPeptide,
-      this.props.selectedScan,
-      this.props.selectedPTMPlacement
-    ];
-    node = node.filter((i) => { return i != null; })
+    let node = this.props.selectedNode
+    node = node.filter((i) => { return i != null })
 
     if (node.length < 1) {
       node = [0]
@@ -117,25 +86,26 @@ class ScanSelectionList extends React.Component {
 
     switch (e.key) {
       case 'ArrowLeft':
-        node = this.selectLeft(node);
-        break;
+        node = this.selectLeft(node)
+        break
       case 'ArrowRight':
-        node = this.selectRight(node);
-        break;
+        node = this.selectRight(node)
+        break
       case 'k':
       case 'ArrowUp':
-        node = this.selectUp(node);
-        break;
+        node = this.selectUp(node)
+        break
       case 'j':
       case 'ArrowDown':
-        node = this.selectDown(node);
-        break;
+        node = this.selectDown(node)
+        break
       default:
-        return;
+        return
     }
 
-    while (node.length < 4) { node.push(null); }
-    this.update(node[0], node[1], node[2], node[3]);
+    while (node.length < 4) { node.push(null) }
+
+    this.update(node)
 
     // TODO: Expand the tree as needed
   }
@@ -144,18 +114,21 @@ class ScanSelectionList extends React.Component {
     return (
       <ul className="tree">
         {
-          this.props.scanData.map(
-            (protein) => {
+          this.props.tree.map(
+            (child) => {
               return (
-                <ProteinListItem
-                  key={protein.proteinId}
-                  protein={protein}
+                <ScanListItem
+                  key={
+                    child.overrideKey != null ?
+                    child.overrideKey : child.nodeId
+                  }
+                  nodeId={child.nodeId}
+                  name={child.name}
+                  children={child.children}
+
                   update={this.update.bind(this)}
-                  selectedProtein={this.props.selectedProtein}
-                  selectedPeptide={this.props.selectedPeptide}
-                  selectedScan={this.props.selectedScan}
-                  selectedPTMPlacement={this.props.selectedPTMPlacement}
-                  peptideData={this.props.peptideData}
+
+                  selectedNode={this.props.selectedNode}
                 />
               )
             }
@@ -167,22 +140,19 @@ class ScanSelectionList extends React.Component {
 }
 
 ScanSelectionList.propTypes = {
-  scanData: React.PropTypes.array,
-  peptideData: React.PropTypes.array,
-  selectedProtein: React.PropTypes.number,
-  selectedPeptide: React.PropTypes.number,
-  selectedScan: React.PropTypes.number,
-  selectedPTMPlacement: React.PropTypes.number,
-  updateAllCallback: React.PropTypes.func.isRequired,
+  tree: React.PropTypes.array,
+
+  updateAllCallback: React.PropTypes.func,
+
+  selectedNode: React.PropTypes.array,
 }
 
 ScanSelectionList.defaultProps = {
-  scanData: null,
-  peptideData: null,
-  selectedProtein: null,
-  selectedPeptide: null,
-  selectedScan: null,
-  selectedPTMPlacement: null,
+  proteins: null,
+
+  updateAllCallback: null,
+
+  selectedNode: [],
 }
 
 module.exports = ScanSelectionList

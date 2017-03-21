@@ -29,7 +29,7 @@ import { exportCSV } from '../io/csv.jsx'
 import { spectraToImage } from '../io/spectra.jsx'
 
 
-hotkey.activate();
+hotkey.activate()
 
 
 class ViewBox extends React.Component {
@@ -61,6 +61,7 @@ class ViewBox extends React.Component {
       modalFragmentSelectionOpen: false,
       modalBYOpen: false,
 
+      loaded: false,
       exporting: false,
 
       /* Validation data */
@@ -80,28 +81,28 @@ class ViewBox extends React.Component {
   }
 
   handleHotkey(e) {
-    if (this.state.scanData != null && !this.anyModalOpen()) {
+    if (this.state.loaded != null && !this.anyModalOpen()) {
       if (e.getModifierState("Control")) {
         switch (e.key) {
           case 'f':
             this.setState({modalSearchOpen: !this.state.modalSearchOpen})
-            break;
+            break
         }
       } else {
         switch(e.key) {
           case 'a':
-            this.updateChoice('accept')
-            break;
+            this.setChoice('accept')
+            break
           case 's':
-            this.updateChoice('maybe')
-            break;
+            this.setChoice('maybe')
+            break
           case 'd':
-            this.updateChoice('reject')
-            break;
+            this.setChoice('reject')
+            break
           default:
             let scanList = this.refs["scanSelectionList"]
             scanList.handleHotkey(e)
-            break;
+            break
         }
       }
     }
@@ -144,42 +145,41 @@ class ViewBox extends React.Component {
     })
   }
 
-  updateAll(proteinId, peptideId, scanId, modsId) {
+  updateAll(nodes) {
+    while (nodes.length < 4) { nodes.push(null) }
+
     this.setState({
-      selectedProtein: proteinId,
-      selectedPeptide: peptideId,
-      selectedScan: scanId,
-      selectedPTMPlacement: modsId,
+      selectedProtein: nodes[0],
+      selectedPeptide: nodes[1],
+      selectedScan: nodes[2],
+      selectedPTMPlacement: nodes[3],
       minMZ: 0,
       maxMZ: null,
     })
 
-    if ((modsId != null) || [proteinId, peptideId, scanId, modsId].every(i => i != null)) {
+
+    if ((nodes[2] != null) || nodes.every(i => i != null)) {
       this.redrawCharts()
     }
   }
 
   redrawCharts() {
-    this.refs["fragmentSpectrum"].drawChart();
-    this.refs["precursorSpectrum"].drawChart();
-    this.refs["quantSpectrum"].drawChart();
+    this.refs["fragmentSpectrum"].drawChart()
+    this.refs["precursorSpectrum"].drawChart()
+    this.refs["quantSpectrum"].drawChart()
   }
 
   getScanData() {
-    if (this.state.selectedProtein != null) {
-      let protein = this.state.scanData[this.state.selectedProtein]
-
-      if (this.state.selectedPeptide != null) {
-        let peptide = protein.peptides[this.state.selectedPeptide]
-
-        if (this.state.selectedScan != null) {
-          let scan = peptide.scans[this.state.selectedScan]
-
-          return scan.scanData
-        }
-      }
-    }
-    return null
+    return (
+      this.state.selectedProtein != null &&
+      this.state.selectedPeptide != null &&
+      this.state.selectedScan != null
+    ) ? (
+      this.state.scanData[this.state.selectedProtein]
+        .peptides[this.state.selectedPeptide]
+        .scans[this.state.selectedScan]
+        .scanData
+    ) : null
   }
 
   updateMinMZ(newMinMZ) {
@@ -199,11 +199,13 @@ class ViewBox extends React.Component {
   }
 
   updateSelectedMz(mz) {
-    let data = this.state.scanData[this.state.selectedProtein]
-      .peptides[this.state.selectedPeptide]
-      .scans[this.state.selectedScan]
-      .scanData
+    if (this.state.selectedPTMPlacement == null) {
+      return
+    }
 
+    let data = this.getScanData()
+
+    // TODO More specific SQL query?
     let matchId = data.find(
       peak => peak.mz === mz
     ).matchInfo[this.state.selectedPTMPlacement].matchId
@@ -212,31 +214,19 @@ class ViewBox extends React.Component {
   }
 
   updateSelectedMatchId(matchId) {
-    let peptide = this.state.scanData[this.state.selectedProtein]
-      .peptides[this.state.selectedPeptide]
-    let peptideDataId = peptide.peptideDataId
-    let modificationStateId = peptide.modificationStateId
-    let scan = peptide.scans[this.state.selectedScan]
-
-    if (
-      peptideDataId == null ||
-      modificationStateId == null ||
-      this.state.selectedPTMPlacement == null
-    ) {
-      return;
+    if (this.state.selectedPTMPlacement == null) {
+      return
     }
 
-    let matchData = this.state.peptideData[peptideDataId]
-      .modificationStates[modificationStateId]
-      .mods[this.state.selectedPTMPlacement]
-      .matchData
+    let [ptm] = this.getNodeData().slice(3)
 
-    let currentLabel = ''
+    let currentLabel = (
+      matchId !== null ?
+      ptm.matchData[matchId].name : ''
+    )
 
-    if (matchId !== null) { currentLabel = matchData[matchId].name }
-
-    let mz = matchData[matchId].mz
-    let matches = matchData.filter(
+    let mz = ptm.matchData[matchId].mz
+    let matches = ptm.matchData.filter(
       (item) => {
         item.ppm = 1e6 * Math.abs(item.mz - mz) / mz
         return item.ppm < this.state.maxPPM
@@ -247,7 +237,7 @@ class ViewBox extends React.Component {
       selectedMz: mz,
       modalFragmentSelectionOpen: true,
       fragmentMatches: matches,
-      currentLabel: currentLabel
+      currentLabel: currentLabel,
     })
   }
 
@@ -256,7 +246,7 @@ class ViewBox extends React.Component {
       modalFragmentSelectionOpen: false,
       fragmentMatches: [],
       selectedMz: null,
-      currentLabel: ''
+      currentLabel: '',
     })
   }
 
@@ -293,31 +283,23 @@ class ViewBox extends React.Component {
 
     let peak_targets = {}
 
-    let peptide = this.state.scanData[this.state.selectedProtein]
-      .peptides[this.state.selectedPeptide]
-
-    let matchData = this.state.peptideData[peptide.peptideDataId]
-      .modificationStates[peptide.modificationStateId]
-      .mods[this.state.selectedPTMPlacement]
-      .matchData
-
-    let scanData = this.state.scanData[this.state.selectedProtein]
-      .peptides[this.state.selectedPeptide]
-      .scans[this.state.selectedScan]
-      .scanData
+    let [scan, ptm] = this.getNodeData().slice(2)
+    let scanData = scan.scanData
 
     scanData.forEach(
       function(peak, index) {
         if (peak.mz === this.state.selectedMz) {
           let match_id_target = {matchId: {$set: matchId}}
+
           let ptm_target = {}
           ptm_target[this.state.selectedPTMPlacement] = match_id_target
+
           let match_info_target = {matchInfo: ptm_target}
           peak_targets[index] = match_info_target
           peak.matchInfo[this.state.selectedPTMPlacement].matchId = matchId
 
           this.setState({
-            currentLabel: matchData[matchId].name
+            currentLabel: ptm.matchData[matchId].name,
           })
         }
       }.bind(this)
@@ -325,16 +307,18 @@ class ViewBox extends React.Component {
 
     let scan_data_target = {scanData: peak_targets}
     let scan_target = {}
-    scan_target[this.state.selectedScan] = scan_data_target;
-    let scans_target = {scans: scan_target};
+    scan_target[this.state.selectedScan] = scan_data_target
+
+    let scans_target = {scans: scan_target}
     let peptide_target = {}
-    peptide_target[this.state.selectedPeptide] = scans_target;
-    let peptides_target = {peptides: peptide_target};
+    peptide_target[this.state.selectedPeptide] = scans_target
+
+    let peptides_target = {peptides: peptide_target}
     let protein_target = {}
-    protein_target[this.state.selectedProtein] = peptides_target;
+    protein_target[this.state.selectedProtein] = peptides_target
 
     this.setState({
-      scanData: update(this.state.scanData, protein_target)
+      scanData: update(this.state.scanData, protein_target),
     })
   }
 
@@ -358,14 +342,14 @@ class ViewBox extends React.Component {
 
   *iterate_spectra(export_spectras) {
     while (export_spectras.length < 4) {
-      export_spectras.push(false);
+      export_spectras.push(false)
     }
 
     for (let protein of this.state.scanData) {
       for (let peptide of protein.peptides) {
         for (let scan of peptide.scans) {
-          for (let match of scan.choiceData) {
-            let state = match.state
+          for (let ptm of scan.choiceData) {
+            let state = ptm.state
 
             if (
               (state == "accept" && !export_spectras[0]) ||
@@ -373,7 +357,7 @@ class ViewBox extends React.Component {
               (state == "reject" && !export_spectras[2]) ||
               (state == null && !export_spectras[3])
             ) {
-              continue;
+              continue
             }
 
             let nodes = [
@@ -381,25 +365,19 @@ class ViewBox extends React.Component {
               peptide.peptideId,
               scan.scanId,
               match.modsId,
-            ];
-            if (
-              this.state.peptideData[peptide.peptideDataId] == null ||
-              this.state.peptideData[peptide.peptideDataId].modificationStates[peptide.modificationStateId] == null ||
-              this.state.peptideData[peptide.peptideDataId].modificationStates[peptide.modificationStateId].mods[match.modsId] == null
-            ) {
-              console.log(this.state.peptideData)
-              console.log(peptide.peptideDataId, protein.proteinName, peptide.peptideId, scan.scanId, match.modsId)
-            }
+            ]
+
             let mod = this.state.peptideData[peptide.peptideDataId]
               .modificationStates[peptide.modificationStateId]
-              .mods[match.modsId]
+              .mods[ptm.modsId]
+
             yield [
               nodes,
               protein.proteinName,
               mod != null ? mod.name : '',
               scan.scanNumber,
               state,
-            ];
+            ]
           }
         }
       }
@@ -419,11 +397,11 @@ class ViewBox extends React.Component {
             exportCSV(
               this,
               path.join(dirName, this.state.basename + ".csv")
-            );
+            )
           }
 
           if (!export_spectras.some(i => i)) {
-            return;
+            return
           }
 
           spectraToImage(this, dirName, export_spectras)
@@ -439,12 +417,13 @@ class ViewBox extends React.Component {
 
     let prot_range = this.state.scanData
 
+    // TODO Search lookup
     for (let [i, protein] of prot_range.entries()) {
       if (
         proteinMatch != '' &&
         protein.proteinName.toLowerCase().includes(proteinMatch.toLowerCase())
       ) {
-        this.updateAll(i, 0, 0, 0)
+        this.updateAll([i, 0, 0, 0])
         return
       }
 
@@ -457,7 +436,7 @@ class ViewBox extends React.Component {
           peptideMatch != '' &&
           pepData.peptideSequence.includes(peptideMatch.toUpperCase())
         ) {
-          this.updateAll(i, j, 0, 0)
+          this.updateAll([i, j, 0, 0])
           return
         }
 
@@ -468,7 +447,7 @@ class ViewBox extends React.Component {
             scanMatch != '' &&
             String(scan.scanNumber) == scanMatch
           ) {
-            this.updateAll(i, j, k, 0)
+            this.updateAll([i, j, k, 0])
             return
           }
 
@@ -483,7 +462,7 @@ class ViewBox extends React.Component {
               peptideMatch != '' &&
               ptmData.name.includes(peptideMatch)
             ) {
-              this.updateAll(i, j, k, l)
+              this.updateAll([i, j, k, l])
               return
             }
           }
@@ -492,7 +471,7 @@ class ViewBox extends React.Component {
     }
   }
 
-  updateChoice(choice) {
+  setChoice(choice) {
     if (
       this.state.selectedProtein != null &&
       this.state.selectedPeptide != null &&
@@ -500,18 +479,21 @@ class ViewBox extends React.Component {
       this.state.selectedPTMPlacement != null
     ) {
       /* Messy solution because javascript doesn't allow variables as dict keys */
-      let state_target = {state: {$set: choice}};
-      let ptm_target = {};
-      ptm_target[this.state.selectedPTMPlacement] = state_target;
-      let choice_target = {choiceData: ptm_target};
+      let state_target = {state: {$set: choice}}
+      let ptm_target = {}
+      ptm_target[this.state.selectedPTMPlacement] = state_target
+
+      let choice_target = {choiceData: ptm_target}
       let scan_target = {}
-      scan_target[this.state.selectedScan] = choice_target;
-      let scans_target = {scans: scan_target};
+      scan_target[this.state.selectedScan] = choice_target
+
+      let scans_target = {scans: scan_target}
       let peptide_target = {}
-      peptide_target[this.state.selectedPeptide] = scans_target;
-      let peptides_target = {peptides: peptide_target};
+      peptide_target[this.state.selectedPeptide] = scans_target
+
+      let peptides_target = {peptides: peptide_target}
       let protein_target = {}
-      protein_target[this.state.selectedProtein] = peptides_target;
+      protein_target[this.state.selectedProtein] = peptides_target
 
       /* However, doing it this way keeps from cloning data, saving a lot of time
          on large files.
@@ -529,10 +511,12 @@ class ViewBox extends React.Component {
   }
 
   runImport(data, fileName) {
+    // TODO Connection
     this.setState({
       pycamverterVersion: data.pycamverterVersion,
       scanData: data.scanData,
       peptideData: data.peptideData,
+      loaded: true,
       modalImportOpen: false,
     })
 
@@ -553,6 +537,7 @@ class ViewBox extends React.Component {
     })
   }
 
+  // TODO Remove
   save() {
     dialog.showSaveDialog(
       {
@@ -565,16 +550,93 @@ class ViewBox extends React.Component {
       },
       function(fileName) {
         if (fileName === undefined)
-          return;
+          return
 
         saveCAMV(
           fileName,
           this.state.pycamverterVersion,
           this.state.scanData,
-          this.state.peptideData
+          this.state.peptideData,
         )
       }.bind(this)
-    );
+    )
+  }
+
+  getNodeTree() {
+    if (!this.state.loaded) { return [] }
+    let proteins = []
+
+    for (let prot of this.state.scanData) {
+      let peptides = []
+
+      for (let peptide of prot.peptides) {
+        let scans = []
+        let modDesc = this.state.peptideData[peptide.peptideDataId]
+          .modificationStates[peptide.modificationStateId]
+          .modDesc
+        let pepSeq = this.state.peptideData[peptide.peptideDataId]
+          .peptideSequence
+
+        for (let scan of peptide.scans) {
+          let ptmList = []
+          let ptmPlacements = this.state.peptideData[peptide.peptideDataId]
+            .modificationStates[peptide.modificationStateId]
+            .mods
+
+          for (let [index, ptm] of ptmPlacements.entries()) {
+            ptmList.push({
+              name: ptm.name,
+              nodeId: ptm.exactModsId || ptm.id,
+              choice: scan.choiceData[index].state,
+            })
+          }
+
+          scans.push({
+            name: "Scan: " + scan.scanNumber,
+            nodeId: scan.scanId,
+            children: ptmList,
+          })
+        }
+
+        peptides.push({
+          name: pepSeq + modDesc,
+          nodeId: peptide.peptideId,
+          overrideKey: [peptide.peptideId, peptide.modificationStateId],
+          children: scans,
+        })
+      }
+
+      proteins.push({
+        name: prot.proteinName,
+        nodeId: prot.proteinId,
+        children: peptides,
+      })
+    }
+
+    return proteins
+  }
+
+  getNodeData() {
+    let protein = (
+      this.state.selectedProtein != null ?
+      this.state.scanData[this.state.selectedProtein] : null
+    )
+    let peptide = (
+      (protein != null && this.state.selectedPeptide != null) ?
+      protein.peptides[this.state.selectedPeptide] : null
+    )
+    let scan = (
+      (peptide != null && this.state.selectedScan != null) ?
+      peptide.scans[this.state.selectedScan] : null
+    )
+    let ptm = (
+      (peptide != null && this.state.selectedPTMPlacement != null) ?
+      this.state.peptideData[peptide.peptideDataId]
+        .modificationStates[peptide.modificationStateId]
+        .mods[this.state.selectedPTMPlacement] : null
+    )
+
+    return [protein, peptide, scan, ptm]
   }
 
   render() {
@@ -596,53 +658,51 @@ class ViewBox extends React.Component {
     let collisionType = null
     let c13Num = 0
 
-    if (this.state.selectedProtein != null) {
-      let protein = this.state.scanData[this.state.selectedProtein]
+    let tree = this.getNodeTree()
+    let [protein, peptide, scan, ptm] = this.getNodeData()
 
-      if (this.state.selectedPeptide != null) {
-        let peptide = protein.peptides[this.state.selectedPeptide]
+    if (scan != null) {
+      spectrumData = scan.scanData
+      precursorSpectrumData = scan.precursorScanData
+      precursorMz = scan.precursorMz
+      isolationWindow = scan.precursorIsolationWindow
+      chargeState = scan.chargeState
+      quantSpectrumData = scan.quantScanData
+      quantMz = scan.quantMz
+      protName = protein.proteinName
+      scanNumber = scan.scanNumber
+      fileName = scan.fileName
+      collisionType = scan.collisionType
+      c13Num = scan.c13Num
 
-        if (this.state.selectedScan != null) {
-          let scan = peptide.scans[this.state.selectedScan]
+      if (ptm != null) {
+        inputDisabled = false
+        matchData = ptm.matchData
+        peptideSequence = ptm.name
 
-          spectrumData = scan.scanData
-          precursorSpectrumData = scan.precursorScanData
-          precursorMz = scan.precursorMz
-          isolationWindow = scan.precursorIsolationWindow
-          chargeState = scan.chargeState
-          quantSpectrumData = scan.quantScanData
-          quantMz = scan.quantMz
-          protName = protein.proteinName
-          scanNumber = scan.scanNumber
-          fileName = scan.fileName
-          collisionType = scan.collisionType
-          c13Num = scan.c13Num
+        spectrumData.forEach(function(peak) {
+          let matchId = peak.matchInfo[this.state.selectedPTMPlacement]
+            .matchId
 
-          if (this.state.selectedPTMPlacement != null) {
-            inputDisabled = false
-            let mod = this.state.peptideData[peptide.peptideDataId]
-              .modificationStates[peptide.modificationStateId]
-              .mods[this.state.selectedPTMPlacement]
-            matchData = mod.matchData
-            peptideSequence = mod.name
+          if (matchId) {
+            let match = matchData[matchId]
 
-            spectrumData.forEach(function(peak) {
-              var matchId = peak.matchInfo[this.state.selectedPTMPlacement]
-                .matchId
-
-              if (matchId) {
-                let match = matchData[matchId]
-                if (match.ionType == 'b') {
-                  bFound.push([match.ionPosition, matchId, match.name])
-                } else if (matchData[matchId].ionType == 'y') {
-                  yFound.push([match.ionPosition, matchId, match.name])
-                }
-              }
-            }.bind(this))
+            if (match.ionType == 'b') {
+              bFound.push([match.ionPosition, matchId, match.name])
+            } else if (matchData[matchId].ionType == 'y') {
+              yFound.push([match.ionPosition, matchId, match.name])
+            }
           }
-        }
+        }.bind(this))
       }
     }
+
+    let selectedNode = [
+      this.state.selectedProtein,
+      this.state.selectedPeptide,
+      this.state.selectedScan,
+      this.state.selectedPTMPlacement,
+    ]
 
     return (
       <div
@@ -692,17 +752,11 @@ class ViewBox extends React.Component {
         >
           <ScanSelectionList
             ref="scanSelectionList"
-            scanData={this.state.scanData}
-            peptideData={this.state.peptideData}
-            updateSelectedProteinCallback={this.updateSelectedProtein.bind(this)}
-            updateSelectedPeptideCallback={this.updateSelectedPeptide.bind(this)}
-            updateSelectedScanCallback={this.updateSelectedScan.bind(this)}
-            updateSelectedPTMPlacementCallback={this.updateSelectedPTMPlacement.bind(this)}
+            tree={tree}
+
             updateAllCallback={this.updateAll.bind(this)}
-            selectedProtein={this.state.selectedProtein}
-            selectedPeptide={this.state.selectedPeptide}
-            selectedScan={this.state.selectedScan}
-            selectedPTMPlacement={this.state.selectedPTMPlacement}
+
+            selectedNode={selectedNode}
           />
         </div>
         <div
@@ -777,7 +831,7 @@ class ViewBox extends React.Component {
                   id="openImport"
                   onClick={this.openImport.bind(this)}
                   style={{display: this.state.exporting ? 'none' : null}}
-                  disabled={this.state.scanData.length > 0}
+                  disabled={this.state.loaded}
                 >
                   Open
                 </Button>
@@ -785,7 +839,7 @@ class ViewBox extends React.Component {
                   id="openSave"
                   onClick={this.save.bind(this)}
                   style={{display: this.state.exporting ? 'none' : null}}
-                  disabled={this.state.scanData.length < 1}
+                  disabled={!this.state.loaded}
                 >
                   Save
                 </Button>
@@ -793,7 +847,7 @@ class ViewBox extends React.Component {
                   id="openExport"
                   onClick={this.openExport.bind(this)}
                   style={{display: this.state.exporting ? 'none' : null}}
-                  disabled={this.state.scanData.length < 1}
+                  disabled={!this.state.loaded}
                 >
                   Export
                 </Button>
@@ -813,7 +867,7 @@ class ViewBox extends React.Component {
                 inputDisabled={inputDisabled}
                 matchData={matchData}
                 selectedPTMPlacement={this.state.selectedPTMPlacement}
-                updateChoice={this.updateChoice.bind(this)}
+                updateChoice={this.setChoice.bind(this)}
                 pointChosenCallback={this.updateSelectedMz.bind(this)}
               />
             </div>
