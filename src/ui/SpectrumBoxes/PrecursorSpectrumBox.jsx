@@ -59,8 +59,6 @@ class PrecursorSpectrumBox extends React.Component {
     let chargeState = this.props.chargeState
     let ppm = this.props.ppm
 
-    console.log(this.props.spectrumData)
-
     if (this.props.spectrumData.length > 0) {
       let max_y = Math.max.apply(
         null,
