@@ -14,12 +14,12 @@ exports.exportCSV = function(vb, path) {
   ])
 
   for (let vals of vb.iterate_spectra([true, true, true, true])) {
-    let [nodes, prot, pep, scan, state] = vals;
+    let [nodes, prot, pep, scan, ptm, state] = vals;
 
     dataOut.push([
       scan,
       prot,
-      pep,
+      ptm,
       state,
     ])
   }
