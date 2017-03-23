@@ -180,11 +180,10 @@ class ViewBox extends React.Component {
         }
 
         let matches = this.state.db.all(
-          "SELECT fragment_id, peak_id, name, mz \
-          FROM fragments inner JOIN best_fragments \
-          ON (fragments.peak_id=best_fragment.peak_id AND \
-          fragments.fragment_id=best_fragment.fragment_id) \
-          WHERE best_fragment.ptm_id=?",
+          "SELECT fragments.fragment_id, fragments.peak_id, \
+          fragments.display_name, fragments.mz \
+          FROM fragments \
+          WHERE fragments.ptm_id=? AND fragments.best=1",
           [
             this.state.selectedPTM,
           ],
@@ -193,7 +192,7 @@ class ViewBox extends React.Component {
 
             rows.forEach(function (row) {
               data[row.peak_id].fragId = i.fragment_id
-              data[row.peak_id].name = i.name
+              data[row.peak_id].name = i.display_name
               data[row.peak_id].exp_mz = i.mz
             })
 
@@ -317,27 +316,29 @@ class ViewBox extends React.Component {
         return
     }
 
-    this.state.db.run(
-      "UPDATE best_fragment" +
-      "SET fragment_id=?" +
-      "WHERE peak_id=? AND ptm_id=?",
-      [
-        fragId,
-        peak.peak_id,
-        this.state.selectedPTM,
-      ],
-    )
-    this.state.db.run(
-      "INSERT INTO best_fragment (fragment_id, peak_id, ptm_id)" +
-      "VALUES (?, ?, ?)",
-      [
-        fragId,
-        peak.peak_id,
-        this.state.selectedPTM,
-      ],
-    )
-
-    this.updateScanData()
+    this.state.db.serialize(function() {
+      this.state.db.run(
+        "UPDATE fragments" +
+        "SET best=0" +
+        "WHERE peak_id=? AND ptm_id=?",
+        [
+          peak.peak_id,
+          this.state.selectedPTM,
+        ],
+      )
+      this.state.db.run(
+        "UPDATE fragments" +
+        "SET best=1" +
+        "WHERE frag_id=?",
+        [
+          fragId,
+        ],
+        function(err) {
+          if (err != null) { console.error(err) }
+          this.updateScanData()
+        }.bind(this)
+      )
+    })
   }
 
   closeImportModal() {
