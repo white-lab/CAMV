@@ -710,7 +710,8 @@ class ViewBox extends React.Component {
       scans.charge AS chargeState, \
       scans.collision_type AS collisionType, \
       scans.precursor_mz AS precursorMz, \
-      scans.isolation_window AS precursorIsolationWindow \
+      scans.isolation_window_lower, \
+      scans.isolation_window_upper, \
       scans.quant_mz_id, \
       scans.c13_num as c13Num, \
       files.filename AS fileName \
@@ -722,6 +723,10 @@ class ViewBox extends React.Component {
       ],
       function(err, row) {
         if (err != null) { console.error(err) }
+        row.precursorIsolationWindow = [
+          row.isolation_window_lower,
+          row.isolation_window_upper,
+        ]
         this.setState({
           scan: row,
         })
