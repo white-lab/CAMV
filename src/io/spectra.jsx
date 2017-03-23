@@ -23,18 +23,18 @@ function decodeBase64Image(dataString) {
 
 
 exports.spectraToImage = async function(vb, dirName, export_spectras) {
-  vb.setState({exporting: true});
-  var win = remote.getCurrentWindow();
-  var sizes = win.getBounds();
-  var maximized = win.isMaximized();
+  vb.setState({exporting: true})
+  var win = remote.getCurrentWindow()
+  var sizes = win.getBounds()
+  var maximized = win.isMaximized()
 
-  // win.setSize(800, 650);
-  win.setSize(1188, 840);
-  win.setResizable(false);
+  // win.setSize(800, 650)
+  win.setSize(1188, 840)
+  win.setResizable(false)
   win.closeDevTools()
 
-  let scan_list = vb.refs["scanSelectionList"];
-  let spectrum = vb.refs["fragmentSpectrum"];
+  let scan_list = vb.refs["scanSelectionList"]
+  let spectrum = vb.refs["fragmentSpectrum"]
   spectrum.setState({exporting: true})
 
   let current_node = [
@@ -42,7 +42,7 @@ exports.spectraToImage = async function(vb, dirName, export_spectras) {
     scan_list.props.selectedPeptide,
     scan_list.props.selectedScan,
     scan_list.props.selectedPTM
-  ];
+  ]
 
   /* Dummy call to force interface to redraw */
   vb.refs["scanSelectionList"].update(...[null, null, null, null])
@@ -52,13 +52,13 @@ exports.spectraToImage = async function(vb, dirName, export_spectras) {
     function () {}
   )
 
-  let promises = [];
+  let promises = []
 
   for (let vals of vb.iterate_spectra(export_spectras)) {
-    let [nodes, prot, pep, scan, score, state] = vals;
-    let out_name = prot + " - " + pep + " - " + scan;
+    let [nodes, prot, pep, scan, score, state] = vals
+    let out_name = prot + " - " + pep + " - " + scan
 
-    vb.refs["scanSelectionList"].update(...nodes);
+    vb.refs["scanSelectionList"].update(...nodes)
 
     // let dataUrl = await domtoimage.toSvg(
     let dataUrl = await domtoimage.toPng(
@@ -85,8 +85,8 @@ exports.spectraToImage = async function(vb, dirName, export_spectras) {
 
   Promise.all(promises).then(
     function() {
-      vb.setState({exporting: false});
-      win.setResizable(true);
+      vb.setState({exporting: false})
+      win.setResizable(true)
 
       if (maximized) {
         win.maximize()
@@ -94,9 +94,8 @@ exports.spectraToImage = async function(vb, dirName, export_spectras) {
         win.setSize(sizes.width, sizes.height)
       }
 
-      vb.refs["scanSelectionList"].update(...current_node);
+      vb.refs["scanSelectionList"].update(...current_node)
       spectrum.setState({exporting: false})
     }.bind(vb)
   )
 }
-
