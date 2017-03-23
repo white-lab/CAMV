@@ -28,18 +28,11 @@ class SequenceBox extends React.Component {
     let bFound = []
     let yFound = []
 
-    this.props.spectrumData.forEach(function(peak) {
-      let modsId = this.props.ptm.modsId || this.props.ptm.id
-      let matchId = peak.matchInfo[modsId].matchId
-
-      if (matchId) {
-        let match = this.props.matchData[matchId]
-
-        if (match.ionType == 'b') {
-          bFound.push([match.ionPosition, matchId, match.name])
-        } else if (matchData[matchId].ionType == 'y') {
-          yFound.push([match.ionPosition, matchId, match.name])
-        }
+    this.props.spectrumData.forEach(function(peak, index) {
+      if (peak.ionType == 'b') {
+        bFound.push([peak.ionPos, index, peak.name])
+      } else if (peak.ionType == 'y') {
+        yFound.push([peak.ionPos, index, peak.name])
       }
     }.bind(this))
 
@@ -129,14 +122,12 @@ class SequenceBox extends React.Component {
 SequenceBox.propTypes = {
   ptm: React.PropTypes.object,
   spectrumData: React.PropTypes.array,
-  matchData: React.PropTypes.array,
   clickCallback: React.PropTypes.func,
 }
 
 SequenceBox.defaultProps = {
   ptm: null,
   spectrumData: [],
-  matchData: [],
   clickCallback: null,
 }
 
