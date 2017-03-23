@@ -63,7 +63,7 @@ class QuantSpectrumBox extends React.Component {
       let indices = quantMz.map(
         function(qmz) {
           let errs = this.props.spectrumData.map(
-            peak => 1e6 * Math.abs(qmz - peak.mz) / peak.mz
+            peak => 1e6 * Math.abs(qmz.mz - peak.mz) / peak.mz
           )
 
           if (errs.every(val => val > ppm))
@@ -83,7 +83,7 @@ class QuantSpectrumBox extends React.Component {
 
         if (found) {
           style = 'point {size: 5; fill-color: #5CB85C; visible: true}'
-          name = quantMz[index].name
+          name = quantMz[quantIndex].name
         } else {
           style = 'point {size: 5; fill-color: #5CB85C; visible: false}'
         }
@@ -145,13 +145,13 @@ class QuantSpectrumBox extends React.Component {
 
 QuantSpectrumBox.propTypes = {
   ppm: React.PropTypes.number,
-  quantMz: React.PropTypes.arrayOf(React.PropTypes.number),
+  quantMz: React.PropTypes.arrayOf(React.PropTypes.object),
   spectrumData: React.PropTypes.array,
 }
 
 QuantSpectrumBox.defaultProps = {
   ppm: 20,
-  quantMz: [0, 1],
+  quantMz: [{mz: 0}, {mz: 1}],
   spectrumData: [],
 }
 
