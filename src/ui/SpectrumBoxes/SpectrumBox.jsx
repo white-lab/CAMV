@@ -44,7 +44,7 @@ class SpectrumBox extends React.Component {
       if (
         prevProps.spectrumData != this.props.spectrumData ||
         prevProps.selectedScan != this.props.selectedScan ||
-        prevProps.selectedPTMPlacement != this.props.selectedPTMPlacement ||
+        prevProps.selectedPTM != this.props.selectedPTM ||
         prevState.minMZ != this.state.minMZ ||
         prevState.maxMZ != this.state.maxMZ
       ) {
@@ -117,13 +117,13 @@ class SpectrumBox extends React.Component {
         let style = ''
 
         if (mz > minMZ && mz < maxMZ) {
-          if (this.props.selectedPTMPlacement != null) {
+          if (this.props.selectedPTM != null) {
             style = 'point {size: 3; fill-color: red; visible: true}'
           } else {
             style = 'point {size: 3; fill-color: red; visible: false}'
           }
 
-          let matchInfo = peak.matchInfo[this.props.selectedPTMPlacement]
+          let matchInfo = peak.matchInfo[this.props.selectedPTM]
 
           if (matchInfo != null) {
             let matchId = matchInfo.matchId
@@ -298,7 +298,7 @@ SpectrumBox.propTypes = {
   collisionType: React.PropTypes.string,
 
   selectedScan: React.PropTypes.number,
-  selectedPTMPlacement: React.PropTypes.number,
+  selectedPTM: React.PropTypes.number,
 
   updateChoice: React.PropTypes.func,
   pointChosenCallback: React.PropTypes.func,
@@ -310,7 +310,7 @@ SpectrumBox.defaultProps = {
   collisionType: null,
 
   selectedScan: null,
-  selectedPTMPlacement: null,
+  selectedPTM: null,
 
   updateChoice: null,
   pointChosenCallback: null,

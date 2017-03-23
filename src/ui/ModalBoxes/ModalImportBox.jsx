@@ -3,7 +3,7 @@ import { Modal, Button } from 'react-bootstrap'
 
 const { dialog } = require('electron').remote
 
-import { loadCAMV } from '../../io/camv'
+import { loadSQL } from '../../io/sql'
 
 class ModalImportBox extends React.Component {
   constructor(props) {
@@ -20,8 +20,8 @@ class ModalImportBox extends React.Component {
     dialog.showOpenDialog(
       {
         filters: [{
-          name: 'JSON',
-          extensions: ['camv', 'camv.gz']
+          name: 'CAMV SQLite',
+          extensions: ['db']
         }]
       },
       function (fileNames) {
@@ -46,7 +46,7 @@ class ModalImportBox extends React.Component {
       importing: true,
     })
 
-    loadCAMV(
+    loadSQL(
       this.state.camvFileName,
       function(data) {
         this.props.importCallback(data, this.state.camvFileName)

@@ -7,8 +7,8 @@ class ScanDataBox extends React.Component {
         id="scanData"
       >
         {
-          this.props.protName != null &&
-          <p>{this.props.protName}</p>
+          this.props.proteins != null && this.props.proteins.length > 0 &&
+          <p>{this.props.proteins.map(i => i.proteinName).join(" / ")}</p>
         }
         {
           this.props.chargeState != null &&
@@ -29,14 +29,14 @@ class ScanDataBox extends React.Component {
 
 ScanDataBox.propTypes = {
   chargeState: React.PropTypes.number,
-  protName: React.PropTypes.string,
+  proteins: React.PropTypes.array,
   scanNumber: React.PropTypes.number,
   fileName: React.PropTypes.string,
 }
 
 ScanDataBox.defaultProps = {
   chargeState: null,
-  protName: null,
+  proteins: [],
   scanNumber: null,
   fileName: null,
 }

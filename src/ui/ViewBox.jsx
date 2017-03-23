@@ -5,7 +5,6 @@ import { Button } from 'react-bootstrap'
 import fs from 'fs'
 import path from 'path'
 
-import update from 'react-addons-update'
 const remote = require('electron').remote
 const { dialog } = require('electron').remote
 
@@ -37,14 +36,21 @@ class ViewBox extends React.Component {
     super(props)
     this.state = {
       /* Selected PTM / Scan / Peptide / Protein */
-      selectedProtein: null,
+      selectedProteins: [],
       selectedPeptide: null,
       selectedScan: null,
-      selectedPTMPlacement: null,
+      selectedPTM: null,
+
+      proteins: [],
+      peptide: null,
+      scan: null,
+      ptm: null,
+      scanData: [],
+      precursorData: [],
+      quantData: [],
 
       /* Peak labeling states */
-      selectedMz: null,
-      currentLabel: null,
+      selectedPeak: null,
       fragmentMatches: [],
       maxPPM: 100,  /* Max window for fragments that can be candidates */
       bIons: [],
@@ -62,9 +68,7 @@ class ViewBox extends React.Component {
       nodeTree: null,
 
       /* Validation data */
-      pycamverterVersion: null,
-      scanData: [],
-      peptideData: [],
+      db: null,
       basename: null,
     }
   }
@@ -116,9 +120,9 @@ class ViewBox extends React.Component {
   }
 
 
-  updateSelectedProtein(proteinId) {
+  updateselectedProteins(proteinIds) {
     this.setState({
-      selectedProtein: proteinId,
+      selectedProteins: proteinIds,
     })
   }
 
@@ -134,22 +138,86 @@ class ViewBox extends React.Component {
     })
   }
 
-  updateSelectedPTMPlacement(modsId) {
+  updateselectedPTM(modsId) {
     this.setState({
-      selectedPTMPlacement: modsId,
+      selectedPTM: modsId,
     })
+  }
+
+  blob_to_peaks(blob) {
+    return new TextDecoder("utf-8").decode(blob).split(";").map(
+      function(i) {
+        let [mz, intensity] = i.split(',')
+        mz = parseFloat(mz)
+        intensity = parseFloat(intensity)
+        return {mz: mz, into: intensity}
+      }
+    )
+  }
+
+  updateScanData() {
+    if (this.state.selectedScan == null) { return }
+
+    this.state.db.get(
+      "SELECT (data_blob) " +
+      "FROM scan_data " +
+      "WHERE scan_data.scan_id=? AND scan_data.data_type=?"
+      ,
+      [
+        this.state.selectedScan,
+        "ms2",
+      ],
+      function(err, row) {
+        if (err != null) { console.error(err) }
+
+        let data = this.blob_to_peaks(row.data_blob)
+
+        if (this.state.selectedPTM == null) {
+          this.setState({
+            scanData: data,
+          })
+          return
+        }
+
+        let matches = this.state.db.all(
+          "SELECT fragment_id, peak_id, name, mz \
+          FROM fragments inner JOIN best_fragments \
+          ON (fragments.peak_id=best_fragment.peak_id AND \
+          fragments.fragment_id=best_fragment.fragment_id) \
+          WHERE best_fragment.ptm_id=?",
+          [
+            this.state.selectedPTM,
+          ],
+          function(err, rows) {
+            if (err != null) { console.error(err) }
+
+            rows.forEach(function (row) {
+              data[row.peak_id].fragId = i.fragment_id
+              data[row.peak_id].name = i.name
+              data[row.peak_id].exp_mz = i.mz
+            })
+
+            this.setState({
+              scanData: data,
+            })
+          }
+        )
+
+      }.bind(this)
+    )
   }
 
   updateAll(nodes) {
     while (nodes.length < 4) { nodes.push(null) }
 
     this.setState({
-      selectedProtein: nodes[0],
+      selectedProteins: nodes[0],
       selectedPeptide: nodes[1],
       selectedScan: nodes[2],
-      selectedPTMPlacement: nodes[3],
+      selectedPTM: nodes[3],
     })
 
+    this.updateScanData()
 
     if ((nodes[2] != null) || nodes.every(i => i != null)) {
       this.redrawCharts()
@@ -162,71 +230,60 @@ class ViewBox extends React.Component {
     this.refs["quantSpectrum"].drawChart()
   }
 
-  getScanData() {
-    return (
-      this.state.selectedProtein != null &&
-      this.state.selectedPeptide != null &&
-      this.state.selectedScan != null
-    ) ? (
-      this.state.scanData[this.state.selectedProtein]
-        .peptides[this.state.selectedPeptide]
-        .scans[this.state.selectedScan]
-        .scanData
-    ) : null
-  }
-
-  updateSelectedMz(mz) {
-    if (this.state.selectedPTMPlacement == null) {
+  updateselectedPeakMz(mz) {
+    if (
+      this.state.selectedPTM == null ||
+      this.state.scanData == null
+    ) {
       return
     }
 
-    let data = this.getScanData()
-
-    // TODO More specific SQL query?
-    let matchId = data.find(
+    let peak = this.state.scanData.find(
       peak => peak.mz === mz
-    ).matchInfo[this.state.selectedPTMPlacement].matchId
+    )
 
-    this.updateSelectedMatchId(matchId, mz)
+    this.updateSelectedPeak(peak)
   }
 
-  updateSelectedMatchId(matchId, mz) {
-    if (this.state.selectedPTMPlacement == null) {
+  updateSelectedPeak(peak) {
+    if (this.state.selectedPTM == null) {
       return
     }
-
-    let [ptm] = this.getNodeData().slice(3)
-
-    let currentLabel = (
-      matchId !== null ?
-      ptm.matchData[matchId].name : ''
-    )
-
-    if (mz == null) {
-      mz = ptm.matchData[matchId].mz
-    }
-
-    let matches = ptm.matchData.filter(
-      (item) => {
-        item.ppm = 1e6 * Math.abs(item.mz - mz) / mz
-        return item.ppm < this.state.maxPPM
-      }
-    )
 
     this.setState({
-      selectedMz: mz,
+      selectedPeak: peak,
       modalFragmentSelectionOpen: true,
       fragmentMatches: matches,
-      currentLabel: currentLabel,
     })
+
+    this.state.db.all(
+      "SELECT (mz, name)" +
+      "FROM fragments" +
+      "WHERE ptm_id=? AND peak_id=?",
+      [
+        this.state.selectedPTM,
+        peak.peak_id,
+      ],
+      function (err, rows) {
+        let matches = rows.filter(
+          (item) => {
+            item.ppm = 1e6 * Math.abs(item.mz - peak.mz) / peak.mz
+            return item.ppm < this.state.maxPPM
+          }
+        )
+
+        this.setState({
+          fragmentMatches: matches,
+        })
+      }
+    )
   }
 
   closeFragmentSelectionModal() {
     this.setState({
       modalFragmentSelectionOpen: false,
       fragmentMatches: [],
-      selectedMz: null,
-      currentLabel: '',
+      selectedPeak: null,
     })
   }
 
@@ -251,55 +308,36 @@ class ViewBox extends React.Component {
     })
   }
 
-  updateSelectedFragment(matchId) {
+  updateSelectedFragment(peak, fragId) {
     if (
-      this.state.selectedProtein == null ||
+      this.state.selectedProteins == null ||
       this.state.selectedPeptide == null ||
-      this.state.selectedScan == null ||
-      this.state.selectedMz == null
+      this.state.selectedScan == null
     ) {
         return
     }
 
-    let peak_targets = {}
-
-    let [scan, ptm] = this.getNodeData().slice(2)
-    let scanData = scan.scanData
-
-    scanData.forEach(
-      function(peak, index) {
-        if (peak.mz === this.state.selectedMz) {
-          let match_id_target = {matchId: {$set: matchId}}
-
-          let ptm_target = {}
-          ptm_target[this.state.selectedPTMPlacement] = match_id_target
-
-          let match_info_target = {matchInfo: ptm_target}
-          peak_targets[index] = match_info_target
-          peak.matchInfo[this.state.selectedPTMPlacement].matchId = matchId
-
-          this.setState({
-            currentLabel: ptm.matchData[matchId].name,
-          })
-        }
-      }.bind(this)
+    this.state.db.run(
+      "UPDATE best_fragment" +
+      "SET fragment_id=?" +
+      "WHERE peak_id=? AND ptm_id=?",
+      [
+        fragId,
+        peak.peak_id,
+        this.state.selectedPTM,
+      ],
+    )
+    this.state.db.run(
+      "INSERT INTO best_fragment (fragment_id, peak_id, ptm_id)" +
+      "VALUES (?, ?, ?)",
+      [
+        fragId,
+        peak.peak_id,
+        this.state.selectedPTM,
+      ],
     )
 
-    let scan_data_target = {scanData: peak_targets}
-    let scan_target = {}
-    scan_target[this.state.selectedScan] = scan_data_target
-
-    let scans_target = {scans: scan_target}
-    let peptide_target = {}
-    peptide_target[this.state.selectedPeptide] = scans_target
-
-    let peptides_target = {peptides: peptide_target}
-    let protein_target = {}
-    protein_target[this.state.selectedProtein] = peptides_target
-
-    this.setState({
-      scanData: update(this.state.scanData, protein_target),
-    })
+    this.updateScanData()
   }
 
   closeImportModal() {
@@ -453,34 +491,23 @@ class ViewBox extends React.Component {
 
   setChoice(choice) {
     if (
-      this.state.selectedProtein != null &&
-      this.state.selectedPeptide != null &&
       this.state.selectedScan != null &&
-      this.state.selectedPTMPlacement != null
+      this.state.selectedPTM != null
     ) {
-      /* Messy solution because javascript doesn't allow variables as dict keys */
-      let state_target = {state: {$set: choice}}
-      let ptm_target = {}
-      ptm_target[this.state.selectedPTMPlacement] = state_target
-
-      let choice_target = {choiceData: ptm_target}
-      let scan_target = {}
-      scan_target[this.state.selectedScan] = choice_target
-
-      let scans_target = {scans: scan_target}
-      let peptide_target = {}
-      peptide_target[this.state.selectedPeptide] = scans_target
-
-      let peptides_target = {peptides: peptide_target}
-      let protein_target = {}
-      protein_target[this.state.selectedProtein] = peptides_target
-
-      /* However, doing it this way keeps from cloning data, saving a lot of time
-         on large files.
-       */
-      this.setState({
-        scanData: update(this.state.scanData, protein_target)
-      })
+      this.state.db.run(
+        "UPDATE scan_ptms" +
+        "SET choice=?" +
+        "WHERE scan_id=? AND ptm_id=?",
+        [
+          choice,
+          this.state.selectedScan,
+          this.state.selectedPTM
+        ],
+        function (err) {
+          if (err != null) { console.error(err) }
+          this.buildNodeTree(this.state.db)
+        },
+      )
     }
   }
 
@@ -491,15 +518,13 @@ class ViewBox extends React.Component {
   }
 
   runImport(data, fileName) {
-    // TODO Connection
     this.setState({
-      pycamverterVersion: data.pycamverterVersion,
-      scanData: data.scanData,
-      peptideData: data.peptideData,
+      db: data,
       loaded: true,
       modalImportOpen: false,
-      nodeTree: this.buildNodeTree(data.scanData, data.peptideData),
     })
+
+    this.buildNodeTree(data)
 
     if (fileName != null && fileName.length > 0) {
       this.setState({
@@ -543,57 +568,112 @@ class ViewBox extends React.Component {
     )
   }
 
-  buildNodeTree(scanData, peptideData) {
-    let proteins = []
-
-    for (let prot of scanData) {
-      let peptides = []
-
-      for (let peptide of prot.peptides) {
+  buildNodeTree(db) {
+    db.all(
+      "SELECT \
+      proteins.protein_id, proteins.protein_name, \
+      peptides.peptide_id, peptides.peptide_seq, \
+      mod_states.mod_state_id, mod_states.mod_desc, \
+      scan_info.scan_id, scan_info.scan_num, \
+      ptms.ptm_id, ptms.name, \
+      scan_ptms.choice \
+      \
+      FROM \
+      proteins inner join protein_peptide \
+      ON proteins.protein_id=protein_peptide.protein_id \
+      join peptides \
+      ON protein_peptide.peptide_id=peptides.peptide_id \
+      join mod_states \
+      ON mod_states.peptide_id=peptides.peptide_id \
+      join ptms \
+      on ptms.mod_state_id=mod_states.mod_state_id \
+      join scan_ptms \
+      on scan_ptms.ptm_id=ptms.ptm_id \
+      inner join scan_info \
+      on scan_ptms.scan_id=scan_info.scan_id \
+      ORDER BY proteins.protein_name, peptides.peptide_seq, mod_states.mod_desc, scan_info.scan_num, ptms.name",
+      // TODO Fix ordering
+      function (err, rows) {
+        if (err != null) { console.error(err) }
+        let proteins = []
+        let peptides = []
         let scans = []
-        let modDesc = peptideData[peptide.peptideDataId]
-          .modificationStates[peptide.modificationStateId]
-          .modDesc
-        let pepSeq = peptideData[peptide.peptideDataId]
-          .peptideSequence
+        let ptms = []
+        let last_row = null
 
-        for (let scan of peptide.scans) {
-          let ptmList = []
-          let ptmPlacements = peptideData[peptide.peptideDataId]
-            .modificationStates[peptide.modificationStateId]
-            .mods
+        for (let row of rows) {
+          last_row = row
+          break
+        }
 
-          for (let [index, ptm] of ptmPlacements.entries()) {
-            ptmList.push({
-              name: ptm.name,
-              nodeId: ptm.exactModsId || ptm.id,
-              choice: scan.choiceData[index].state,
+        let prot_name = last_row.protein_name
+        let prot_ids = [last_row.protein_id]
+
+        for (let row of rows) {
+          if (last_row != null && row.protein_id != last_row.protein_id) {
+            if (row.peptide_id != last_row.peptide_id) {
+              proteins.push({
+                name: prot_name,
+                nodeId: last_row.peptide_id,
+                overrideKey: prot_ids,
+                children: peptides,
+              })
+              peptides = []
+              prot_name = row.protein_name
+              prot_ids = [row.protein_id]
+            } else {
+              prot_name = (
+                prot_name +
+                (prot_name.length > 0 ? " / " : "") +
+                last_row.protein_name
+              )
+              prot_ids = prot_ids + [last_row.protein_id]
+            }
+          }
+
+          if (last_row != null && row.peptide_id != last_row.peptide_id && row.mod_state_id != last_row.mod_state_id) {
+            peptides.push({
+              name: last_row.peptide_seq + " " + last_row.mod_desc,
+              nodeId: last_row.peptide_id,
+              overrideKey: [last_row.peptide_id, last_row.mod_state_id],
+              children: scans,
+            })
+            scans = []
+          }
+
+          if (last_row != null && row.scan_num != last_row.scan_num) {
+            scans.push({
+              name: "Scan " + last_row.scan_num,
+              nodeId: last_row.scan_id,
+              children: ptms,
+            })
+            ptms = []
+          }
+
+          if (last_row != null && row.ptm_id != last_row.ptm_id) {
+            ptms.push({
+              name: last_row.name,
+              nodeId: last_row.ptm_id,
+              choice: last_row.choice,
             })
           }
 
-          scans.push({
-            name: "Scan: " + scan.scanNumber,
-            nodeId: scan.scanId,
-            children: ptmList,
-          })
+          last_row = row
         }
 
-        peptides.push({
-          name: pepSeq + modDesc,
-          nodeId: peptide.peptideId,
-          overrideKey: [peptide.peptideId, peptide.modificationStateId],
-          children: scans,
+        console.log(peptides)
+        proteins.push({
+          name: prot_name,
+          nodeId: last_row.peptide_id,
+          overrideKey: prot_ids,
+          children: peptides,
         })
-      }
 
-      proteins.push({
-        name: prot.proteinName,
-        nodeId: prot.proteinId,
-        children: peptides,
-      })
-    }
-
-    return proteins
+        this.setState({
+          nodeTree: proteins,
+        })
+      }.bind(this)
+    )
   }
 
   getNodeTree() {
@@ -609,35 +689,109 @@ class ViewBox extends React.Component {
       this.state.selectedProtein,
       this.state.selectedPeptide,
       this.state.selectedScan,
-      this.state.selectedPTMPlacement,
+      this.state.selectedPTM,
     ]
   }
 
-  getNodeData() {
-    let protein = (
-      this.state.selectedProtein != null ?
-      this.state.scanData[this.state.selectedProtein] : null
+  updateNodeData() {
+    this.state.db.get(
+      "SELECT \
+      proteins.protein_id, proteins.protein_name \
+      \
+      FROM proteins \
+      WHERE proteins.protein_id IN ? \
+      ORDER BY proteins.protein_name",
+      [
+        this.state.selectedProteins,
+      ],
+      function(err, rows) {
+        if (err != null) { console.error(err) }
+        this.setState({
+          proteins: rows,
+        })
+      }.bind(this)
     )
-    let peptide = (
-      (protein != null && this.state.selectedPeptide != null) ?
-      protein.peptides[this.state.selectedPeptide] : null
+    this.state.db.get(
+      "SELECT peptides.peptide_id, peptides.peptide_seq \
+      FROM peptides \
+      WHERE peptides.peptide_id=?",
+      [
+        this.state.selectedPeptide,
+      ],
+      function(err, row) {
+        if (err != null) { console.error(err) }
+        this.setState({
+          peptide: row,
+        })
+      }
     )
-    let scan = (
-      (peptide != null && this.state.selectedScan != null) ?
-      peptide.scans[this.state.selectedScan] : null
+    this.state.db.get(
+      "SELECT * \
+      FROM scan_info \
+      WHERE scan_info.scan_id=?",
+      [
+        this.state.selectedScan,
+      ],
+      function(err, row) {
+        if (err != null) { console.error(err) }
+        this.setState({
+          scan: row,
+        })
+      }
     )
-    let ptm = (
-      (peptide != null && this.state.selectedPTMPlacement != null) ?
-      this.state.peptideData[peptide.peptideDataId]
-        .modificationStates[peptide.modificationStateId]
-        .mods[this.state.selectedPTMPlacement] : null
+    this.state.db.get(
+      "SELECT data_blob \
+      FROM scan_data \
+      WHERE scan_data.data_type=? AND scan_data.scan_id=?",
+      [
+        "precursor",
+        this.state.selectedScan,
+      ],
+      function(err, row) {
+        if (err != null) { console.error(err) }
+        this.setState({
+          precursorData: this.blob_to_peaks(row.data_blob),
+        })
+      }.bind(this)
     )
-
-    return [protein, peptide, scan, ptm]
+    this.state.db.get(
+      "SELECT data_blob \
+      FROM scan_data \
+      WHERE scan_data.data_type=? AND scan_data.scan_id=?",
+      [
+        "quant",
+        this.state.selectedScan,
+      ],
+      function(err, row) {
+        if (err != null) { console.error(err) }
+        this.setState({
+          quantData: this.blob_to_peaks(row.data_blob),
+        })
+      }.bind(this)
+    )
+    this.state.db.get(
+      "SELECT * \
+      FROM ptms \
+      WHERE ptm.ptm_id=?",
+      [
+        this.state.selectedPTM,
+      ],
+      function(err, row) {
+        if (err != null) { console.error(err) }
+        this.setState({
+          ptm: row,
+        })
+      }
+    )
   }
 
   render() {
-    let [protein, peptide, scan, ptm] = this.getNodeData()
+    let [proteins, peptide, scan, ptm] = [
+      this.state.proteins,
+      this.state.peptide,
+      this.state.scan,
+      this.state.ptm,
+    ]
 
     return (
       <div
@@ -666,9 +820,8 @@ class ViewBox extends React.Component {
         <ModalFragmentBox
           ref="modalFragmentBox"
           showModal={this.state.modalFragmentSelectionOpen}
-          mz={this.state.selectedMz}
+          peak={this.state.selectedPeak}
           fragmentMatches={this.state.fragmentMatches}
-          currentLabel={this.state.currentLabel}
           updateCallback={this.updateSelectedFragment.bind(this)}
           closeCallback={this.closeFragmentSelectionModal.bind(this)}
         />
@@ -708,7 +861,7 @@ class ViewBox extends React.Component {
                 id="scanDataContainer"
               >
                 <ScanDataBox
-                  protName={protein.proteinName}
+                  protName={proteins}
                   chargeState={scan.chargeState}
                   scanNumber={scan.scanNumber}
                   fileName={scan.fileName}
@@ -745,7 +898,7 @@ class ViewBox extends React.Component {
               >
                 <PrecursorSpectrumBox
                   ref="precursorSpectrum"
-                  spectrumData={scan != null ? scan.precursorScanData : []}
+                  spectrumData={this.state.precursorData}
                   precursorMz={scan != null ? scan.precursorMz : null}
                   isolationWindow={scan != null ? scan.precursorIsolationWindow : null}
                   c13Num={scan != null ? scan.c13Num : 0}
@@ -762,7 +915,7 @@ class ViewBox extends React.Component {
               >
                 <QuantSpectrumBox
                   ref="quantSpectrum"
-                  spectrumData={scan != null ? scan.quantScanData : []}
+                  spectrumData={this.state.quantData}
                   quantMz={scan != null ? scan.quantMz : null}
                   ppm={50}
                 />
@@ -799,16 +952,16 @@ class ViewBox extends React.Component {
             >
               <SpectrumBox
                 ref="fragmentSpectrum"
-                spectrumData={scan != null ? scan.scanData : []}
+                spectrumData={this.state.scanData}
                 matchData={ptm != null ? ptm.matchData : []}
                 collisionType={scan != null ? scan.collisionType : null}
                 inputDisabled={ptm == null}
 
                 selectedScan={this.state.selectedScan}
-                selectedPTMPlacement={this.state.selectedPTMPlacement}
+                selectedPTM={this.state.selectedPTM}
 
                 updateChoice={this.setChoice.bind(this)}
-                pointChosenCallback={this.updateSelectedMz.bind(this)}
+                pointChosenCallback={this.updateselectedPeakMz.bind(this)}
               />
             </div>
           </div>

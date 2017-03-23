@@ -5,25 +5,23 @@ class ModalFragmentBox extends React.Component {
   constructor(props) {
     super(props)
     this.state = {
-      mz: null,
+      peak: null,
       fragmentMatches: [],
-      currentLabel: '',
     }
   }
 
   componentWillReceiveProps(nextProps) {
     this.setState({
-      mz: nextProps.mz,
+      peak: nextProps.peak,
       fragmentMatches: nextProps.fragmentMatches,
-      currentLabel: nextProps.currentLabel
     })
   }
 
   update() {
-    var matchId = $( "#fragmentSelect" ).val()
+    let fragId = $( "#fragmentSelect" ).val()
 
     if (this.props.updateCallback != null) {
-      this.props.updateCallback(matchId)
+      this.props.updateCallback(peak, fragId)
     }
 
     this.close()
@@ -45,11 +43,11 @@ class ModalFragmentBox extends React.Component {
           <Modal.Title>
             <div>
               Observed m/z:&nbsp;
-              { this.state.mz != null ? this.state.mz.toFixed(5) : null }
+              { this.props.peak != null ? this.props.peak.mz.toFixed(5) : null }
             </div>
             <div>
               Current Label:&nbsp;
-              {this.state.currentLabel}
+              {this.props.peak != null ? this.props.peak.name : null}
             </div>
           </Modal.Title>
         </Modal.Header>
@@ -62,7 +60,7 @@ class ModalFragmentBox extends React.Component {
                   return (
                     <option
                       key={i}
-                      value={object.ionId || object.id}
+                      value={object.frag_id || object.ionId || object.id}
                     >
                       {
                         object.name +

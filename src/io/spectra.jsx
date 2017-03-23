@@ -41,7 +41,7 @@ exports.spectraToImage = async function(vb, dirName, export_spectras) {
     scan_list.props.selectedProtein,
     scan_list.props.selectedPeptide,
     scan_list.props.selectedScan,
-    scan_list.props.selectedPTMPlacement
+    scan_list.props.selectedPTM
   ];
 
   /* Dummy call to force interface to redraw */
