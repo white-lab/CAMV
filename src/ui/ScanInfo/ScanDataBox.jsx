@@ -16,7 +16,13 @@ class ScanDataBox extends React.Component {
         }
         {
           this.props.scanNumber != null &&
-          <p>Scan: {this.props.scanNumber}</p>
+          <p>
+            Scan: {this.props.scanNumber}
+            {
+              this.props.searchScore != null &&
+              " - Score: " + this.props.searchScore
+            }
+          </p>
         }
         {
           this.props.fileName != null &&
@@ -29,12 +35,14 @@ class ScanDataBox extends React.Component {
 
 ScanDataBox.propTypes = {
   chargeState: React.PropTypes.number,
+  searchScore: React.PropTypes.number,
   proteins: React.PropTypes.array,
   scanNumber: React.PropTypes.number,
   fileName: React.PropTypes.string,
 }
 
 ScanDataBox.defaultProps = {
+  searchScore: null,
   chargeState: null,
   proteins: [],
   scanNumber: null,

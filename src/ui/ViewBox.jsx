@@ -396,7 +396,7 @@ class ViewBox extends React.Component {
       export_spectras.push(false)
     }
 
-    for (let proteins of this.state.nodeTree) {
+    for (let protein of this.state.nodeTree) {
       for (let peptide of protein.children) {
         for (let scan of peptide.children) {
           for (let ptm of scan.children) {
@@ -415,7 +415,7 @@ class ViewBox extends React.Component {
               protein.nodeId,
               peptide.nodeId,
               scan.nodeId,
-              match.nodeId,
+              ptm.nodeId,
             ]
 
             yield [
@@ -601,14 +601,22 @@ class ViewBox extends React.Component {
           break
         }
 
-        for (let row of rows) {
-          if (row.protein_id != last_row.protein_id) {
-            proteins.push({
-              name: last_row.protein_name,
-              nodeId: last_row.protein_id,
-              children: peptides,
+        for (let row of rows.concat({})) {
+          if (row.ptm_id != last_row.ptm_id) {
+            ptms.push({
+              name: last_row.name,
+              nodeId: last_row.ptm_id,
+              choice: last_row.choice,
             })
-            peptides = []
+          }
+
+          if (row.scan_num != last_row.scan_num) {
+            scans.push({
+              name: "Scan " + last_row.scan_num,
+              nodeId: last_row.scan_id,
+              children: ptms,
+            })
+            ptms = []
           }
 
           if (
@@ -624,31 +632,17 @@ class ViewBox extends React.Component {
             scans = []
           }
 
-          if (row.scan_num != last_row.scan_num) {
-            scans.push({
-              name: "Scan " + last_row.scan_num,
-              nodeId: last_row.scan_id,
-              children: ptms,
+          if (row.protein_id != last_row.protein_id) {
+            proteins.push({
+              name: last_row.protein_name,
+              nodeId: last_row.protein_id,
+              children: peptides,
             })
-            ptms = []
-          }
-
-          if (row.ptm_id != last_row.ptm_id) {
-            ptms.push({
-              name: last_row.name,
-              nodeId: last_row.ptm_id,
-              choice: last_row.choice,
-            })
+            peptides = []
           }
 
           last_row = row
         }
-
-        proteins.push({
-          name: last_row.protein_name,
-          nodeId: last_row.protein_id,
-          children: peptides,
-        })
 
         this.setState({
           nodeTree: proteins,
@@ -713,10 +707,13 @@ class ViewBox extends React.Component {
       scans.isolation_window_lower, \
       scans.isolation_window_upper, \
       scans.quant_mz_id, \
-      scans.c13_num as c13Num, \
+      scans.c13_num AS c13Num, \
+      scan_ptms.mascot_score AS searchScore, \
       files.filename AS fileName \
       FROM scans INNER JOIN files \
       ON scans.file_id=files.file_id \
+      INNER JOIN scan_ptms \
+      ON scan_ptms.scan_id=scans.scan_id \
       WHERE scans.scan_id=?",
       [
         this.state.selectedScan,
@@ -878,6 +875,7 @@ class ViewBox extends React.Component {
                 <ScanDataBox
                   protName={proteins}
                   chargeState={scan.chargeState}
+                  searchScore={scan.searchScore}
                   scanNumber={scan.scanNumber}
                   fileName={scan.fileName}
                 />

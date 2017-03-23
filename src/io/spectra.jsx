@@ -45,7 +45,7 @@ exports.spectraToImage = async function(vb, dirName, export_spectras) {
   ]
 
   /* Dummy call to force interface to redraw */
-  vb.refs["scanSelectionList"].update(...[null, null, null, null])
+  vb.refs["scanSelectionList"].update([null, null, null, null])
 
   await domtoimage.toPng(
     document.getElementById('viewBox'),
@@ -58,7 +58,7 @@ exports.spectraToImage = async function(vb, dirName, export_spectras) {
     let [nodes, prot, pep, scan, score, state] = vals
     let out_name = prot + " - " + pep + " - " + scan
 
-    vb.refs["scanSelectionList"].update(...nodes)
+    await vb.refs["scanSelectionList"].update(nodes)
 
     // let dataUrl = await domtoimage.toSvg(
     let dataUrl = await domtoimage.toPng(
@@ -94,7 +94,7 @@ exports.spectraToImage = async function(vb, dirName, export_spectras) {
         win.setSize(sizes.width, sizes.height)
       }
 
-      vb.refs["scanSelectionList"].update(...current_node)
+      vb.refs["scanSelectionList"].update(current_node)
       spectrum.setState({exporting: false})
     }.bind(vb)
   )
