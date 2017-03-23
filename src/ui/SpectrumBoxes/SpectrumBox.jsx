@@ -123,51 +123,44 @@ class SpectrumBox extends React.Component {
             style = 'point {size: 3; fill-color: red; visible: false}'
           }
 
-          let matchInfo = peak.matchInfo[this.props.selectedPTM]
+          if (peak.name != null) {
+            let isotope = (
+              peak.name != null &&
+              peak.name.includes("¹³C")
+            )
+            let by_ion = (
+              peak.name != null &&
+              peak.name.match(/^[abcxyz][^-]*$/) != null
+            )
+            ppm = 1e6 * Math.abs(peak.exp_mz - mz) / mz
+            name = (
+              (
+                !isotope && ((into >= max_y / 10) || by_ion)
+              ) ? peak.name : null
+            )
 
-          if (matchInfo != null) {
-            let matchId = matchInfo.matchId
+            let ppm_cutoff = 10
 
-            if (matchId != null) {
-              let match = this.props.matchData[matchId]
-              let isotope = (
-                match.name != null &&
-                match.name.includes("¹³C")
-              )
-              let by_ion = (
-                match.name != null &&
-                match.name.match(/^[abcxyz][^-]*$/) != null
-              )
-              ppm = 1e6 * Math.abs(match.mz - mz) / mz
-              name = (
-                (
-                  !isotope && ((into >= max_y / 10) || by_ion)
-                ) ? match.name : null
-              )
-
-              let ppm_cutoff = 10
-
-              if (this.props.collisionType == "CID") {
-                ppm_cutoff = 1000
-              } else if (this.props.collisionType == "HCD") {
-                ppm_cutoff = 10
-              }
-
-              if (into == 0) {
-                // Plot intermediate line-plot points along x-axis
-                style = null
-              } else if (ppm < ppm_cutoff) {
-                if (isotope) {
-                  style = 'point {size: 3; fill-color: #F0AD4E; visible: true}'
-                } else {
-                  style = 'point {size: 3; fill-color: #5CB85C; visible: true}'
-                }
-              } else {
-                style = 'star {size: 3; fill-color: magenta; visible: true}'
-              }
-            } else if (into < max_y / 10) {
-              style = null
+            if (this.props.collisionType == "CID") {
+              ppm_cutoff = 1000
+            } else if (this.props.collisionType == "HCD") {
+              ppm_cutoff = 10
             }
+
+            if (into == 0) {
+              // Plot intermediate line-plot points along x-axis
+              style = null
+            } else if (ppm < ppm_cutoff) {
+              if (isotope) {
+                style = 'point {size: 3; fill-color: #F0AD4E; visible: true}'
+              } else {
+                style = 'point {size: 3; fill-color: #5CB85C; visible: true}'
+              }
+            } else {
+              style = 'star {size: 3; fill-color: magenta; visible: true}'
+            }
+          } else if (into < max_y / 10) {
+            style = null
           }
 
           data.addRows([
@@ -294,7 +287,6 @@ class SpectrumBox extends React.Component {
 SpectrumBox.propTypes = {
   spectrumData: React.PropTypes.array,
   inputDisabled: React.PropTypes.bool,
-  matchData: React.PropTypes.array.isRequired,
   collisionType: React.PropTypes.string,
 
   selectedScan: React.PropTypes.number,
