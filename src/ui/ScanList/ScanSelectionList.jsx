@@ -76,32 +76,67 @@ class ScanSelectionList extends React.Component {
     return node
   }
 
+  getIndices(nodes) {
+    let indices = []
+
+    let node = this.props.tree
+    let children = node
+
+    for (let nodeId of nodes) {
+      let index = children.findIndex(child => child.nodeId == nodeId)
+      node = children[index]
+      children = node.children
+      indices.push(index)
+    }
+
+    return indices
+  }
+
+  getNode(indices) {
+    let nodes = []
+
+    let node = this.props.tree
+    let children = node
+
+    for (let index of indices) {
+      node = children[index]
+      children = node.children
+      nodes.push(node.nodeId)
+    }
+
+    return nodes
+  }
+
   handleHotkey(e) {
     let node = this.props.selectedNode
     node = node.filter((i) => { return i != null })
 
-    if (node.length < 1) {
-      node = [0]
+    let indices = this.getIndices(node)
+
+    if (indices.length < 1) {
+      indices = [0]
     }
 
     switch (e.key) {
       case 'ArrowLeft':
-        node = this.selectLeft(node)
+        indices = this.selectLeft(indices)
         break
       case 'ArrowRight':
-        node = this.selectRight(node)
+        indices = this.selectRight(indices)
         break
       case 'k':
       case 'ArrowUp':
-        node = this.selectUp(node)
+        indices = this.selectUp(indices)
         break
       case 'j':
       case 'ArrowDown':
-        node = this.selectDown(node)
+        indices = this.selectDown(indices)
         break
       default:
         return
     }
+
+    node = this.getNode(indices)
 
     while (node.length < 4) { node.push(null) }
 
