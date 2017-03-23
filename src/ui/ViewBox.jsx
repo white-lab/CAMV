@@ -35,7 +35,7 @@ class ViewBox extends React.Component {
     super(props)
     this.state = {
       /* Selected PTM / Scan / Peptide / Protein */
-      selectedProteins: [],
+      selectedProtein: null,
       selectedPeptide: null,
       selectedScan: null,
       selectedPTM: null,
@@ -47,6 +47,7 @@ class ViewBox extends React.Component {
       scanData: [],
       precursorData: [],
       quantData: [],
+      quantMz: [],
 
       /* Peak labeling states */
       selectedPeak: null,
@@ -64,7 +65,7 @@ class ViewBox extends React.Component {
 
       loaded: false,
       exporting: false,
-      nodeTree: null,
+      nodeTree: [],
 
       /* Validation data */
       db: null,
@@ -108,6 +109,56 @@ class ViewBox extends React.Component {
     }
   }
 
+  componentDidUpdate(prevProps, prevState) {
+    if (
+      prevState.selectedProtein != this.state.selectedProtein &&
+      this.state.selectedProtein
+    ) {
+      this.updateProtein()
+    }
+
+    if (
+      prevState.selectedPeptide != this.state.selectedPeptide &&
+      this.state.selectedPeptide
+    ) {
+      this.updatePeptide()
+    }
+
+    if (
+      prevState.selectedScan != this.state.selectedScan &&
+      this.state.selectedScan
+    ) {
+      this.updateScan()
+    }
+
+    if (
+      prevState.selectedPTM != this.state.selectedPTM &&
+      this.state.selectedPTM
+    ) {
+      this.updatePTM()
+    }
+
+    if (
+      (
+        prevState.selectedScan != this.state.selectedScan &&
+        this.state.selectedScan != null
+      ) || (
+        prevState.selectedPTM != this.state.selectedPTM &&
+        this.state.selectedPTM != null
+      )
+    ) {
+      this.updateScanData()
+      this.redrawCharts()
+    }
+
+    if (
+      prevState.db != this.state.db &&
+      this.state.db != null
+    ) {
+      this.buildNodeTree()
+    }
+  }
+
   anyModalOpen() {
     return [
       this.state.modalImportOpen,
@@ -116,31 +167,6 @@ class ViewBox extends React.Component {
       this.state.modalFragmentSelectionOpen,
       this.state.modalBYOpen,
     ].some(i => i != false)
-  }
-
-
-  updateselectedProteins(proteinIds) {
-    this.setState({
-      selectedProteins: proteinIds,
-    })
-  }
-
-  updateSelectedPeptide(peptideId) {
-    this.setState({
-      selectedPeptide: peptideId,
-    })
-  }
-
-  updateSelectedScan(scanId) {
-    this.setState({
-      selectedScan: scanId,
-    })
-  }
-
-  updateselectedPTM(modsId) {
-    this.setState({
-      selectedPTM: modsId,
-    })
   }
 
   blob_to_peaks(blob) {
@@ -180,7 +206,8 @@ class ViewBox extends React.Component {
 
         let matches = this.state.db.all(
           "SELECT fragments.fragment_id, fragments.peak_id, \
-          fragments.display_name, fragments.mz \
+          fragments.display_name, fragments.mz, \
+          fragments.ion_type, fragments.ion_pos \
           FROM fragments inner JOIN scan_ptms \
           ON fragments.scan_ptm_id=scan_ptms.scan_ptm_id \
           WHERE scan_ptms.scan_id=? AND scan_ptms.ptm_id=? AND fragments.best=1",
@@ -192,17 +219,18 @@ class ViewBox extends React.Component {
             if (err != null) { console.error(err) }
 
             rows.forEach(function (row) {
-              console.log(row)
-              console.log(data)
-              data[row.peak_id].fragId = row.fragment_id
-              data[row.peak_id].name = row.display_name
-              data[row.peak_id].exp_mz = row.mz
+              let peak = data[row.peak_id]
+              peak.fragId = row.fragment_id
+              peak.name = row.display_name
+              peak.exp_mz = row.mz
+              peak.ionType = row.ion_type
+              peak.ionPos = row.ion_pos
             })
 
             this.setState({
               scanData: data,
             })
-          }
+          }.bind(this),
         )
 
       }.bind(this)
@@ -213,17 +241,11 @@ class ViewBox extends React.Component {
     while (nodes.length < 4) { nodes.push(null) }
 
     this.setState({
-      selectedProteins: nodes[0],
+      selectedProtein: nodes[0],
       selectedPeptide: nodes[1],
       selectedScan: nodes[2],
       selectedPTM: nodes[3],
     })
-
-    this.updateScanData()
-
-    if ((nodes[2] != null) || nodes.every(i => i != null)) {
-      this.redrawCharts()
-    }
   }
 
   redrawCharts() {
@@ -279,7 +301,7 @@ class ViewBox extends React.Component {
         this.setState({
           fragmentMatches: matches,
         })
-      }
+      }.bind(this),
     )
   }
 
@@ -314,7 +336,7 @@ class ViewBox extends React.Component {
 
   updateSelectedFragment(peak, fragId) {
     if (
-      this.state.selectedProteins == null ||
+      this.state.selectedProtein == null ||
       this.state.selectedPeptide == null ||
       this.state.selectedScan == null
     ) {
@@ -492,6 +514,7 @@ class ViewBox extends React.Component {
       this.state.selectedScan != null &&
       this.state.selectedPTM != null
     ) {
+      console.log(this.state.selectedPTM, this.state.selectedScan, choice)
       this.state.db.run(
         "UPDATE scan_ptms \
         SET choice=? \
@@ -502,9 +525,10 @@ class ViewBox extends React.Component {
           this.state.selectedPTM
         ],
         function (err) {
+          console.log('done!')
           if (err != null) { console.error(err) }
-          this.buildNodeTree(this.state.db)
-        },
+          this.buildNodeTree()
+        }.bind(this),
       )
     }
   }
@@ -521,8 +545,6 @@ class ViewBox extends React.Component {
       loaded: true,
       modalImportOpen: false,
     })
-
-    this.buildNodeTree(data)
 
     if (fileName != null && fileName.length > 0) {
       this.setState({
@@ -541,8 +563,8 @@ class ViewBox extends React.Component {
     })
   }
 
-  buildNodeTree(db) {
-    db.all(
+  buildNodeTree() {
+    this.state.db.all(
       "SELECT \
       proteins.protein_id, proteins.protein_name, \
       peptides.peptide_id, peptides.peptide_seq, \
@@ -579,32 +601,20 @@ class ViewBox extends React.Component {
           break
         }
 
-        let prot_name = last_row.protein_name
-        let prot_ids = [last_row.protein_id]
-
         for (let row of rows) {
-          if (last_row != null && row.protein_id != last_row.protein_id) {
-            if (row.peptide_id != last_row.peptide_id) {
-              proteins.push({
-                name: prot_name,
-                nodeId: last_row.peptide_id,
-                overrideKey: prot_ids,
-                children: peptides,
-              })
-              peptides = []
-              prot_name = row.protein_name
-              prot_ids = [row.protein_id]
-            } else {
-              prot_name = (
-                prot_name +
-                (prot_name.length > 0 ? " / " : "") +
-                last_row.protein_name
-              )
-              prot_ids = prot_ids + [last_row.protein_id]
-            }
+          if (row.protein_id != last_row.protein_id) {
+            proteins.push({
+              name: last_row.protein_name,
+              nodeId: last_row.protein_id,
+              children: peptides,
+            })
+            peptides = []
           }
 
-          if (last_row != null && row.peptide_id != last_row.peptide_id && row.mod_state_id != last_row.mod_state_id) {
+          if (
+            row.peptide_id != last_row.peptide_id &&
+            row.mod_state_id != last_row.mod_state_id
+          ) {
             peptides.push({
               name: last_row.peptide_seq + " " + last_row.mod_desc,
               nodeId: last_row.peptide_id,
@@ -614,7 +624,7 @@ class ViewBox extends React.Component {
             scans = []
           }
 
-          if (last_row != null && row.scan_num != last_row.scan_num) {
+          if (row.scan_num != last_row.scan_num) {
             scans.push({
               name: "Scan " + last_row.scan_num,
               nodeId: last_row.scan_id,
@@ -623,7 +633,7 @@ class ViewBox extends React.Component {
             ptms = []
           }
 
-          if (last_row != null && row.ptm_id != last_row.ptm_id) {
+          if (row.ptm_id != last_row.ptm_id) {
             ptms.push({
               name: last_row.name,
               nodeId: last_row.ptm_id,
@@ -634,11 +644,9 @@ class ViewBox extends React.Component {
           last_row = row
         }
 
-        console.log(peptides)
         proteins.push({
-          name: prot_name,
-          nodeId: last_row.peptide_id,
-          overrideKey: prot_ids,
+          name: last_row.protein_name,
+          nodeId: last_row.protein_id,
           children: peptides,
         })
 
@@ -647,14 +655,6 @@ class ViewBox extends React.Component {
         })
       }.bind(this)
     )
-  }
-
-  getNodeTree() {
-    if (!this.state.loaded || this.state.nodeTree == null) {
-      return []
-    }
-
-    return this.state.nodeTree
   }
 
   getSelectedNode() {
@@ -666,24 +666,27 @@ class ViewBox extends React.Component {
     ]
   }
 
-  updateNodeData() {
-    this.state.db.get(
+  updateProtein() {
+    this.state.db.all(
       "SELECT \
       proteins.protein_id, proteins.protein_name \
       \
       FROM proteins \
-      WHERE proteins.protein_id IN ? \
+      WHERE proteins.protein_id=? \
       ORDER BY proteins.protein_name",
       [
-        this.state.selectedProteins,
+        this.state.selectedProtein,
       ],
       function(err, rows) {
         if (err != null) { console.error(err) }
         this.setState({
           proteins: rows,
         })
-      }.bind(this)
+      }.bind(this),
     )
+  }
+
+  updatePeptide() {
     this.state.db.get(
       "SELECT peptides.peptide_id, peptides.peptide_seq \
       FROM peptides \
@@ -696,11 +699,23 @@ class ViewBox extends React.Component {
         this.setState({
           peptide: row,
         })
-      }
+      }.bind(this),
     )
+  }
+
+  updateScan() {
     this.state.db.get(
-      "SELECT * \
-      FROM scans \
+      "SELECT \
+      scans.scan_num AS scanNumber, \
+      scans.charge AS chargeState, \
+      scans.collision_type AS collisionType, \
+      scans.precursor_mz AS precursorMz, \
+      scans.isolation_window AS precursorIsolationWindow \
+      scans.quant_mz_id, \
+      scans.c13_num as c13Num, \
+      files.filename AS fileName \
+      FROM scans INNER JOIN files \
+      ON scans.file_id=files.file_id \
       WHERE scans.scan_id=?",
       [
         this.state.selectedScan,
@@ -710,7 +725,26 @@ class ViewBox extends React.Component {
         this.setState({
           scan: row,
         })
-      }
+
+        this.state.db.all(
+          "SELECT \
+          quant_mz_peaks.mz, \
+          quant_mz_peaks.peak_name AS name \
+          FROM quant_mz_peaks \
+          WHERE quant_mz_id=? \
+          ORDER BY quant_mz_peaks.mz",
+          [
+            row.quant_mz_id,
+          ],
+          function(err, rows) {
+            if (err != null) { console.error(err) }
+
+            this.setState({
+              quantMz: rows,
+            })
+          }.bind(this)
+        )
+      }.bind(this),
     )
     this.state.db.get(
       "SELECT data_blob \
@@ -725,7 +759,7 @@ class ViewBox extends React.Component {
         this.setState({
           precursorData: this.blob_to_peaks(row.data_blob),
         })
-      }.bind(this)
+      }.bind(this),
     )
     this.state.db.get(
       "SELECT data_blob \
@@ -740,12 +774,15 @@ class ViewBox extends React.Component {
         this.setState({
           quantData: this.blob_to_peaks(row.data_blob),
         })
-      }.bind(this)
+      }.bind(this),
     )
+  }
+
+  updatePTM() {
     this.state.db.get(
       "SELECT * \
       FROM ptms \
-      WHERE ptm.ptm_id=?",
+      WHERE ptms.ptm_id=?",
       [
         this.state.selectedPTM,
       ],
@@ -754,7 +791,7 @@ class ViewBox extends React.Component {
         this.setState({
           ptm: row,
         })
-      }
+      }.bind(this),
     )
   }
 
@@ -813,7 +850,7 @@ class ViewBox extends React.Component {
         >
           <ScanSelectionList
             ref="scanSelectionList"
-            tree={this.getNodeTree()}
+            tree={this.state.nodeTree}
 
             updateAllCallback={this.updateAll.bind(this)}
 
@@ -829,7 +866,7 @@ class ViewBox extends React.Component {
             id="sequenceBox"
           >
             {
-              (scan != null && protein != null) &&
+              (scan != null && proteins != null) &&
               <div
                 id="scanDataContainer"
               >
@@ -848,8 +885,7 @@ class ViewBox extends React.Component {
               >
                 <SequenceBox
                   ptm={ptm}
-                  spectrumData={scan.spectrumData}
-                  matchData={ptm.matchData}
+                  spectrumData={this.state.scanData}
                   clickCallback={this.handleBYClick.bind(this)}
                 />
               </div>
@@ -889,7 +925,7 @@ class ViewBox extends React.Component {
                 <QuantSpectrumBox
                   ref="quantSpectrum"
                   spectrumData={this.state.quantData}
-                  quantMz={scan != null ? scan.quantMz : null}
+                  quantMz={this.state.quantMz}
                   ppm={50}
                 />
               </div>
@@ -918,7 +954,6 @@ class ViewBox extends React.Component {
               <SpectrumBox
                 ref="fragmentSpectrum"
                 spectrumData={this.state.scanData}
-                matchData={ptm != null ? ptm.matchData : []}
                 collisionType={scan != null ? scan.collisionType : null}
                 inputDisabled={ptm == null}
 
