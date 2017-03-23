@@ -53,8 +53,8 @@ class QuantSpectrumBox extends React.Component {
     data.addColumn({'type': 'string', 'role': 'annotation'})
 
     let quantMz = this.props.quantMz
-    let minMZ = Math.round(2 * Math.min.apply(null, quantMz)) / 2 - 1
-    let maxMZ = Math.round(2 * Math.max.apply(null, quantMz)) / 2 + 1
+    let minMZ = Math.round(2 * Math.min.apply(null, quantMz.map(i => i.mz))) / 2 - 1
+    let maxMZ = Math.round(2 * Math.max.apply(null, quantMz.map(i => i.mz))) / 2 + 1
     let ppm = this.props.ppm
 
     if (this.props.spectrumData.length > 0) {
@@ -77,11 +77,13 @@ class QuantSpectrumBox extends React.Component {
         let mz = peak.mz
         let into = peak.into
         let name = ''
-        let found = (indices.indexOf(index) != -1)
+        let quantIndex = indices.indexOf(index)
+        let found = (quantIndex != -1)
         let style = ''
 
         if (found) {
           style = 'point {size: 5; fill-color: #5CB85C; visible: true}'
+          name = quantMz[index].name
         } else {
           style = 'point {size: 5; fill-color: #5CB85C; visible: false}'
         }
