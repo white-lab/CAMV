@@ -7,7 +7,7 @@ import sqlite3 from 'sqlite3'
 
 
 exports.loadSQL = function(fileName, cb) {
-  let db = new sqlite3.Database(
+  let db = new sqlite3.cached.Database(
     fileName, sqlite3.OPEN_READWRITE,
     function(err) {
       if (err != null) {
