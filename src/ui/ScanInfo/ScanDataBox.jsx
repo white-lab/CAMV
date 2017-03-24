@@ -4,11 +4,11 @@ class ScanDataBox extends React.Component {
   render() {
     let filename = (
       this.props.scan != null ?
-      this.props.scan.filenName.replace(/^.*[\\\/]/, '') : ''
+      this.props.scan.fileName.replace(/^.*[\\\/]/, '') : ''
     )
     let prot = (
       this.props.proteins != null ?
-      this.props.proteinName : ''
+      this.props.proteins.proteinName : ''
     )
 
     if (filename.length > 100) {
@@ -61,7 +61,7 @@ class ScanDataBox extends React.Component {
 
 ScanDataBox.propTypes = {
   scan: React.PropTypes.object,
-  proteins: React.PropTypes.array,
+  proteins: React.PropTypes.object,
 }
 
 ScanDataBox.defaultProps = {

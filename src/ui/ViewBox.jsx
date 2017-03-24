@@ -4,6 +4,7 @@ import { Button } from 'react-bootstrap'
 
 import fs from 'fs'
 import path from 'path'
+import sqlite3 from 'sqlite3'
 
 const remote = require('electron').remote
 const { dialog } = require('electron').remote
@@ -88,6 +89,9 @@ class ViewBox extends React.Component {
           case 'f':
             this.setState({modalSearchOpen: !this.state.modalSearchOpen})
             break
+          case 'o':
+            this.setState({modalImportOpen: true})
+            break
         }
       } else {
         switch(e.key) {
@@ -153,7 +157,13 @@ class ViewBox extends React.Component {
           "ms2",
         ],
         function(err, row) {
-          if (err != null) { console.error(err); resolve() }
+          if (err != null && err.errno != sqlite3.INTERRUPT) {
+            console.error(err)
+            resolve()
+            return
+          }
+
+          if (row == null) { resolve(); return }
 
           let data = this.blob_to_peaks(row.data_blob)
 
@@ -181,10 +191,17 @@ class ViewBox extends React.Component {
               this.state.selectedPTM,
             ],
             function(err, rows) {
-              if (err != null) { console.error(err) }
+              if (err != null && err.errno != sqlite3.INTERRUPT) {
+                console.error(err)
+                return
+              }
+
+              if (rows == null) { return }
 
               rows.forEach(function (row) {
                 let peak = data[row.peak_id]
+                if (peak == null) { return }
+
                 peak.peak_id = row.peak_id
                 peak.fragId = row.fragment_id
                 peak.name = row.display_name
@@ -216,6 +233,8 @@ class ViewBox extends React.Component {
   updateAll(nodes) {
     while (nodes.length < 4) { nodes.push(null) }
 
+    this.state.db.interrupt()
+
     return new Promise(function(resolve) {
       this.setState(
         {
@@ -238,7 +257,7 @@ class ViewBox extends React.Component {
         promises.push(this.updatePeptide())
       }
       if (nodes[2] != null) {
-        promises.push(this.updateScan())
+        promises.push(this.updateScan(true))
       }
       if (nodes[3] != null) {
         promises.push(this.updatePTM())
@@ -292,7 +311,11 @@ class ViewBox extends React.Component {
         peak.peak_id,
       ],
       function (err, rows) {
-        if (err != null) { console.error(err) }
+        if (err != null && err.errno != sqlite3.INTERRUPT) {
+          console.error(err)
+          return
+        }
+
         if (rows == null) { return }
 
         let matches = rows.filter(
@@ -370,7 +393,11 @@ class ViewBox extends React.Component {
           fragId,
         ],
         function(err) {
-          if (err != null) { console.error(err) }
+          if (err != null && err.errno != sqlite3.INTERRUPT) {
+            console.error(err)
+            return
+          }
+
           this.updateScanData(false)
         }.bind(this)
       )
@@ -542,7 +569,11 @@ class ViewBox extends React.Component {
           this.state.selectedPTM
         ],
         function (err) {
-          if (err != null) { console.error(err) }
+          if (err != null && err.errno != sqlite3.INTERRUPT) {
+            console.error(err)
+            return
+          }
+
           this.buildNodeTree()
         }.bind(this),
       )
@@ -556,6 +587,7 @@ class ViewBox extends React.Component {
   }
 
   runImport(data, fileName) {
+    console.log(data)
     this.setState({
       db: data,
       loaded: true,
@@ -611,7 +643,10 @@ class ViewBox extends React.Component {
       mod_states.mod_desc, scans.scan_num, ptms.name",
       // TODO Fix ordering
       function (err, rows) {
-        if (err != null) { console.error(err) }
+        if (err != null && err.errno != sqlite3.INTERRUPT) {
+          console.error(err)
+          return
+        }
 
         let proteins = []
         let peptides = []
@@ -655,7 +690,7 @@ class ViewBox extends React.Component {
             scans = []
           }
 
-          if (row.protein_id != last_row.protein_id) {
+          if (row.protein_set_id != last_row.protein_set_id) {
             proteins.push({
               name: last_row.protein_set_name,
               nodeId: last_row.protein_set_id,
@@ -685,7 +720,7 @@ class ViewBox extends React.Component {
 
   updateProtein() {
     return new Promise(function(resolve) {
-      this.state.db.all(
+      this.state.db.get(
         "SELECT \
         protein_sets.protein_set_id, \
         protein_sets.protein_set_name AS proteinName, \
@@ -696,12 +731,16 @@ class ViewBox extends React.Component {
         [
           this.state.selectedProteins,
         ],
-        function(err, rows) {
-          if (err != null) { console.error(err) }
-          if (rows == null) { return }
+        function(err, row) {
+          if (err != null && err.errno != sqlite3.INTERRUPT) {
+            console.error(err)
+            return
+          }
+
+          if (row == null) { return }
           this.setState(
             {
-              proteins: rows,
+              proteins: row,
             },
             function() { resolve() },
           )
@@ -720,7 +759,11 @@ class ViewBox extends React.Component {
           this.state.selectedPeptide,
         ],
         function(err, row) {
-          if (err != null) { console.error(err) }
+          if (err != null && err.errno != sqlite3.INTERRUPT) {
+            console.error(err)
+            return
+          }
+
           if (row == null) { return }
           this.setState(
             {
@@ -733,7 +776,7 @@ class ViewBox extends React.Component {
     }.bind(this))
   }
 
-  updateScan() {
+  updateScan(redraw) {
     return new Promise(function(resolve) {
       this.state.db.serialize(function() {
         this.state.db.get(
@@ -757,7 +800,10 @@ class ViewBox extends React.Component {
             this.state.selectedScan,
           ],
           function(err, row) {
-            if (err != null) { console.error(err) }
+            if (err != null && err.errno != sqlite3.INTERRUPT) {
+              console.error(err)
+              return
+            }
 
             // Seems to happen in fast spectra selection
             if (row == null) { return }
@@ -781,7 +827,10 @@ class ViewBox extends React.Component {
                 row.quant_mz_id,
               ],
               function(err, rows) {
-                if (err != null) { console.error(err) }
+                if (err != null && err.errno != sqlite3.INTERRUPT) {
+                  console.error(err)
+                  return
+                }
 
                 this.setState({
                   quantMz: rows,
@@ -799,7 +848,11 @@ class ViewBox extends React.Component {
             this.state.selectedScan,
           ],
           function(err, row) {
-            if (err != null) { console.error(err) }
+            if (err != null && err.errno != sqlite3.INTERRUPT) {
+              console.error(err)
+              return
+            }
+
             if (row == null) { return }
             this.setState({
               precursorData: this.blob_to_peaks(row.data_blob),
@@ -815,7 +868,11 @@ class ViewBox extends React.Component {
             this.state.selectedScan,
           ],
           function(err, row) {
-            if (err != null) { console.error(err) }
+            if (err != null && err.errno != sqlite3.INTERRUPT) {
+              console.error(err)
+              return
+            }
+
             if (row == null) { return }
 
             this.setState(
@@ -823,8 +880,11 @@ class ViewBox extends React.Component {
                 quantData: this.blob_to_peaks(row.data_blob),
               },
               function() {
+                if (redraw) {
+                  this.redrawCharts()
+                }
                 resolve()
-              }
+              }.bind(this)
             )
           }.bind(this),
         )
@@ -842,7 +902,11 @@ class ViewBox extends React.Component {
           this.state.selectedPTM,
         ],
         function(err, row) {
-          if (err != null) { console.error(err) }
+          if (err != null && err.errno != sqlite3.INTERRUPT) {
+            console.error(err)
+            return
+          }
+
           if (row == null) { return }
           this.setState(
             {
@@ -992,7 +1056,6 @@ class ViewBox extends React.Component {
                   id="openImport"
                   onClick={this.openImport.bind(this)}
                   style={{display: this.state.exporting ? 'none' : null}}
-                  disabled={this.state.loaded}
                 >
                   Open
                 </Button>
