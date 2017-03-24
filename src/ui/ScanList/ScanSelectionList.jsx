@@ -49,7 +49,15 @@ class ScanSelectionList extends React.Component {
 
     while(node.length < 4) {
       node.push(0)
-      node[node.length - 1] = this.getMaxLength(node) - 1
+      let max = this.getMaxLength(node)
+
+      if (max <= 0) {
+        node.pop()
+        break
+      }
+
+      node[node.length - 1] = max - 1
+
     }
 
     return node
