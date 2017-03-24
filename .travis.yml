@@ -1,6 +1,15 @@
 language: node_js
 sudo: false
 
+
+addons:
+  apt:
+    sources:
+    - ubuntu-toolchain-r-test
+    - llvm-toolchain-precise-3.5
+    packages:
+     - clang-3.5
+
 matrix:
   include:
     - os: linux
