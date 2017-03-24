@@ -1,6 +1,12 @@
 # Change Log
 
-## 0.3.0 (2017-\*-\*)
+## 0.3.0 (2017-03-24)
+
+Features
+
+  - Major change to storage format, now CAMV uses an SQLite database and
+    fetches / updates data on the fly. +These changes are not backwards
+    compatible with old CAMV / pycamverter data+.
 
 Bugfixes
 
