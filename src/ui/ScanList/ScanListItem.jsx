@@ -103,7 +103,10 @@ class ScanListItem extends React.Component {
 }
 
 ScanListItem.propTypes = {
-  nodeId: React.PropTypes.number.isRequired,
+  nodeId: React.PropTypes.oneOfType([
+    React.PropTypes.number,
+    React.PropTypes.array,
+  ]).isRequired,
   overrideKey: React.PropTypes.number,
 
   name: React.PropTypes.string.isRequired,

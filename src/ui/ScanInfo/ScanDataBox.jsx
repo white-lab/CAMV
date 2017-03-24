@@ -2,13 +2,31 @@ import React from 'react'
 
 class ScanDataBox extends React.Component {
   render() {
+    let filename = (
+      this.props.scan != null ?
+      this.props.scan.filenName.replace(/^.*[\\\/]/, '') : ''
+    )
+    let prot = (
+      this.props.proteins != null ?
+      this.props.proteinName : ''
+    )
+
+    if (filename.length > 100) {
+      filename = filename.substring(0, 100) + "..."
+    }
+    if (prot.length > 100) {
+      prot = prot.substring(0, 100) + "..."
+    }
+
     return (
       <div
         id="scanData"
       >
         {
-          this.props.proteins != null && this.props.proteins.length > 0 &&
-          <p>{this.props.proteins.map(i => i.proteinName).join(" / ")}</p>
+          prot.length > 0 &&
+          <p>
+            {prot}
+          </p>
         }
         {
           this.props.scan != null && this.props.scan.chargeState != null &&
@@ -31,9 +49,9 @@ class ScanDataBox extends React.Component {
           </p>
         }
         {
-          this.props.scan != null && this.props.scan.fileName != null &&
+          filename.length > 0 &&
           <p>
-            File Name: {this.props.scan.fileName.replace(/^.*[\\\/]/, '')}
+            File: {filename}
           </p>
         }
       </div>

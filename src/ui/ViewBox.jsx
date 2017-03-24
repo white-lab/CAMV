@@ -35,7 +35,7 @@ class ViewBox extends React.Component {
     super(props)
     this.state = {
       /* Selected PTM / Scan / Peptide / Protein */
-      selectedProtein: null,
+      selectedProteins: null,
       selectedPeptide: null,
       selectedScan: null,
       selectedPTM: null,
@@ -110,27 +110,6 @@ class ViewBox extends React.Component {
   }
 
   componentDidUpdate(prevProps, prevState) {
-    if (
-      prevState.selectedProtein != this.state.selectedProtein &&
-      this.state.selectedProtein
-    ) {
-      this.updateProtein()
-    }
-
-    if (
-      prevState.selectedPeptide != this.state.selectedPeptide &&
-      this.state.selectedPeptide
-    ) {
-      this.updatePeptide()
-    }
-
-    if (
-      prevState.selectedPTM != this.state.selectedPTM &&
-      this.state.selectedPTM
-    ) {
-      this.updatePTM()
-    }
-
     if (
       prevState.db != this.state.db &&
       this.state.db != null
@@ -240,7 +219,7 @@ class ViewBox extends React.Component {
     return new Promise(function(resolve) {
       this.setState(
         {
-          selectedProtein: nodes[0],
+          selectedProteins: nodes[0],
           selectedPeptide: nodes[1],
           selectedScan: nodes[2],
           selectedPTM: nodes[3],
@@ -361,7 +340,7 @@ class ViewBox extends React.Component {
 
   updateSelectedFragment(peak, fragId) {
     if (
-      this.state.selectedProtein == null ||
+      this.state.selectedProteins == null ||
       this.state.selectedPeptide == null ||
       this.state.selectedScan == null
     ) {
@@ -603,7 +582,7 @@ class ViewBox extends React.Component {
   buildNodeTree() {
     this.state.db.all(
       "SELECT \
-      proteins.protein_id, proteins.protein_name, \
+      protein_sets.protein_set_id, protein_sets.protein_set_name, \
       peptides.peptide_id, peptides.peptide_seq, \
       mod_states.mod_state_id, mod_states.mod_desc, \
       scans.scan_id, scans.scan_num, \
@@ -625,17 +604,15 @@ class ViewBox extends React.Component {
       JOIN peptides \
       ON mod_states.peptide_id=peptides.peptide_id \
       \
-      JOIN protein_peptide \
-      ON protein_peptide.peptide_id=peptides.peptide_id \
+      INNER JOIN protein_sets \
+      ON protein_sets.protein_set_id=peptides.protein_set_id \
       \
-      INNER JOIN proteins \
-      ON proteins.protein_id=protein_peptide.protein_id \
-      \
-      ORDER BY proteins.protein_name, peptides.peptide_seq, \
+      ORDER BY protein_sets.protein_set_name, peptides.peptide_seq, \
       mod_states.mod_desc, scans.scan_num, ptms.name",
       // TODO Fix ordering
       function (err, rows) {
         if (err != null) { console.error(err) }
+
         let proteins = []
         let peptides = []
         let scans = []
@@ -680,8 +657,8 @@ class ViewBox extends React.Component {
 
           if (row.protein_id != last_row.protein_id) {
             proteins.push({
-              name: last_row.protein_name,
-              nodeId: last_row.protein_id,
+              name: last_row.protein_set_name,
+              nodeId: last_row.protein_set_id,
               children: peptides,
             })
             peptides = []
@@ -699,7 +676,7 @@ class ViewBox extends React.Component {
 
   getSelectedNode() {
     return [
-      this.state.selectedProtein,
+      this.state.selectedProteins,
       this.state.selectedPeptide,
       this.state.selectedScan,
       this.state.selectedPTM,
@@ -710,16 +687,18 @@ class ViewBox extends React.Component {
     return new Promise(function(resolve) {
       this.state.db.all(
         "SELECT \
-        proteins.protein_id, proteins.protein_name \
+        protein_sets.protein_set_id, \
+        protein_sets.protein_set_name AS proteinName, \
+        protein_sets.protein_set_accession AS accessions \
         \
-        FROM proteins \
-        WHERE proteins.protein_id=? \
-        ORDER BY proteins.protein_name",
+        FROM protein_sets \
+        WHERE protein_sets.protein_set_id=?",
         [
-          this.state.selectedProtein,
+          this.state.selectedProteins,
         ],
         function(err, rows) {
           if (err != null) { console.error(err) }
+          if (rows == null) { return }
           this.setState(
             {
               proteins: rows,
@@ -742,6 +721,7 @@ class ViewBox extends React.Component {
         ],
         function(err, row) {
           if (err != null) { console.error(err) }
+          if (row == null) { return }
           this.setState(
             {
               peptide: row,
@@ -863,6 +843,7 @@ class ViewBox extends React.Component {
         ],
         function(err, row) {
           if (err != null) { console.error(err) }
+          if (row == null) { return }
           this.setState(
             {
               ptm: row,
@@ -950,7 +931,7 @@ class ViewBox extends React.Component {
                 id="scanDataContainer"
               >
                 <ScanDataBox
-                  protName={proteins}
+                  proteins={proteins}
                   scan={scan}
                 />
               </div>
