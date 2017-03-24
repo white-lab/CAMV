@@ -6,6 +6,10 @@ matrix:
     - os: linux
       node_js: '7'
       env: DEPLOY_FILE=out/make/CAMV-linux-x64.zip
+      addons:
+         apt:
+            sources: [ 'ubuntu-toolchain-r-test','llvm-toolchain-precise-3.5', 'gcc-multilib', 'g++-multilib', 'libsqlite3-dev:i386' ]
+            packages: [ 'clang-3.5' ]
     - os: osx
       node_js: '7'
       env: DEPLOY_FILE=out/make/CAMV-darwin-x64.zip
