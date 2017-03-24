@@ -248,25 +248,23 @@ class ViewBox extends React.Component {
         function () { resolve() },
       )
     }.bind(this)).then(function() {
+      let promises = []
       if (nodes[2] != null || nodes[3] != null) {
-        return this.updateScanData(true)
+        promises.push(this.updateScanData(true))
       }
-    }.bind(this)).then(function() {
       if (nodes[0] != null) {
-        return this.updateProtein()
+        promises.push(this.updateProtein())
       }
-    }.bind(this)).then(function() {
       if (nodes[1] != null) {
-        return this.updatePeptide()
+        promises.push(this.updatePeptide())
       }
-    }.bind(this)).then(function() {
       if (nodes[2] != null) {
-        return this.updateScan()
+        promises.push(this.updateScan())
       }
-    }.bind(this)).then(function() {
       if (nodes[3] != null) {
-        return this.updatePTM()
+        promises.push(this.updatePTM())
       }
+      return Promise.all(promises)
     }.bind(this))
   }
 
