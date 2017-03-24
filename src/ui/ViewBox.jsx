@@ -125,30 +125,10 @@ class ViewBox extends React.Component {
     }
 
     if (
-      prevState.selectedScan != this.state.selectedScan &&
-      this.state.selectedScan
-    ) {
-      this.updateScan()
-    }
-
-    if (
       prevState.selectedPTM != this.state.selectedPTM &&
       this.state.selectedPTM
     ) {
       this.updatePTM()
-    }
-
-    if (
-      (
-        prevState.selectedScan != this.state.selectedScan &&
-        this.state.selectedScan != null
-      ) || (
-        prevState.selectedPTM != this.state.selectedPTM &&
-        this.state.selectedPTM != null
-      )
-    ) {
-      this.updateScanData()
-      this.redrawCharts()
     }
 
     if (
@@ -180,72 +160,114 @@ class ViewBox extends React.Component {
     )
   }
 
-  updateScanData() {
+  updateScanData(redraw) {
     if (this.state.selectedScan == null) { return }
 
-    this.state.db.get(
-      "SELECT (data_blob) \
-      FROM scan_data \
-      WHERE scan_data.scan_id=? AND scan_data.data_type=?"
-      ,
-      [
-        this.state.selectedScan,
-        "ms2",
-      ],
-      function(err, row) {
-        if (err != null) { console.error(err) }
+    return new Promise(function(resolve) {
+      this.state.db.get(
+        "SELECT (data_blob) \
+        FROM scan_data \
+        WHERE scan_data.scan_id=? AND scan_data.data_type=?"
+        ,
+        [
+          this.state.selectedScan,
+          "ms2",
+        ],
+        function(err, row) {
+          if (err != null) { console.error(err); resolve() }
 
-        let data = this.blob_to_peaks(row.data_blob)
+          let data = this.blob_to_peaks(row.data_blob)
 
-        if (this.state.selectedPTM == null) {
-          this.setState({
-            scanData: data,
-          })
-          return
-        }
+          if (this.state.selectedPTM == null) {
+            this.setState(
+              {
+                scanData: data,
+              },
+              function() {
+                resolve()
+              },
+            )
+            return
+          }
 
-        let matches = this.state.db.all(
-          "SELECT fragments.fragment_id, fragments.peak_id, \
-          fragments.display_name, fragments.mz, \
-          fragments.ion_type, fragments.ion_pos \
-          FROM fragments inner JOIN scan_ptms \
-          ON fragments.scan_ptm_id=scan_ptms.scan_ptm_id \
-          WHERE scan_ptms.scan_id=? AND scan_ptms.ptm_id=? AND fragments.best=1",
-          [
-            this.state.selectedScan,
-            this.state.selectedPTM,
-          ],
-          function(err, rows) {
-            if (err != null) { console.error(err) }
+          let matches = this.state.db.all(
+            "SELECT fragments.fragment_id, fragments.peak_id, \
+            fragments.display_name, fragments.mz, \
+            fragments.ion_type, fragments.ion_pos \
+            FROM fragments inner JOIN scan_ptms \
+            ON fragments.scan_ptm_id=scan_ptms.scan_ptm_id \
+            WHERE scan_ptms.scan_id=? AND scan_ptms.ptm_id=? AND fragments.best=1",
+            [
+              this.state.selectedScan,
+              this.state.selectedPTM,
+            ],
+            function(err, rows) {
+              if (err != null) { console.error(err) }
 
-            rows.forEach(function (row) {
-              let peak = data[row.peak_id]
-              peak.fragId = row.fragment_id
-              peak.name = row.display_name
-              peak.exp_mz = row.mz
-              peak.ionType = row.ion_type
-              peak.ionPos = row.ion_pos
-            })
+              rows.forEach(function (row) {
+                let peak = data[row.peak_id]
+                peak.peak_id = row.peak_id
+                peak.fragId = row.fragment_id
+                peak.name = row.display_name
+                peak.exp_mz = row.mz
+                peak.ionType = row.ion_type
+                peak.ionPos = row.ion_pos
+              })
 
-            this.setState({
-              scanData: data,
-            })
-          }.bind(this),
-        )
+              this.setState(
+                {
+                  scanData: data,
+                },
+                function () {
+                  if (redraw) {
+                    this.redrawCharts()
+                  }
 
-      }.bind(this)
-    )
+                  resolve()
+                }.bind(this),
+              )
+            }.bind(this),
+          )
+
+        }.bind(this)
+      )
+    }.bind(this))
   }
 
   updateAll(nodes) {
     while (nodes.length < 4) { nodes.push(null) }
 
-    this.setState({
-      selectedProtein: nodes[0],
-      selectedPeptide: nodes[1],
-      selectedScan: nodes[2],
-      selectedPTM: nodes[3],
-    })
+    return new Promise(function(resolve) {
+      this.setState(
+        {
+          selectedProtein: nodes[0],
+          selectedPeptide: nodes[1],
+          selectedScan: nodes[2],
+          selectedPTM: nodes[3],
+        },
+        function () { resolve() },
+      )
+    }.bind(this)).then(function() {
+      if (nodes[2] != null || nodes[3] != null) {
+        return this.updateScanData(true)
+      }
+    }.bind(this)).then(function() {
+      if (nodes[0] != null) {
+        return this.updateProtein()
+      }
+    }.bind(this)).then(function() {
+      if (nodes[1] != null) {
+        return this.updatePeptide()
+      }
+    }.bind(this)).then(function() {
+      if (nodes[2] != null) {
+        return this.updateScan()
+      }
+    }.bind(this)).then(function() {
+      if (nodes[3] != null) {
+        return this.updatePTM()
+      }
+    }.bind(this))
   }
 
   redrawCharts() {
@@ -277,20 +299,25 @@ class ViewBox extends React.Component {
     this.setState({
       selectedPeak: peak,
       modalFragmentSelectionOpen: true,
-      fragmentMatches: matches,
     })
 
     this.state.db.all(
-      "SELECT (mz, name) \
-      FROM fragments INNER JOIN scan_ptms \
+      "SELECT fragments.mz, fragments.display_name AS name \
+      FROM scan_ptms \
+      INNER JOIN fragments \
       ON fragments.scan_ptm_id=scan_ptms.scan_ptm_id \
-      WHERE scan_ptms.scan_id=? AND scan_ptms.ptm_id=? AND peak_id=?",
+      WHERE scan_ptms.scan_id=? AND \
+      scan_ptms.ptm_id=? AND \
+      fragments.peak_id=?",
       [
         this.state.selectedScan,
         this.state.selectedPTM,
         peak.peak_id,
       ],
       function (err, rows) {
+        if (err != null) { console.error(err) }
+        if (rows == null) { return }
+
         let matches = rows.filter(
           (item) => {
             item.ppm = 1e6 * Math.abs(item.mz - peak.mz) / peak.mz
@@ -367,7 +394,7 @@ class ViewBox extends React.Component {
         ],
         function(err) {
           if (err != null) { console.error(err) }
-          this.updateScanData()
+          this.updateScanData(false)
         }.bind(this)
       )
     })
@@ -514,7 +541,6 @@ class ViewBox extends React.Component {
       this.state.selectedScan != null &&
       this.state.selectedPTM != null
     ) {
-      console.log(this.state.selectedPTM, this.state.selectedScan, choice)
       this.state.db.run(
         "UPDATE scan_ptms \
         SET choice=? \
@@ -525,7 +551,6 @@ class ViewBox extends React.Component {
           this.state.selectedPTM
         ],
         function (err) {
-          console.log('done!')
           if (err != null) { console.error(err) }
           this.buildNodeTree()
         }.bind(this),
@@ -571,22 +596,31 @@ class ViewBox extends React.Component {
       mod_states.mod_state_id, mod_states.mod_desc, \
       scans.scan_id, scans.scan_num, \
       ptms.ptm_id, ptms.name, \
+      scan_ptms.scan_ptm_id, \
       scan_ptms.choice \
       \
       FROM \
-      proteins inner join protein_peptide \
-      ON proteins.protein_id=protein_peptide.protein_id \
-      join peptides \
-      ON protein_peptide.peptide_id=peptides.peptide_id \
-      join mod_states \
+      scan_ptms \
+      INNER JOIN scans \
+      ON scan_ptms.scan_id=scans.scan_id \
+      \
+      JOIN ptms \
+      ON scan_ptms.ptm_id=ptms.ptm_id \
+      \
+      JOIN mod_states \
+      ON ptms.mod_state_id=mod_states.mod_state_id \
+      \
+      JOIN peptides \
       ON mod_states.peptide_id=peptides.peptide_id \
-      join ptms \
-      on ptms.mod_state_id=mod_states.mod_state_id \
-      join scan_ptms \
-      on scan_ptms.ptm_id=ptms.ptm_id \
-      inner join scans \
-      on scan_ptms.scan_id=scans.scan_id \
-      ORDER BY proteins.protein_name, peptides.peptide_seq, mod_states.mod_desc, scans.scan_num, ptms.name",
+      \
+      JOIN protein_peptide \
+      ON protein_peptide.peptide_id=peptides.peptide_id \
+      \
+      INNER JOIN proteins \
+      ON proteins.protein_id=protein_peptide.protein_id \
+      \
+      ORDER BY proteins.protein_name, peptides.peptide_seq, \
+      mod_states.mod_desc, scans.scan_num, ptms.name",
       // TODO Fix ordering
       function (err, rows) {
         if (err != null) { console.error(err) }
@@ -602,7 +636,7 @@ class ViewBox extends React.Component {
         }
 
         for (let row of rows.concat({})) {
-          if (row.ptm_id != last_row.ptm_id) {
+          if (row.scan_ptm_id != last_row.scan_ptm_id) {
             ptms.push({
               name: last_row.name,
               nodeId: last_row.ptm_id,
@@ -661,140 +695,171 @@ class ViewBox extends React.Component {
   }
 
   updateProtein() {
-    this.state.db.all(
-      "SELECT \
-      proteins.protein_id, proteins.protein_name \
-      \
-      FROM proteins \
-      WHERE proteins.protein_id=? \
-      ORDER BY proteins.protein_name",
-      [
-        this.state.selectedProtein,
-      ],
-      function(err, rows) {
-        if (err != null) { console.error(err) }
-        this.setState({
-          proteins: rows,
-        })
-      }.bind(this),
-    )
+    return new Promise(function(resolve) {
+      this.state.db.all(
+        "SELECT \
+        proteins.protein_id, proteins.protein_name \
+        \
+        FROM proteins \
+        WHERE proteins.protein_id=? \
+        ORDER BY proteins.protein_name",
+        [
+          this.state.selectedProtein,
+        ],
+        function(err, rows) {
+          if (err != null) { console.error(err) }
+          this.setState(
+            {
+              proteins: rows,
+            },
+            function() { resolve() },
+          )
+        }.bind(this),
+      )
+    }.bind(this))
   }
 
   updatePeptide() {
-    this.state.db.get(
-      "SELECT peptides.peptide_id, peptides.peptide_seq \
-      FROM peptides \
-      WHERE peptides.peptide_id=?",
-      [
-        this.state.selectedPeptide,
-      ],
-      function(err, row) {
-        if (err != null) { console.error(err) }
-        this.setState({
-          peptide: row,
-        })
-      }.bind(this),
-    )
+    return new Promise(function(resolve) {
+      this.state.db.get(
+        "SELECT peptides.peptide_id, peptides.peptide_seq \
+        FROM peptides \
+        WHERE peptides.peptide_id=?",
+        [
+          this.state.selectedPeptide,
+        ],
+        function(err, row) {
+          if (err != null) { console.error(err) }
+          this.setState(
+            {
+              peptide: row,
+            },
+            function() { resolve() },
+          )
+        }.bind(this),
+      )
+    }.bind(this))
   }
 
   updateScan() {
-    this.state.db.get(
-      "SELECT \
-      scans.scan_num AS scanNumber, \
-      scans.charge AS chargeState, \
-      scans.collision_type AS collisionType, \
-      scans.precursor_mz AS precursorMz, \
-      scans.isolation_window_lower, \
-      scans.isolation_window_upper, \
-      scans.quant_mz_id, \
-      scans.c13_num AS c13Num, \
-      scan_ptms.mascot_score AS searchScore, \
-      files.filename AS fileName \
-      FROM scans INNER JOIN files \
-      ON scans.file_id=files.file_id \
-      INNER JOIN scan_ptms \
-      ON scan_ptms.scan_id=scans.scan_id \
-      WHERE scans.scan_id=?",
-      [
-        this.state.selectedScan,
-      ],
-      function(err, row) {
-        if (err != null) { console.error(err) }
-        row.precursorIsolationWindow = [
-          row.isolation_window_lower,
-          row.isolation_window_upper,
-        ]
-        this.setState({
-          scan: row,
-        })
-
-        this.state.db.all(
+    return new Promise(function(resolve) {
+      this.state.db.serialize(function() {
+        this.state.db.get(
           "SELECT \
-          quant_mz_peaks.mz, \
-          quant_mz_peaks.peak_name AS name \
-          FROM quant_mz_peaks \
-          WHERE quant_mz_id=? \
-          ORDER BY quant_mz_peaks.mz",
+          scans.scan_num AS scanNumber, \
+          scans.charge AS chargeState, \
+          scans.collision_type AS collisionType, \
+          scans.precursor_mz AS precursorMz, \
+          scans.isolation_window_lower, \
+          scans.isolation_window_upper, \
+          scans.quant_mz_id, \
+          scans.c13_num AS c13Num, \
+          scan_ptms.mascot_score AS searchScore, \
+          files.filename AS fileName \
+          FROM scans INNER JOIN files \
+          ON scans.file_id=files.file_id \
+          INNER JOIN scan_ptms \
+          ON scan_ptms.scan_id=scans.scan_id \
+          WHERE scans.scan_id=?",
           [
-            row.quant_mz_id,
+            this.state.selectedScan,
           ],
-          function(err, rows) {
+          function(err, row) {
             if (err != null) { console.error(err) }
 
+            // Seems to happen in fast spectra selection
+            if (row == null) { return }
+
+            row.precursorIsolationWindow = [
+              row.isolation_window_lower,
+              row.isolation_window_upper,
+            ]
             this.setState({
-              quantMz: rows,
+              scan: row,
             })
-          }.bind(this)
+
+            this.state.db.all(
+              "SELECT \
+              quant_mz_peaks.mz, \
+              quant_mz_peaks.peak_name AS name \
+              FROM quant_mz_peaks \
+              WHERE quant_mz_id=? \
+              ORDER BY quant_mz_peaks.mz",
+              [
+                row.quant_mz_id,
+              ],
+              function(err, rows) {
+                if (err != null) { console.error(err) }
+
+                this.setState({
+                  quantMz: rows,
+                })
+              }.bind(this)
+            )
+          }.bind(this),
         )
-      }.bind(this),
-    )
-    this.state.db.get(
-      "SELECT data_blob \
-      FROM scan_data \
-      WHERE scan_data.data_type=? AND scan_data.scan_id=?",
-      [
-        "precursor",
-        this.state.selectedScan,
-      ],
-      function(err, row) {
-        if (err != null) { console.error(err) }
-        this.setState({
-          precursorData: this.blob_to_peaks(row.data_blob),
-        })
-      }.bind(this),
-    )
-    this.state.db.get(
-      "SELECT data_blob \
-      FROM scan_data \
-      WHERE scan_data.data_type=? AND scan_data.scan_id=?",
-      [
-        "quant",
-        this.state.selectedScan,
-      ],
-      function(err, row) {
-        if (err != null) { console.error(err) }
-        this.setState({
-          quantData: this.blob_to_peaks(row.data_blob),
-        })
-      }.bind(this),
-    )
+        this.state.db.get(
+          "SELECT data_blob \
+          FROM scan_data \
+          WHERE scan_data.data_type=? AND scan_data.scan_id=?",
+          [
+            "precursor",
+            this.state.selectedScan,
+          ],
+          function(err, row) {
+            if (err != null) { console.error(err) }
+            if (row == null) { return }
+            this.setState({
+              precursorData: this.blob_to_peaks(row.data_blob),
+            })
+          }.bind(this),
+        )
+        this.state.db.get(
+          "SELECT data_blob \
+          FROM scan_data \
+          WHERE scan_data.data_type=? AND scan_data.scan_id=?",
+          [
+            "quant",
+            this.state.selectedScan,
+          ],
+          function(err, row) {
+            if (err != null) { console.error(err) }
+            if (row == null) { return }
+
+            this.setState(
+              {
+                quantData: this.blob_to_peaks(row.data_blob),
+              },
+              function() {
+                resolve()
+              }
+            )
+          }.bind(this),
+        )
+      }.bind(this))
+    }.bind(this))
   }
 
   updatePTM() {
-    this.state.db.get(
-      "SELECT * \
-      FROM ptms \
-      WHERE ptms.ptm_id=?",
-      [
-        this.state.selectedPTM,
-      ],
-      function(err, row) {
-        if (err != null) { console.error(err) }
-        this.setState({
-          ptm: row,
-        })
-      }.bind(this),
-    )
+    return new Promise(function(resolve) {
+      this.state.db.get(
+        "SELECT * \
+        FROM ptms \
+        WHERE ptms.ptm_id=?",
+        [
+          this.state.selectedPTM,
+        ],
+        function(err, row) {
+          if (err != null) { console.error(err) }
+          this.setState(
+            {
+              ptm: row,
+            },
+            function() { resolve() }
+          )
+        }.bind(this),
+      )
+    }.bind(this))
   }
 
   render() {
