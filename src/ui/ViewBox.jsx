@@ -41,7 +41,7 @@ class ViewBox extends React.Component {
       selectedScan: null,
       selectedPTM: null,
 
-      proteins: [],
+      proteins: null,
       peptide: null,
       scan: null,
       ptm: null,
@@ -365,44 +365,31 @@ class ViewBox extends React.Component {
         return
     }
 
-    this.state.db.serialize(function() {
-      this.state.db.run(
-        "UPDATE fragments \
-        SET fragments.best=0 \
-        WHERE fragments.peak_id=? AND scan_ptm_id IN ( \
-          SELECT scan_ptms.scan_ptm_id \
-          FROM scan_ptms \
-          WHERE scan_ptms.scan_id=? AND scan_ptms.ptm_id=? \
-        )",
-        [
-          peak.peak_id,
-          this.state.selectedScan,
-          this.state.selectedPTM,
-        ],
-        function (err) {
-          if (err != null) {
-            this.handleSQLError(err)
-            return
-          }
-        }.bind(this),
-      )
-      this.state.db.run(
+    return this.wrapSQLRun(
+      "UPDATE fragments \
+      SET fragments.best=0 \
+      WHERE fragments.peak_id=? AND scan_ptm_id IN ( \
+        SELECT scan_ptms.scan_ptm_id \
+        FROM scan_ptms \
+        WHERE scan_ptms.scan_id=? AND scan_ptms.ptm_id=? \
+      )",
+      [
+        peak.peak_id,
+        this.state.selectedScan,
+        this.state.selectedPTM,
+      ],
+    ).then(function () {
+      return this.wrapSQLRun(
         "UPDATE fragments \
         SET best=1 \
         WHERE frag_id=?",
         [
           fragId,
         ],
-        function (err) {
-          if (err != null) {
-            this.handleSQLError(err)
-            return
-          }
-
-          this.updateScanData(false)
-        }.bind(this),
       )
-    })
+    }.bind(this)).then(function() {
+      return this.updateScanData(false)
+    }.bind(this))
   }
 
   closeImportModal() {
@@ -557,28 +544,22 @@ class ViewBox extends React.Component {
 
   setChoice(choice) {
     if (
-      this.state.selectedScan != null &&
-      this.state.selectedPTM != null
-    ) {
-      this.state.db.run(
-        "UPDATE scan_ptms \
-        SET choice=? \
-        WHERE scan_id=? AND ptm_id=?",
-        [
-          choice,
-          this.state.selectedScan,
-          this.state.selectedPTM
-        ],
-        function (err) {
-          if (err != null) {
-            this.handleSQLError(err)
-            return
-          }
+      this.state.selectedScan == null ||
+      this.state.selectedPTM == null
+    ) { return }
 
-          this.buildNodeTree()
-        }.bind(this),
-      )
-    }
+    return this.wrapSQLRun(
+      "UPDATE scan_ptms \
+      SET choice=? \
+      WHERE scan_id=? AND ptm_id=?",
+      [
+        choice,
+        this.state.selectedScan,
+        this.state.selectedPTM
+      ],
+    ).then(function () {
+      return this.buildNodeTree()
+    }.bind(this))
   }
 
   openImport() {
@@ -613,7 +594,7 @@ class ViewBox extends React.Component {
   }
 
   buildNodeTree() {
-    this.state.db.all(
+    return this.wrapSQLAll(
       "SELECT \
       protein_sets.protein_set_id, protein_sets.protein_set_name, \
       peptides.peptide_id, peptides.peptide_seq, \
@@ -642,12 +623,8 @@ class ViewBox extends React.Component {
       \
       ORDER BY protein_sets.protein_set_name, peptides.peptide_seq, \
       mod_states.mod_desc, scans.scan_num, ptms.name",
-      function (err, rows) {
-        if (err != null || rows == null) {
-          this.handleSQLError(err)
-          return
-        }
-
+      [],
+      function (resolve, reject, rows) {
         let proteins = []
         let peptides = []
         let scans = []
@@ -704,7 +681,7 @@ class ViewBox extends React.Component {
 
         this.setState({
           nodeTree: proteins,
-        })
+        }, resolve)
       }.bind(this)
     )
   }
@@ -731,12 +708,9 @@ class ViewBox extends React.Component {
         this.state.selectedProteins,
       ],
       function(resolve, reject, row) {
-        this.setState(
-          {
-            proteins: row,
-          },
-          resolve,
-        )
+        this.setState({
+          proteins: row,
+        }, resolve)
       }.bind(this),
     )
   }
@@ -750,12 +724,9 @@ class ViewBox extends React.Component {
         this.state.selectedPeptide,
       ],
       function(resolve, reject, row) {
-        this.setState(
-          {
-            peptide: row,
-          },
-          resolve,
-        )
+        this.setState({
+          peptide: row,
+        }, resolve)
       }.bind(this),
     )
   }
@@ -774,6 +745,28 @@ class ViewBox extends React.Component {
 
           if (cb != null) {
             cb(resolve, reject, ret)
+          } else {
+            resolve()
+          }
+        }.bind(this)
+      )
+    }.bind(this))
+  }
+
+  wrapSQLRun(query, params, cb) {
+    return new Promise(function(resolve, reject) {
+      this.state.db.run(
+        query,
+        params,
+        function (err) {
+          if (err != null) {
+            this.handleSQLError(err)
+            reject()
+            return
+          }
+
+          if (cb != null) {
+            cb(resolve, reject)
           } else {
             resolve()
           }
@@ -860,12 +853,9 @@ class ViewBox extends React.Component {
           this.state.selectedScan,
         ],
         function(resolve, reject, rows) {
-          this.setState(
-            {
-              quantMz: rows,
-            },
-            resolve,
-          )
+          this.setState({
+            quantMz: rows,
+          }, resolve)
         }.bind(this),
       )
     )
@@ -897,11 +887,9 @@ class ViewBox extends React.Component {
           this.state.selectedScan,
         ],
         function(resolve, reject, row) {
-          this.setState(
-            {
-              quantData: this.blob_to_peaks(row.data_blob),
-            }, resolve,
-          )
+          this.setState({
+            quantData: this.blob_to_peaks(row.data_blob),
+          }, resolve)
         }.bind(this),
       )
     )
@@ -926,12 +914,9 @@ class ViewBox extends React.Component {
         this.state.selectedPTM,
       ],
       function(resolve, reject, row) {
-        this.setState(
-          {
-            ptm: row,
-          },
-          resolve,
-        )
+        this.setState({
+          ptm: row,
+        }, resolve)
       }.bind(this),
     )
   }
