@@ -11,22 +11,30 @@ class ScanDataBox extends React.Component {
           <p>{this.props.proteins.map(i => i.proteinName).join(" / ")}</p>
         }
         {
-          this.props.chargeState != null &&
-          <p>Charge State: +{this.props.chargeState}</p>
-        }
-        {
-          this.props.scanNumber != null &&
+          this.props.scan != null && this.props.scan.chargeState != null &&
           <p>
-            Scan: {this.props.scanNumber}
+            Charge State: +{this.props.scan.chargeState}
             {
-              this.props.searchScore != null &&
-              " - Score: " + this.props.searchScore
+              this.props.scan.c13Num > 0 &&
+              ", " + this.props.scan.c13Num + " ¹³C"
             }
           </p>
         }
         {
-          this.props.fileName != null &&
-          <p>File Name: {this.props.fileName.replace(/^.*[\\\/]/, '')}</p>
+          this.props.scan != null && this.props.scan.scanNumber != null &&
+          <p>
+            Scan: {this.props.scan.scanNumber}
+            {
+              this.props.scan.searchScore != null &&
+              " - Score: " + this.props.scan.searchScore
+            }
+          </p>
+        }
+        {
+          this.props.scan != null && this.props.scan.fileName != null &&
+          <p>
+            File Name: {this.props.scan.fileName.replace(/^.*[\\\/]/, '')}
+          </p>
         }
       </div>
     )
@@ -34,19 +42,13 @@ class ScanDataBox extends React.Component {
 }
 
 ScanDataBox.propTypes = {
-  chargeState: React.PropTypes.number,
-  searchScore: React.PropTypes.number,
+  scan: React.PropTypes.object,
   proteins: React.PropTypes.array,
-  scanNumber: React.PropTypes.number,
-  fileName: React.PropTypes.string,
 }
 
 ScanDataBox.defaultProps = {
-  searchScore: null,
-  chargeState: null,
+  scan: null,
   proteins: [],
-  scanNumber: null,
-  fileName: null,
 }
 
 module.exports = ScanDataBox

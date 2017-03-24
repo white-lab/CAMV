@@ -953,10 +953,7 @@ class ViewBox extends React.Component {
               >
                 <ScanDataBox
                   protName={proteins}
-                  chargeState={scan.chargeState}
-                  searchScore={scan.searchScore}
-                  scanNumber={scan.scanNumber}
-                  fileName={scan.fileName}
+                  scan={scan}
                 />
               </div>
             }
