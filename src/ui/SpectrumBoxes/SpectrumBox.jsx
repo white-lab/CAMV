@@ -131,7 +131,7 @@ class SpectrumBox extends React.Component {
                 style = 'point {size: 3; fill-color: #5CB85C; visible: true}'
               }
             } else {
-              style = 'star {size: 3; fill-color: magenta; visible: true}'
+              style = 'point {size: 5; shape-type: star; fill-color: #FF00FF; visible: true}'
             }
           } else if (into < max_y / 10) {
             style = null
