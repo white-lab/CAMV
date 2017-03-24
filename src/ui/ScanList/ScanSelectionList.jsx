@@ -57,7 +57,6 @@ class ScanSelectionList extends React.Component {
       }
 
       node[node.length - 1] = max - 1
-
     }
 
     return node
@@ -79,6 +78,58 @@ class ScanSelectionList extends React.Component {
 
       node.pop()
       node[node.length - 1] += 1
+    }
+
+    return node
+  }
+
+  selectNext(node) {
+    if (node.length < 4) {
+      while (node.length < 4) { node.push(0) }
+      return node
+    }
+
+    if (node.length >= 4) {
+      node[node.length - 1] += 1
+    } else {
+      node.push(0)
+    }
+
+    while (node[node.length - 1] >= this.getMaxLength(node)) {
+      if (node.length <= 1) {
+        return init
+      }
+
+      node.pop()
+      node[node.length - 1] += 1
+    }
+
+    while (node.length < 4) { node.push(0) }
+
+    return node
+  }
+
+  selectPrevious(node) {
+    while (node[node.length - 1] == 0 && node.length > 0) {
+      node.pop()
+    }
+
+    if (node.length < 1) {
+      return [0, 0, 0, 0]
+    }
+
+    node[node.length - 1] -= 1
+
+    while(node.length < 4) {
+      node.push(0)
+      let max = this.getMaxLength(node)
+
+      if (max <= 0) {
+        node.pop()
+        break
+      }
+
+      node[node.length - 1] = max - 1
     }
 
     return node
@@ -139,6 +190,13 @@ class ScanSelectionList extends React.Component {
       case 'j':
       case 'ArrowDown':
         indices = this.selectDown(indices)
+        break
+      case 'n':
+        indices = this.selectNext(indices)
+        break
+      case 'm':
+      case 'p':
+        indices = this.selectPrevious(indices)
         break
       default:
         return

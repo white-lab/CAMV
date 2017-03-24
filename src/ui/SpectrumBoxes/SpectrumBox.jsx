@@ -3,8 +3,6 @@ import React from 'react'
 import AcceptButton from './Buttons/AcceptButton'
 import MaybeButton from './Buttons/MaybeButton'
 import RejectButton from './Buttons/RejectButton'
-import SetMaxMZ from './SetMaxMZ'
-import SetMinMZ from './SetMinMZ'
 
 class SpectrumBox extends React.Component {
   constructor(props) {
@@ -12,8 +10,6 @@ class SpectrumBox extends React.Component {
     this.state = {
       chartLoaded: false,
       exporting: false,
-      minMZ: 0,
-      maxMZ: null,
     }
   }
 
@@ -44,9 +40,7 @@ class SpectrumBox extends React.Component {
       if (
         prevProps.spectrumData != this.props.spectrumData ||
         prevProps.selectedScan != this.props.selectedScan ||
-        prevProps.selectedPTM != this.props.selectedPTM ||
-        prevState.minMZ != this.state.minMZ ||
-        prevState.maxMZ != this.state.maxMZ
+        prevProps.selectedPTM != this.props.selectedPTM
       ) {
         this.drawChart()
       }
@@ -57,36 +51,16 @@ class SpectrumBox extends React.Component {
     window.removeEventListener('resize', this.handleResize.bind(this))
   }
 
-  updateMinMZ(newMinMZ) {
-    this.setState({
-      minMZ: newMinMZ > 0 ? newMinMZ : 0,
-    })
-  }
-
-  updateMaxMZ(newMaxMZ) {
-    let scanData = this.getScanData()
-    let max_mz = Math.ceil(
-      (scanData != null) ? scanData[scanData.length - 1].mz + 1 : 100
-    )
-    this.setState({
-      maxMZ: newMaxMZ < max_mz ? newMaxMZ : max_mz,
-    })
-  }
-
   drawChart() {
     if (!this.state.chartLoaded) { return }
 
-    let minMZ = Math.max(0, this.state.minMZ == null ? 0 : this.state.minMZ)
+    let minMZ = 0
     let maxMZ = 1
     let max_y = 15
 
     if (this.props.spectrumData.length > 0) {
-      let scanMax = Math.ceil(
+      maxMZ = Math.ceil(
         this.props.spectrumData[this.props.spectrumData.length - 1].mz + 1
-      )
-      maxMZ = (
-        this.props.maxMZ == null ?
-        scanMax : Math.min(scanMax, this.props.maxMZ)
       )
 
       max_y = Math.max.apply(
@@ -239,31 +213,6 @@ class SpectrumBox extends React.Component {
           id="updateBox"
           style={{display: this.state.exporting ? 'none' : null}}
         >
-          <div id="mzBox">
-            <div className="setMinMZ">
-              <SetMinMZ
-                callback={this.updateMinMZ.bind(this)}
-                disabled={this.props.inputDisabled}
-                minMZ={this.state.minMZ}
-              />
-            </div>
-
-            <div className="setMaxMZ">
-              <SetMaxMZ
-                callback={this.updateMaxMZ.bind(this)}
-                disabled={this.props.inputDisabled}
-                maxMZ={this.state.maxMZ}
-                scanMaxMZ={
-                  Math.ceil(
-                    this.props.spectrumData.length == 0 ?
-                    1 :
-                    this.props.spectrumData[this.props.spectrumData.length - 1].mz + 1
-                  )
-                }
-              />
-            </div>
-          </div>
-
           <div id="choiceBox">
             <AcceptButton
               callback={this.props.updateChoice}
