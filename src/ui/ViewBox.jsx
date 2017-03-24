@@ -484,6 +484,13 @@ class ViewBox extends React.Component {
     }
   }
 
+  getBase(node) {
+    let sl = this.refs["scanSelectionList"]
+    let indices = sl.getIndices(node)
+    while (indices.length < 4) { indices.push(0) }
+    return sl.getNode(indices)
+  }
+
   runSearch(proteinMatch, peptideMatch, scanMatch) {
     this.setState({
       modalSearchOpen: false,
@@ -495,7 +502,10 @@ class ViewBox extends React.Component {
         proteinMatch != '' &&
         protein.name.toLowerCase().includes(proteinMatch.toLowerCase())
       ) {
-        this.updateAll([protein.nodeId, 0, 0, 0])
+        this.updateAll(
+          this.getBase([protein.nodeId])
+        )
+
         return
       }
 
@@ -504,7 +514,9 @@ class ViewBox extends React.Component {
           peptideMatch != '' &&
           peptide.name.includes(peptideMatch.toUpperCase())
         ) {
-          this.updateAll([protein.nodeId, peptide.nodeId, 0, 0])
+          this.updateAll(
+            this.getBase([protein.nodeId, peptide.nodeId])
+          )
           return
         }
 
@@ -513,7 +525,9 @@ class ViewBox extends React.Component {
             scanMatch != '' &&
             String(scan.name.split(" ")[1]) == scanMatch
           ) {
-            this.updateAll([protein.nodeId, peptide.nodeId, scan.nodeId, 0])
+            this.updateAll(
+              this.getBase([protein.nodeId, peptide.nodeId, scan.nodeId])
+            )
             return
           }
 
