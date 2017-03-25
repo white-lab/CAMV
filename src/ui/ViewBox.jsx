@@ -83,18 +83,35 @@ class ViewBox extends React.Component {
   }
 
   handleHotkey(e) {
-    if (this.state.loaded != null && !this.anyModalOpen()) {
-      if (e.getModifierState("Control")) {
-        switch (e.key) {
-          case 'f':
-            this.setState({modalSearchOpen: !this.state.modalSearchOpen})
-            break
-          case 'o':
-            this.setState({modalImportOpen: true})
-            break
-        }
-      } else {
-        switch(e.key) {
+    let desc = []
+
+    for (let mod of ["Shift", "Meta", "Alt", "Control"]) {
+      if (e.getModifierState(mod)) {
+        desc.push(mod)
+      }
+    }
+
+    desc.push(e.key)
+    desc = desc.join(" ")
+
+    switch (desc) {
+      case 'Control o':
+        this.setState({modalImportOpen: !this.state.modalImportOpen})
+        break
+    }
+
+    if (this.state.loaded) {
+      switch (desc) {
+        case 'Control f':
+          this.setState({modalSearchOpen: !this.state.modalSearchOpen})
+          break
+        case 'Control e':
+          this.setState({modalExportOpen: !this.state.modalExportOpen})
+          break
+      }
+
+      if (!this.anyModalOpen()) {
+        switch (desc) {
           case 'a':
             this.setChoice('accept')
             break
@@ -105,8 +122,7 @@ class ViewBox extends React.Component {
             this.setChoice('reject')
             break
           default:
-            let scanList = this.refs["scanSelectionList"]
-            scanList.handleHotkey(e)
+            this.refs["scanSelectionList"].handleHotkey(e)
             break
         }
       }
@@ -249,10 +265,8 @@ class ViewBox extends React.Component {
       }
       return Promise.all(promises)
     }.bind(this)).catch(function(err) {
-      if (err.errno != sqlite3.INTERRUPT) {
+      if (err != null && err.errno != sqlite3.INTERRUPT) {
         console.error(err)
-      } else {
-        this.state.db.interrupt()
       }
     }.bind(this))
   }
@@ -282,8 +296,8 @@ class ViewBox extends React.Component {
     if (error == null) {
       return
     } else if (error.errno == sqlite3.INTERRUPT) {
-      console.log("interrupting")
-      this.state.db.interrupt()
+      console.log("interrupted")
+      // this.state.db.interrupt()
     } else {
       console.log(error)
     }
@@ -739,6 +753,7 @@ class ViewBox extends React.Component {
         function (err, ret) {
           if (err != null || ret == null) {
             this.handleSQLError(err)
+            this.state.db.interrupt()
             reject()
             return
           }
@@ -761,6 +776,7 @@ class ViewBox extends React.Component {
         function (err) {
           if (err != null) {
             this.handleSQLError(err)
+            this.state.db.interrupt()
             reject()
             return
           }
@@ -783,6 +799,7 @@ class ViewBox extends React.Component {
         function (err, ret) {
           if (err != null || ret == null) {
             this.handleSQLError(err)
+            this.state.db.interrupt()
             reject()
             return
           }
