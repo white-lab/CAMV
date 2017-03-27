@@ -44,14 +44,6 @@ exports.spectraToImage = async function(vb, dirName, export_spectras) {
     scan_list.props.selectedPTM
   ]
 
-  /* Dummy call to force interface to redraw */
-  await vb.updateAll([null, null, null, null])
-
-  await domtoimage.toPng(
-    document.getElementById('viewBox'),
-    function () {}
-  )
-
   let promises = []
 
   for (let vals of vb.iterate_spectra(export_spectras)) {
