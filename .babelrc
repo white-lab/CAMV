@@ -1,6 +1,7 @@
 {
   "presets": ["es2017-node7", "react"],
   "plugins": [
+    "transform-react-jsx-source",
     "react-hot-loader/babel",
     "syntax-async-functions",
     "transform-runtime"
