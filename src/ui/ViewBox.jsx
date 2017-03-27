@@ -162,7 +162,7 @@ class ViewBox extends React.Component {
     if (this.state.selectedScan == null) { return }
 
     return this.wrapSQLGet(
-      "SELECT (data_blob) \
+      "SELECT scan_data.data_blob, scan_data.scan_id \
       FROM scan_data \
       WHERE scan_data.scan_id=? AND scan_data.data_type=?",
       [
@@ -170,14 +170,16 @@ class ViewBox extends React.Component {
         "ms2",
       ],
       function(resolve, reject, row) {
+        if (row.scan_id != this.state.selectedScan) {
+          reject({errno: sqlite3.INTERRUPT})
+          return
+        }
+
         let data = this.blob_to_peaks(row.data_blob)
 
-        this.setState(
-          {
-            scanData: data,
-          },
-          resolve,
-        )
+        this.setState({
+          scanData: data,
+        }, resolve)
       }.bind(this)
     )
   }
@@ -188,9 +190,12 @@ class ViewBox extends React.Component {
     return this.wrapSQLAll(
       "SELECT fragments.fragment_id, fragments.peak_id, \
       fragments.display_name, fragments.mz, \
-      fragments.ion_type, fragments.ion_pos \
+      fragments.ion_type, fragments.ion_pos, \
+      scan_ptms.scan_id, scan_ptms.ptm_id \
+      \
       FROM fragments inner JOIN scan_ptms \
       ON fragments.scan_ptm_id=scan_ptms.scan_ptm_id \
+      \
       WHERE scan_ptms.scan_id=? AND scan_ptms.ptm_id=? AND fragments.best=1",
       [
         this.state.selectedScan,
@@ -200,6 +205,14 @@ class ViewBox extends React.Component {
         let data = this.state.scanData
 
         rows.forEach(function (row) {
+          if (
+            row.scan_id != this.state.selectedScan ||
+            row.ptm_id != this.state.selectedPTM
+          ) {
+            reject({errno: sqlite3.INTERRUPT})
+            return
+          }
+
           let peak = data[row.peak_id]
           if (peak == null) { return }
 
@@ -210,7 +223,7 @@ class ViewBox extends React.Component {
           peak.ionType = row.ion_type
           peak.ionPos = row.ion_pos
           peak.ppm = 1e6 * Math.abs(peak.mz - row.mz) / row.mz
-        })
+        }.bind(this))
 
         this.setState({
           scanData: data,
@@ -334,9 +347,11 @@ class ViewBox extends React.Component {
 
     return this.wrapSQLAll(
       "SELECT fragments.mz, fragments.display_name AS name \
+      \
       FROM scan_ptms \
       INNER JOIN fragments \
       ON fragments.scan_ptm_id=scan_ptms.scan_ptm_id \
+      \
       WHERE scan_ptms.scan_id=? AND \
       scan_ptms.ptm_id=? AND \
       fragments.peak_id=?",
@@ -741,6 +756,10 @@ class ViewBox extends React.Component {
         this.state.selectedProteins,
       ],
       function(resolve, reject, row) {
+        if (row.protein_set_id != this.state.selectedProteins) {
+          reject({errno: sqlite3.INTERRUPT})
+          return
+        }
         this.setState({
           proteins: row,
         }, resolve)
@@ -757,6 +776,10 @@ class ViewBox extends React.Component {
         this.state.selectedPeptide,
       ],
       function(resolve, reject, row) {
+        if (row.peptide_id != this.state.selectedPeptide) {
+          reject({errno: sqlite3.INTERRUPT})
+          return
+        }
         this.setState({
           peptide: row,
         }, resolve)
@@ -833,12 +856,13 @@ class ViewBox extends React.Component {
     }.bind(this))
   }
 
-  updateScan(redraw) {
+  updateScan() {
     let promises = []
 
     promises.push(
       this.wrapSQLGet(
         "SELECT \
+        scans.scan_id, \
         scans.scan_num AS scanNumber, \
         scans.charge AS chargeState, \
         scans.collision_type AS collisionType, \
@@ -861,6 +885,10 @@ class ViewBox extends React.Component {
           this.state.selectedScan,
         ],
         function(resolve, reject, row) {
+          if (row.scan_id != this.state.selectedScan) {
+            reject({errno: sqlite3.INTERRUPT})
+            return
+          }
           row.precursorIsolationWindow = [
             row.isolation_window_lower,
             row.isolation_window_upper,
@@ -871,7 +899,7 @@ class ViewBox extends React.Component {
         }.bind(this),
       ).then(function () {
         return this.wrapSQLGet(
-          "SELECT data_blob \
+          "SELECT scan_data.data_blob, scan_data.scan_id \
           FROM scan_data \
           WHERE scan_data.data_type=? AND scan_data.scan_id=?",
           [
@@ -879,6 +907,11 @@ class ViewBox extends React.Component {
             this.state.selectedScan,
           ],
           function(resolve, reject, row) {
+            if (row.scan_id != this.state.selectedScan) {
+              reject({errno: sqlite3.INTERRUPT})
+              return
+            }
+
             let peaks = this.blob_to_peaks(row.data_blob)
 
             let ionSeries = []
@@ -922,7 +955,7 @@ class ViewBox extends React.Component {
 
     promises.push(
       this.wrapSQLGet(
-        "SELECT data_blob \
+        "SELECT scan_data.data_blob, scan_data.scan_id \
         FROM scan_data \
         WHERE scan_data.data_type=? AND scan_data.scan_id=?",
         [
@@ -930,6 +963,10 @@ class ViewBox extends React.Component {
           this.state.selectedScan,
         ],
         function(resolve, reject, row) {
+          if (row.scan_id != this.state.selectedScan) {
+            reject({errno: sqlite3.INTERRUPT})
+            return
+          }
           this.setState({
             quantData: this.blob_to_peaks(row.data_blob),
           }, resolve)
@@ -938,7 +975,8 @@ class ViewBox extends React.Component {
         return this.wrapSQLAll(
           "SELECT \
           quant_mz_peaks.mz, \
-          quant_mz_peaks.peak_name AS name \
+          quant_mz_peaks.peak_name AS name, \
+          scans.scan_id \
           \
           FROM scans \
           INNER JOIN quant_mz_peaks \
@@ -952,6 +990,11 @@ class ViewBox extends React.Component {
           ],
           function(resolve, reject, rows) {
             rows.forEach(function (row) {
+              if (row.scan_id != this.state.selectedScan) {
+                reject({errno: sqlite3.INTERRUPT})
+                return
+              }
+
               let errs = this.state.quantData.map(
                 (peak) => {
                   return 1e6 * Math.abs(peak.mz - row.mz) / row.mz
@@ -977,16 +1020,7 @@ class ViewBox extends React.Component {
       }.bind(this))
     )
 
-    return Promise.all(promises).then(function () {
-      return new Promise(
-        function (resolve) {
-          if (redraw) {
-            this.redrawCharts()
-          }
-          resolve()
-        }.bind(this)
-      )
-    }.bind(this))
+    return Promise.all(promises)
   }
 
   updatePTM() {
@@ -998,6 +1032,10 @@ class ViewBox extends React.Component {
         this.state.selectedPTM,
       ],
       function(resolve, reject, row) {
+        if (row.ptm_id != this.state.selectedPTM) {
+          reject({errno: sqlite3.INTERRUPT})
+          return
+        }
         this.setState({
           ptm: row,
         }, resolve)
