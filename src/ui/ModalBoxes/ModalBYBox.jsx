@@ -8,9 +8,9 @@ class ModalBYBox extends React.Component {
     }
   }
 
-  onClick(element) {
+  onClick(peak) {
     if (this.props.clickCallback != null) {
-      this.props.clickCallback(element[0])
+      this.props.clickCallback(peak)
     }
   }
 
@@ -32,10 +32,10 @@ class ModalBYBox extends React.Component {
               <div id="modalBIons">
                 {
                   this.props.bIons.map(
-                    (element, index) =>
+                    (peak, index) =>
                     <p key={index}>
-                      <a onClick={this.onClick.bind(this, element)}>
-                        {element[1]}
+                      <a onClick={this.onClick.bind(this, peak)}>
+                        {peak.name}
                       </a>
                     </p>
                   )
@@ -49,10 +49,10 @@ class ModalBYBox extends React.Component {
               <div id="modalYIons">
                 {
                   this.props.yIons.map(
-                    (element, index) =>
+                    (peak, index) =>
                     <p key={index}>
-                      <a onClick={this.onClick.bind(this, element)}>
-                        {element[1]}
+                      <a onClick={this.onClick.bind(this, peak)}>
+                        {peak.name}
                       </a>
                     </p>
                   )

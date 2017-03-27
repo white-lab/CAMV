@@ -17,8 +17,8 @@ class SequenceBox extends React.Component {
 
       let [bFound, yFound] = this.getBYFound()
 
-      let bions = bFound.filter(i => i[0] == bindex).map(i => i.slice(1))
-      let yions = yFound.filter(i => i[0] == yindex).map(i => i.slice(1))
+      let bions = bFound.filter(i => i[0] == bindex).map(i => i[1])
+      let yions = yFound.filter(i => i[0] == yindex).map(i => i[1])
 
       this.props.clickCallback(bions, yions)
     }
@@ -30,9 +30,9 @@ class SequenceBox extends React.Component {
 
     this.props.spectrumData.forEach(function(peak, index) {
       if (peak.ionType == 'b') {
-        bFound.push([peak.ionPos, index, peak.name])
+        bFound.push([peak.ionPos, peak])
       } else if (peak.ionType == 'y') {
-        yFound.push([peak.ionPos, index, peak.name])
+        yFound.push([peak.ionPos, peak])
       }
     }.bind(this))
 

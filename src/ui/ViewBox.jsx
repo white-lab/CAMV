@@ -376,11 +376,11 @@ class ViewBox extends React.Component {
     })
   }
 
-  clickBYModal(matchId) {
+  clickBYModal(peak) {
     this.setState({
       modalBYOpen: false,
     })
-    this.updateSelectedMatchId(matchId, null)
+    this.updatePeak(peak)
   }
 
   closeBYModal() {
@@ -1017,7 +1017,10 @@ class ViewBox extends React.Component {
       <div
         className="panel panel-default"
         id="viewBox"
-        style={{margin: this.state.exporting ? '0px' : '10px'}}
+        style={{
+          margin: this.state.exporting ? '0px' : '10px',
+          height: this.state.exporting ? "100%" : "calc(100% - 29px)",
+        }}
       >
         <ModalImportBox
           ref="modalImportBox"
