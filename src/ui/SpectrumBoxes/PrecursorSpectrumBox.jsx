@@ -166,6 +166,28 @@ class PrecursorSpectrumBox extends React.Component {
       document.getElementById('precursorGoogleChart')
     )
 
+    if (this.props.pointChosenCallback != null) {
+      google.visualization.events.addListener(
+        chart, 'select',
+        function (e) {
+          let selectedItem = chart.getSelection()[0]
+
+          if (selectedItem) {
+            if (
+              data.getValue(selectedItem.row, 1) == 0 ||
+              data.getValue(selectedItem.row, 4) != null
+            ) { return}
+
+            let mz = data.getValue(selectedItem.row, 0)
+            let peak = this.props.spectrumData.find(
+              peak => peak.mz === mz
+            )
+            this.props.pointChosenCallback(peak)
+          }
+        }.bind(this)
+      )
+    }
+
     chart.draw(data, options)
   }
 
@@ -189,6 +211,8 @@ PrecursorSpectrumBox.propTypes = {
   ppm: React.PropTypes.number,
   precursorMz: React.PropTypes.number,
   spectrumData: React.PropTypes.array,
+
+  pointChosenCallback: React.PropTypes.func,
 }
 
 PrecursorSpectrumBox.defaultProps = {
@@ -198,6 +222,8 @@ PrecursorSpectrumBox.defaultProps = {
   ppm: 20,
   precursorMz: 0,
   spectrumData: [],
+
+  pointChosenCallback: null,
 }
 
 module.exports = PrecursorSpectrumBox

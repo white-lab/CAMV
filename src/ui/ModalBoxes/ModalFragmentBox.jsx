@@ -40,40 +40,57 @@ class ModalFragmentBox extends React.Component {
         onHide={this.close.bind(this)}
       >
         <Modal.Header>
-          <Modal.Title>
-            <div>
-              Observed m/z:&nbsp;
-              { this.props.peak != null ? this.props.peak.mz.toFixed(5) : null }
-            </div>
-            <div>
-              Current Label:&nbsp;
-              {this.props.peak != null ? this.props.peak.name : null}
-            </div>
-          </Modal.Title>
+          {
+            this.props.peak != null &&
+            <Modal.Title>
+              <div>
+                Observed m/z:&nbsp;
+                { this.props.peak.mz.toFixed(5) }
+              </div>
+              {
+                this.props.peak.name != null &&
+                <div>
+                  Current Label:&nbsp;
+                  { this.props.peak.name }
+                  {
+                    this.props.peak.exp_mz != null &&
+                    " - " + this.props.peak.exp_mz.toFixed(5)
+                  }
+                  {
+                    this.props.peak.ppm != null &&
+                    ' (' + this.props.peak.ppm.toFixed(1) + ' ppm)'
+                  }
+                </div>
+              }
+            </Modal.Title>
+          }
         </Modal.Header>
-        <Modal.Body>
-          New Label:&nbsp;
-          <select id="fragmentSelect">
-            {
-              this.state.fragmentMatches.map(
-                (object, i) => {
-                  return (
-                    <option
-                      key={i}
-                      value={object.frag_id || object.ionId || object.id}
-                    >
-                      {
-                        object.name +
-                        ' - ' + object.mz.toFixed(5) +
-                        ' (' + object.ppm.toFixed(1) + ' ppm)'
-                      }
-                    </option>
-                  )
-                }
-              )
-            }
-          </select>
-        </Modal.Body>
+        {
+          this.state.fragmentMatches.length > 0 &&
+          <Modal.Body>
+            New Label:&nbsp;
+            <select id="fragmentSelect">
+              {
+                this.state.fragmentMatches.map(
+                  (object, i) => {
+                    return (
+                      <option
+                        key={i}
+                        value={object.frag_id || object.ionId || object.id}
+                      >
+                        {
+                          object.name +
+                          ' - ' + object.mz.toFixed(5) +
+                          ' (' + object.ppm.toFixed(1) + ' ppm)'
+                        }
+                      </option>
+                    )
+                  }
+                )
+              }
+            </select>
+          </Modal.Body>
+        }
         <Modal.Footer>
           <Button
             disabled={this.state.fragmentMatches.length == 0}

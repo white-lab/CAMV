@@ -52,7 +52,7 @@ class QuantSpectrumBox extends React.Component {
     data.addColumn({'type': 'string', 'role': 'style'})
     data.addColumn({'type': 'string', 'role': 'annotation'})
 
-    let quantMz = this.props.quantMz
+    let quantMz = this.props.spectrumData
     let minMZ = Math.round(2 * Math.min.apply(null, quantMz.map(i => i.mz))) / 2 - 1
     let maxMZ = Math.round(2 * Math.max.apply(null, quantMz.map(i => i.mz))) / 2 + 1
     let ppm = this.props.ppm
@@ -60,30 +60,28 @@ class QuantSpectrumBox extends React.Component {
     if (this.props.spectrumData.length > 0) {
       data.addRows([[minMZ, 0, null, null]])
 
-      let indices = quantMz.map(
-        function(qmz) {
-          let errs = this.props.spectrumData.map(
-            peak => 1e6 * Math.abs(qmz.mz - peak.mz) / peak.mz
-          )
+      let ppm_cutoff = 10
 
-          if (errs.every(val => val > ppm))
-            return null
-
-          return errs.indexOf(Math.min.apply(Math, errs))
-        }.bind(this)
-      )
+      if (this.props.collisionType == "CID") {
+        ppm_cutoff = 1000
+      } else if (this.props.collisionType == "HCD") {
+        ppm_cutoff = 10
+      }
 
       this.props.spectrumData.forEach(function(peak, index) {
         let mz = peak.mz
         let into = peak.into
         let name = ''
-        let quantIndex = indices.indexOf(index)
-        let found = (quantIndex != -1)
         let style = ''
 
-        if (found) {
-          style = 'point {size: 5; fill-color: #5CB85C; visible: true}'
-          name = quantMz[quantIndex].name
+        if (peak.name != null) {
+          name = peak.name
+
+          if (peak.ppm < ppm_cutoff) {
+            style = 'point {size: 5; fill-color: #5CB85C; visible: true}'
+          } else {
+            style = 'point {size: 5; shape-type: star; fill-color: #FF00FF; visible: true}'
+          }
         } else {
           style = 'point {size: 5; fill-color: #5CB85C; visible: false}'
         }
@@ -127,6 +125,27 @@ class QuantSpectrumBox extends React.Component {
       document.getElementById('quantGoogleChart')
     )
 
+    if (this.props.pointChosenCallback != null) {
+      google.visualization.events.addListener(
+        chart, 'select',
+        function (e) {
+          let selectedItem = chart.getSelection()[0]
+
+          if (selectedItem) {
+            if (
+              data.getValue(selectedItem.row, 1) == 0
+            ) { return}
+
+            let mz = data.getValue(selectedItem.row, 0)
+            let peak = this.props.spectrumData.find(
+              peak => peak.mz === mz
+            )
+            this.props.pointChosenCallback(peak)
+          }
+        }.bind(this)
+      )
+    }
+
     chart.draw(data, options)
   }
 
@@ -147,12 +166,15 @@ QuantSpectrumBox.propTypes = {
   ppm: React.PropTypes.number,
   quantMz: React.PropTypes.arrayOf(React.PropTypes.object),
   spectrumData: React.PropTypes.array,
+
+  pointChosenCallback: React.PropTypes.func,
 }
 
 QuantSpectrumBox.defaultProps = {
   ppm: 20,
-  quantMz: [{mz: 0}, {mz: 1}],
   spectrumData: [],
+
+  pointChosenCallback: null,
 }
 
 module.exports = QuantSpectrumBox

@@ -80,6 +80,14 @@ class SpectrumBox extends React.Component {
     data.addColumn({'type': 'string', 'role': 'style'})
     data.addColumn({'type': 'string', 'role': 'annotation'})
 
+    let ppm_cutoff = 10
+
+    if (this.props.collisionType == "CID") {
+      ppm_cutoff = 1000
+    } else if (this.props.collisionType == "HCD") {
+      ppm_cutoff = 10
+    }
+
     if (this.props.spectrumData.length > 0) {
       data.addRows([[minMZ, 0, null, null]])
 
@@ -106,25 +114,17 @@ class SpectrumBox extends React.Component {
               peak.name != null &&
               peak.name.match(/^[abcxyz][^-]*$/) != null
             )
-            ppm = 1e6 * Math.abs(peak.exp_mz - mz) / mz
+
             name = (
               (
                 !isotope && ((into >= max_y / 10) || by_ion)
               ) ? peak.name : null
             )
 
-            let ppm_cutoff = 10
-
-            if (this.props.collisionType == "CID") {
-              ppm_cutoff = 1000
-            } else if (this.props.collisionType == "HCD") {
-              ppm_cutoff = 10
-            }
-
             if (into == 0) {
               // Plot intermediate line-plot points along x-axis
               style = null
-            } else if (ppm < ppm_cutoff) {
+            } else if (peak.ppm != null && peak.ppm < ppm_cutoff) {
               if (isotope) {
                 style = 'point {size: 3; fill-color: #F0AD4E; visible: true}'
               } else {
@@ -185,9 +185,15 @@ class SpectrumBox extends React.Component {
           let selectedItem = chart.getSelection()[0]
 
           if (selectedItem) {
-            this.props.pointChosenCallback(
-              data.getValue(selectedItem.row, 0)
+            if (
+              data.getValue(selectedItem.row, 1) == 0
+            ) { return}
+
+            let mz = data.getValue(selectedItem.row, 0)
+            let peak = this.props.spectrumData.find(
+              peak => peak.mz === mz
             )
+            this.props.pointChosenCallback(peak)
           }
         }.bind(this)
       )

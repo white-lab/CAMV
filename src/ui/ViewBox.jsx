@@ -48,7 +48,6 @@ class ViewBox extends React.Component {
       scanData: [],
       precursorData: [],
       quantData: [],
-      quantMz: [],
 
       /* Peak labeling states */
       selectedPeak: null,
@@ -159,82 +158,72 @@ class ViewBox extends React.Component {
     )
   }
 
-  updateScanData(redraw) {
+  updateScanData() {
     if (this.state.selectedScan == null) { return }
 
-    let promises = []
-    promises.push(
-      this.wrapSQLGet(
-        "SELECT (data_blob) \
-        FROM scan_data \
-        WHERE scan_data.scan_id=? AND scan_data.data_type=?",
-        [
-          this.state.selectedScan,
-          "ms2",
-        ],
-        function(resolve, reject, row) {
-          let data = this.blob_to_peaks(row.data_blob)
+    return this.wrapSQLGet(
+      "SELECT (data_blob) \
+      FROM scan_data \
+      WHERE scan_data.scan_id=? AND scan_data.data_type=?",
+      [
+        this.state.selectedScan,
+        "ms2",
+      ],
+      function(resolve, reject, row) {
+        let data = this.blob_to_peaks(row.data_blob)
 
-          this.setState(
-            {
-              scanData: data,
-            },
-            resolve,
-          )
-        }.bind(this)
-      ).then(function () {
-        if (this.state.selectedPTM == null) { return }
-        return this.wrapSQLAll(
-          "SELECT fragments.fragment_id, fragments.peak_id, \
-          fragments.display_name, fragments.mz, \
-          fragments.ion_type, fragments.ion_pos \
-          FROM fragments inner JOIN scan_ptms \
-          ON fragments.scan_ptm_id=scan_ptms.scan_ptm_id \
-          WHERE scan_ptms.scan_id=? AND scan_ptms.ptm_id=? AND fragments.best=1",
-          [
-            this.state.selectedScan,
-            this.state.selectedPTM,
-          ],
-          function(resolve, reject, rows) {
-            let data = this.state.scanData
-
-            rows.forEach(function (row) {
-              let peak = data[row.peak_id]
-              if (peak == null) { return }
-
-              peak.peak_id = row.peak_id
-              peak.fragId = row.fragment_id
-              peak.name = row.display_name
-              peak.exp_mz = row.mz
-              peak.ionType = row.ion_type
-              peak.ionPos = row.ion_pos
-            })
-
-            this.setState(
-              {
-                scanData: data,
-              },
-              resolve,
-            )
-          }.bind(this),
+        this.setState(
+          {
+            scanData: data,
+          },
+          resolve,
         )
-      }.bind(this))
+      }.bind(this)
     )
-    return Promise.all(promises).then(function () {
-      return new Promise(
-        function (resolve) {
-        if (redraw) {
-          this.redrawCharts()
-        }
-        resolve()
-      }.bind(this))
-    }.bind(this))
+  }
+
+  updatePTMData() {
+    if (this.state.selectedPTM == null) { return }
+
+    return this.wrapSQLAll(
+      "SELECT fragments.fragment_id, fragments.peak_id, \
+      fragments.display_name, fragments.mz, \
+      fragments.ion_type, fragments.ion_pos \
+      FROM fragments inner JOIN scan_ptms \
+      ON fragments.scan_ptm_id=scan_ptms.scan_ptm_id \
+      WHERE scan_ptms.scan_id=? AND scan_ptms.ptm_id=? AND fragments.best=1",
+      [
+        this.state.selectedScan,
+        this.state.selectedPTM,
+      ],
+      function(resolve, reject, rows) {
+        let data = this.state.scanData
+
+        rows.forEach(function (row) {
+          let peak = data[row.peak_id]
+          if (peak == null) { return }
+
+          peak.peak_id = row.peak_id
+          peak.fragId = row.fragment_id
+          peak.name = row.display_name
+          peak.exp_mz = row.mz
+          peak.ionType = row.ion_type
+          peak.ionPos = row.ion_pos
+          peak.ppm = 1e6 * Math.abs(peak.mz - row.mz) / row.mz
+        })
+
+        this.setState({
+          scanData: data,
+        }, resolve)
+      }.bind(this),
+    )
   }
 
   updateAll(nodes) {
     while (nodes.length < 4) { nodes.push(null) }
 
     this.state.db.interrupt()
+    let prev_nodes = this.getSelectedNode()
 
     return new Promise(function(resolve) {
       this.setState(
@@ -248,26 +237,40 @@ class ViewBox extends React.Component {
       )
     }.bind(this)).then(function() {
       let promises = []
-      if (nodes[2] != null || nodes[3] != null) {
-        promises.push(this.updateScanData(true))
-      }
-      if (nodes[0] != null) {
+
+      if (nodes[0] != null && nodes[0] != prev_nodes[0]) {
         promises.push(this.updateProtein())
       }
-      if (nodes[1] != null) {
+      if (nodes[1] != null && nodes[1] != prev_nodes[1]) {
         promises.push(this.updatePeptide())
       }
-      if (nodes[2] != null) {
-        promises.push(this.updateScan(true))
+      if (nodes[2] != null && nodes[2] != prev_nodes[2]) {
+        promises.push(this.updateScan())
+        promises.push(this.updateScanData())
       }
-      if (nodes[3] != null) {
+      if (nodes[3] != null && nodes.slice(2) != prev_nodes.slice(2)) {
         promises.push(this.updatePTM())
       }
+
       return Promise.all(promises)
     }.bind(this)).catch(function(err) {
       if (err != null && err.errno != sqlite3.INTERRUPT) {
         console.error(err)
       }
+    }).then(function() {
+      let promises = []
+
+      if (nodes[3] != null && nodes.slice(2) != prev_nodes.slice(2)) {
+        promises.push(this.updatePTMData())
+      }
+
+      return Promise.all(promises)
+    }.bind(this)).catch(function(err) {
+      if (err != null && err.errno != sqlite3.INTERRUPT) {
+        console.error(err)
+      }
+    }.bind(this)).then(function() {
+      this.redrawCharts()
     }.bind(this))
   }
 
@@ -277,7 +280,7 @@ class ViewBox extends React.Component {
     this.refs["quantSpectrum"].drawChart()
   }
 
-  updateselectedPeakMz(mz) {
+  selectedPrecursorMz(peak) {
     if (
       this.state.selectedPTM == null ||
       this.state.scanData == null
@@ -285,11 +288,24 @@ class ViewBox extends React.Component {
       return
     }
 
-    let peak = this.state.scanData.find(
-      peak => peak.mz === mz
-    )
+    this.setState({
+      selectedPeak: peak,
+      modalFragmentSelectionOpen: true,
+    })
+  }
 
-    this.updateSelectedPeak(peak)
+  selectedQuantMz(peak) {
+    if (
+      this.state.selectedPTM == null ||
+      this.state.scanData == null
+    ) {
+      return
+    }
+
+    this.setState({
+      selectedPeak: peak,
+      modalFragmentSelectionOpen: true,
+    })
   }
 
   handleSQLError(error) {
@@ -303,8 +319,11 @@ class ViewBox extends React.Component {
     }
   }
 
-  updateSelectedPeak(peak) {
-    if (this.state.selectedPTM == null) {
+  updatePeak(peak) {
+    if (
+      this.state.selectedPTM == null ||
+      this.state.scanData == null
+    ) {
       return
     }
 
@@ -402,7 +421,7 @@ class ViewBox extends React.Component {
         ],
       )
     }.bind(this)).then(function() {
-      return this.updateScanData(false)
+      return this.updateScanData()
     }.bind(this))
   }
 
@@ -850,48 +869,55 @@ class ViewBox extends React.Component {
             scan: row,
           }, resolve)
         }.bind(this),
-      )
-    )
+      ).then(function () {
+        return this.wrapSQLGet(
+          "SELECT data_blob \
+          FROM scan_data \
+          WHERE scan_data.data_type=? AND scan_data.scan_id=?",
+          [
+            "precursor",
+            this.state.selectedScan,
+          ],
+          function(resolve, reject, row) {
+            let peaks = this.blob_to_peaks(row.data_blob)
 
-    promises.push(
-      this.wrapSQLAll(
-        "SELECT \
-        quant_mz_peaks.mz, \
-        quant_mz_peaks.peak_name AS name \
-        \
-        FROM scans \
-        INNER JOIN quant_mz_peaks \
-        ON scans.quant_mz_id=quant_mz_peaks.quant_mz_id \
-        \
-        WHERE scans.scan_id=? \
-        \
-        ORDER BY quant_mz_peaks.mz",
-        [
-          this.state.selectedScan,
-        ],
-        function(resolve, reject, rows) {
-          this.setState({
-            quantMz: rows,
-          }, resolve)
-        }.bind(this),
-      )
-    )
+            let ionSeries = []
 
-    promises.push(
-      this.wrapSQLGet(
-        "SELECT data_blob \
-        FROM scan_data \
-        WHERE scan_data.data_type=? AND scan_data.scan_id=?",
-        [
-          "precursor",
-          this.state.selectedScan,
-        ],
-        function(resolve, reject, row) {
-          this.setState({
-            precursorData: this.blob_to_peaks(row.data_blob),
-          }, resolve)
-        }.bind(this),
-      )
+            for (let i = -this.state.scan.c13Num; i <= 5; i++) {
+              ionSeries.push(i)
+            }
+
+            let scan = this.state.scan
+
+            ionSeries.forEach(
+              (val) => {
+                let exp_mz = (scan.precursorMz + 1.003355 * val / scan.chargeState)
+                let errs = peaks.map(
+                  peak => 1e6 * Math.abs(peak.mz - exp_mz) / peak.mz
+                )
+
+                if (errs.every(val => val > this.state.maxPPM))
+                  return
+
+                let ppm = Math.min.apply(Math, errs)
+                let peak = peaks[errs.indexOf(ppm)]
+                peak.ppm = ppm
+                peak.exp_mz = exp_mz
+                peak.name = (
+                  "MH^{+" +
+                  (scan.chargeState > 1 ? scan.chargeState : "") +
+                  "}" +
+                  (val > -scan.c13Num ? " + " + (val + scan.c13Num) + " ¹³C" : "")
+                )
+              }
+            )
+
+            this.setState({
+              precursorData: peaks,
+            }, resolve)
+          }.bind(this),
+        )
+      }.bind(this))
     )
 
     promises.push(
@@ -908,17 +934,58 @@ class ViewBox extends React.Component {
             quantData: this.blob_to_peaks(row.data_blob),
           }, resolve)
         }.bind(this),
-      )
+      ).then(function () {
+        return this.wrapSQLAll(
+          "SELECT \
+          quant_mz_peaks.mz, \
+          quant_mz_peaks.peak_name AS name \
+          \
+          FROM scans \
+          INNER JOIN quant_mz_peaks \
+          ON scans.quant_mz_id=quant_mz_peaks.quant_mz_id \
+          \
+          WHERE scans.scan_id=? \
+          \
+          ORDER BY quant_mz_peaks.mz",
+          [
+            this.state.selectedScan,
+          ],
+          function(resolve, reject, rows) {
+            rows.forEach(function (row) {
+              let errs = this.state.quantData.map(
+                (peak) => {
+                  return 1e6 * Math.abs(peak.mz - row.mz) / row.mz
+                }
+              )
+
+              if (errs.every(val => val > this.state.maxPPM))
+                return
+
+              let min_err = Math.min.apply(Math, errs)
+              let peak = this.state.quantData[errs.indexOf(min_err)]
+
+              if (peak == null) { return }
+
+              peak.name = row.name
+              peak.exp_mz = row.mz
+              peak.ppm = min_err
+            }.bind(this))
+
+            resolve()
+          }.bind(this),
+        )
+      }.bind(this))
     )
 
     return Promise.all(promises).then(function () {
       return new Promise(
         function (resolve) {
-        if (redraw) {
-          this.redrawCharts()
-        }
-        resolve()
-      }.bind(this))
+          if (redraw) {
+            this.redrawCharts()
+          }
+          resolve()
+        }.bind(this)
+      )
     }.bind(this))
   }
 
@@ -1054,6 +1121,8 @@ class ViewBox extends React.Component {
                   c13Num={scan != null ? scan.c13Num : 0}
                   chargeState={scan != null ? scan.chargeState : null}
                   ppm={50}
+
+                  pointChosenCallback={this.selectedPrecursorMz.bind(this)}
                 />
               </div>
               <div
@@ -1066,8 +1135,9 @@ class ViewBox extends React.Component {
                 <QuantSpectrumBox
                   ref="quantSpectrum"
                   spectrumData={this.state.quantData}
-                  quantMz={this.state.quantMz}
                   ppm={50}
+
+                  pointChosenCallback={this.selectedQuantMz.bind(this)}
                 />
               </div>
               <div id="exportSave">
@@ -1101,7 +1171,7 @@ class ViewBox extends React.Component {
                 selectedPTM={this.state.selectedPTM}
 
                 updateChoice={this.setChoice.bind(this)}
-                pointChosenCallback={this.updateselectedPeakMz.bind(this)}
+                pointChosenCallback={this.updatePeak.bind(this)}
               />
             </div>
           </div>
