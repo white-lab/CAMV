@@ -1,5 +1,12 @@
 # Change Log
 
+## 0.3.1 (2017-03-27)
+
+Features
+
+  - Allow picking precursor + quantification ions to view ppm / expected m/z /
+    etc.
+
 ## 0.3.0 (2017-03-24)
 
 Features
