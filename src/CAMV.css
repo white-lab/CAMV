@@ -170,6 +170,10 @@ li[class=reject] > span {
   color: red;
 }
 
+li[class=truncated] > span {
+  color: orange;
+}
+
 li[class=undecided] > span {
   color: black;
 }

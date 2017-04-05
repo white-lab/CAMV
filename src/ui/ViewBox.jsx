@@ -622,6 +622,27 @@ class ViewBox extends React.Component {
       db: data,
       loaded: true,
       modalImportOpen: false,
+
+      selectedProteins: null,
+      selectedPeptide: null,
+      selectedScan: null,
+      selectedPTM: null,
+
+      proteins: null,
+      peptide: null,
+      scan: null,
+      ptm: null,
+      scanData: [],
+      precursorData: [],
+      quantData: [],
+
+      selectedPeak: null,
+      fragmentMatches: [],
+      maxPPM: 100,  /* Max window for fragments that can be candidates */
+      bIons: [],
+      yIons: [],
+
+      nodeTree: [],
     })
 
     if (fileName != null && fileName.length > 0) {
@@ -646,7 +667,7 @@ class ViewBox extends React.Component {
       "SELECT \
       protein_sets.protein_set_id, protein_sets.protein_set_name, \
       peptides.peptide_id, peptides.peptide_seq, \
-      mod_states.mod_state_id, mod_states.mod_desc, \
+      mod_states.mod_state_id, mod_states.mod_desc, mod_states.num_comb, \
       scans.scan_id, scans.scan_num, \
       ptms.ptm_id, ptms.name, \
       scan_ptms.scan_ptm_id, \
@@ -698,6 +719,7 @@ class ViewBox extends React.Component {
               name: "Scan " + last_row.scan_num,
               nodeId: last_row.scan_id,
               children: ptms,
+              numComb: last_row.num_comb,
             })
             ptms = []
           }

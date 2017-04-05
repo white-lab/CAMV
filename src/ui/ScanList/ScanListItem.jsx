@@ -56,7 +56,10 @@ class ScanListItem extends React.Component {
         <li
           className={
             this.props.choice != null ?
-            this.props.choice : 'undecided'
+            this.props.choice : (
+              (this.props.numComb != null && this.props.numComb != this.props.children.length) ?
+              'truncated' : 'undecided'
+            )
           }
           onClick={this.toggle.bind(this)}
         >
@@ -112,6 +115,7 @@ ScanListItem.propTypes = {
   name: React.PropTypes.string.isRequired,
   children: React.PropTypes.array,
   choice: React.PropTypes.string,
+  numComb: React.PropTypes.number,
 
   update: React.PropTypes.func,
 
@@ -124,6 +128,7 @@ ScanListItem.defaultProps = {
 
   children: [],
   choice: null,
+  numComb: null,
 
   update: null,
 
