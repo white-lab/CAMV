@@ -1,5 +1,12 @@
 # Change Log
 
+## 0.3.2 (2017-04-05)
+
+Features
+
+  - Added support for reprocessing individual scans without PTM combination
+    limits.
+
 ## 0.3.1 (2017-03-27)
 
 Features
