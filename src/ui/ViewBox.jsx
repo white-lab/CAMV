@@ -1238,7 +1238,7 @@ class ViewBox extends React.Component {
               </div>
               <div id="exportSave">
                 {
-                  this.state.scan != null && this.state.scan.truncated &&
+                  this.state.scan != null && this.state.scan.truncated != 0 &&
                   <Button
                     id="openProcessScan"
                     onClick={this.openProcessScan.bind(this)}
