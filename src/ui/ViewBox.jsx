@@ -14,6 +14,7 @@ import ModalImportBox from './ModalBoxes/ModalImportBox'
 import ModalSearchBox from './ModalBoxes/ModalSearchBox'
 import ModalFragmentBox from './ModalBoxes/ModalFragmentBox'
 import ModalBYBox from './ModalBoxes/ModalBYBox'
+import ModalProcessScanBox from './ModalBoxes/ModalProcessScanBox'
 
 import SpectrumBox from './SpectrumBoxes/SpectrumBox'
 import PrecursorSpectrumBox from './SpectrumBoxes/PrecursorSpectrumBox'
@@ -62,6 +63,7 @@ class ViewBox extends React.Component {
       modalImportOpen: true,
       modalFragmentSelectionOpen: false,
       modalBYOpen: false,
+      modalProcessScan: false,
 
       loaded: false,
       exporting: false,
@@ -144,6 +146,7 @@ class ViewBox extends React.Component {
       this.state.modalSearchOpen,
       this.state.modalFragmentSelectionOpen,
       this.state.modalBYOpen,
+      this.state.modalProcessScan,
     ].some(i => i != false)
   }
 
@@ -391,7 +394,7 @@ class ViewBox extends React.Component {
     })
   }
 
-  clickBYModal(peak) {
+  openBYModal(peak) {
     this.setState({
       modalBYOpen: false,
     })
@@ -402,6 +405,22 @@ class ViewBox extends React.Component {
     this.setState({
       modalBYOpen: false,
     })
+  }
+
+  openProcessScan() {
+    this.setState({
+      modalProcessScan: true,
+    })
+  }
+
+  closeProcessScan(reprocessed) {
+    this.setState({
+      modalProcessScan: false,
+    })
+
+    if (reprocessed) {
+      this.buildNodeTree()
+    }
   }
 
   updateSelectedFragment(peak, fragId) {
@@ -667,8 +686,8 @@ class ViewBox extends React.Component {
       "SELECT \
       protein_sets.protein_set_id, protein_sets.protein_set_name, \
       peptides.peptide_id, peptides.peptide_seq, \
-      mod_states.mod_state_id, mod_states.mod_desc, mod_states.num_comb, \
-      scans.scan_id, scans.scan_num, \
+      mod_states.mod_state_id, mod_states.mod_desc, \
+      scans.scan_id, scans.scan_num, scans.truncated, \
       ptms.ptm_id, ptms.name, \
       scan_ptms.scan_ptm_id, \
       scan_ptms.choice \
@@ -719,7 +738,7 @@ class ViewBox extends React.Component {
               name: "Scan " + last_row.scan_num,
               nodeId: last_row.scan_id,
               children: ptms,
-              numComb: last_row.num_comb,
+              truncated: last_row.truncated != 0,
             })
             ptms = []
           }
@@ -893,6 +912,7 @@ class ViewBox extends React.Component {
         scans.isolation_window_upper, \
         scans.quant_mz_id, \
         scans.c13_num AS c13Num, \
+        scans.truncated, \
         scan_ptms.mascot_score AS searchScore, \
         files.filename AS fileName \
         \
@@ -1066,13 +1086,6 @@ class ViewBox extends React.Component {
   }
 
   render() {
-    let [proteins, peptide, scan, ptm] = [
-      this.state.proteins,
-      this.state.peptide,
-      this.state.scan,
-      this.state.ptm,
-    ]
-
     return (
       <div
         className="panel panel-default"
@@ -1111,10 +1124,18 @@ class ViewBox extends React.Component {
         <ModalBYBox
           ref="modalBYBox"
           showModal={this.state.modalBYOpen}
-          clickCallback={this.clickBYModal.bind(this)}
+          clickCallback={this.openBYModal.bind(this)}
           closeCallback={this.closeBYModal.bind(this)}
           bIons={this.state.bIons}
           yIons={this.state.yIons}
+        />
+        <ModalProcessScanBox
+          ref="modalProcessScanBox"
+          showModal={this.state.modalProcessScan}
+          clickCallback={this.openProcessScan.bind(this)}
+          closeCallback={this.closeProcessScan.bind(this)}
+          scan={this.state.scan}
+          db={this.state.db}
         />
         <div
           className="panel panel-default"
@@ -1139,23 +1160,23 @@ class ViewBox extends React.Component {
             id="sequenceBox"
           >
             {
-              (scan != null && proteins != null) &&
+              (this.state.scan != null && this.state.proteins != null) &&
               <div
                 id="scanDataContainer"
               >
                 <ScanDataBox
-                  proteins={proteins}
-                  scan={scan}
+                  proteins={this.state.proteins}
+                  scan={this.state.scan}
                 />
               </div>
             }
             {
-              (scan != null && ptm != null) &&
+              (this.state.scan != null && this.state.ptm != null) &&
               <div
                 id="sequenceContainer"
               >
                 <SequenceBox
-                  ptm={ptm}
+                  ptm={this.state.ptm}
                   spectrumData={this.state.scanData}
                   clickCallback={this.handleBYClick.bind(this)}
                 />
@@ -1179,10 +1200,22 @@ class ViewBox extends React.Component {
                 <PrecursorSpectrumBox
                   ref="precursorSpectrum"
                   spectrumData={this.state.precursorData}
-                  precursorMz={scan != null ? scan.precursorMz : null}
-                  isolationWindow={scan != null ? scan.precursorIsolationWindow : null}
-                  c13Num={scan != null ? scan.c13Num : 0}
-                  chargeState={scan != null ? scan.chargeState : null}
+                  precursorMz={
+                    this.state.scan != null ?
+                    this.state.scan.precursorMz : null
+                  }
+                  isolationWindow={
+                    this.state.scan != null ?
+                    this.state.scan.precursorIsolationWindow : null
+                  }
+                  c13Num={
+                    this.state.scan != null ?
+                    this.state.scan.c13Num : 0
+                  }
+                  chargeState={
+                    this.state.scan != null ?
+                    this.state.scan.chargeState : null
+                  }
                   ppm={50}
 
                   pointChosenCallback={this.selectedPrecursorMz.bind(this)}
@@ -1204,6 +1237,16 @@ class ViewBox extends React.Component {
                 />
               </div>
               <div id="exportSave">
+                {
+                  this.state.scan != null && this.state.scan.truncated &&
+                  <Button
+                    id="openProcessScan"
+                    onClick={this.openProcessScan.bind(this)}
+                    style={{display: this.state.exporting ? 'none' : null}}
+                  >
+                    Process
+                  </Button>
+                }
                 <Button
                   id="openImport"
                   onClick={this.openImport.bind(this)}
@@ -1227,8 +1270,11 @@ class ViewBox extends React.Component {
               <SpectrumBox
                 ref="fragmentSpectrum"
                 spectrumData={this.state.scanData}
-                collisionType={scan != null ? scan.collisionType : null}
-                inputDisabled={ptm == null}
+                collisionType={
+                  this.state.scan != null ?
+                  this.state.scan.collisionType : null
+                }
+                inputDisabled={this.state.ptm == null}
 
                 selectedScan={this.state.selectedScan}
                 selectedPTM={this.state.selectedPTM}

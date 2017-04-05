@@ -1,4 +1,4 @@
-  import React from 'react'
+import React from 'react'
 
 import ScanListItem from './ScanListItem'
 
@@ -226,6 +226,7 @@ class ScanSelectionList extends React.Component {
                   nodeId={child.nodeId}
                   name={child.name}
                   children={child.children}
+                  truncated={child.truncated}
 
                   update={this.update.bind(this)}
 

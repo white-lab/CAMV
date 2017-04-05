@@ -57,7 +57,7 @@ class ScanListItem extends React.Component {
           className={
             this.props.choice != null ?
             this.props.choice : (
-              (this.props.numComb != null && this.props.numComb != this.props.children.length) ?
+              this.props.truncated != null && this.props.truncated ?
               'truncated' : 'undecided'
             )
           }
@@ -87,6 +87,7 @@ class ScanListItem extends React.Component {
                       nodeId={child.nodeId}
                       name={child.name}
                       choice={child.choice}
+                      truncated={child.truncated}
                       children={child.children}
 
                       update={this.update.bind(this)}
@@ -115,7 +116,7 @@ ScanListItem.propTypes = {
   name: React.PropTypes.string.isRequired,
   children: React.PropTypes.array,
   choice: React.PropTypes.string,
-  numComb: React.PropTypes.number,
+  truncated: React.PropTypes.bool,
 
   update: React.PropTypes.func,
 
@@ -128,7 +129,7 @@ ScanListItem.defaultProps = {
 
   children: [],
   choice: null,
-  numComb: null,
+  truncated: false,
 
   update: null,
 
