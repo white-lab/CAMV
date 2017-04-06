@@ -1,5 +1,11 @@
 # Change Log
 
+## 0.3.3 (2017-04-06)
+
+Features
+
+  - Added the ability to add custom labels to peaks and remove a label.
+
 ## 0.3.2 (2017-04-05)
 
 Features

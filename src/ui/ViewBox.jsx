@@ -152,11 +152,11 @@ class ViewBox extends React.Component {
 
   blob_to_peaks(blob) {
     return new TextDecoder("utf-8").decode(blob).split(";").map(
-      function(i) {
+      function(i, index) {
         let [mz, intensity] = i.split(',')
         mz = parseFloat(mz)
         intensity = parseFloat(intensity)
-        return {mz: mz, into: intensity}
+        return {mz: mz, into: intensity, peak_id: index}
       }
     )
   }
@@ -190,6 +190,11 @@ class ViewBox extends React.Component {
   updatePTMData() {
     if (this.state.selectedPTM == null) { return }
 
+    /* Reset peak assignments */
+    this.state.scanData = this.state.scanData.map(
+      (peak) => { return {mz: peak.mz, into: peak.into, peak_id: peak.peak_id} }
+    )
+
     return this.wrapSQLAll(
       "SELECT fragments.fragment_id, fragments.peak_id, \
       fragments.display_name, fragments.mz, \
@@ -219,7 +224,6 @@ class ViewBox extends React.Component {
           let peak = data[row.peak_id]
           if (peak == null) { return }
 
-          peak.peak_id = row.peak_id
           peak.fragId = row.fragment_id
           peak.name = row.display_name
           peak.exp_mz = row.mz
@@ -260,7 +264,10 @@ class ViewBox extends React.Component {
       if (nodes[1] != null && nodes[1] != prev_nodes[1]) {
         promises.push(this.updatePeptide())
       }
-      if (nodes[2] != null && nodes[2] != prev_nodes[2]) {
+      if (
+        (nodes[2] != null && nodes[2] != prev_nodes[2]) ||
+        (nodes[3] == null && prev_nodes[3] != null)
+      ) {
         promises.push(this.updateScan())
         promises.push(this.updateScanData())
       }
@@ -349,7 +356,10 @@ class ViewBox extends React.Component {
     })
 
     return this.wrapSQLAll(
-      "SELECT fragments.mz, fragments.display_name AS name \
+      "SELECT \
+      fragments.fragment_id, \
+      fragments.mz, \
+      fragments.display_name AS name \
       \
       FROM scan_ptms \
       INNER JOIN fragments \
@@ -427,14 +437,88 @@ class ViewBox extends React.Component {
     if (
       this.state.selectedProteins == null ||
       this.state.selectedPeptide == null ||
-      this.state.selectedScan == null
+      this.state.selectedScan == null ||
+      this.state.selectedPTM == null
+    ) {
+        return
+    }
+
+    return this.unsetFragmentLabel(peak, false).then(function () {
+      return this.wrapSQLRun(
+        "UPDATE fragments \
+        SET best=1 \
+        WHERE fragments.fragment_id=?",
+        [
+          fragId,
+        ],
+      )
+    }.bind(this)).then(function() {
+      return this.updatePTMData()
+    }.bind(this))
+  }
+
+  newFragmentLabel(peak, label) {
+    if (
+      this.state.selectedProteins == null ||
+      this.state.selectedPeptide == null ||
+      this.state.selectedScan == null ||
+      this.state.selectedPTM == null
+    ) {
+        return
+    }
+
+    return this.unsetFragmentLabel(peak, false).then(function () {
+      return this.wrapSQLGet(
+        "SELECT scan_ptms.scan_ptm_id \
+        FROM scan_ptms \
+        WHERE scan_ptms.scan_id=? AND scan_ptms.ptm_id=?",
+        [
+          this.state.selectedScan,
+          this.state.selectedPTM,
+        ],
+        function(resolve_a, reject_a, row) {
+          this.wrapSQLRun(
+            "INSERT INTO fragments ( \
+              scan_ptm_id, \
+              peak_id, \
+              name, \
+              display_name, \
+              mz, \
+              best \
+            ) VALUES (?, ?, ?, ?, ?, ?)",
+            [
+              row.scan_ptm_id,
+              peak.peak_id,
+              label,
+              label,
+              peak.mz,
+              1,
+            ],
+            function(resolve_b, reject_b) {
+              resolve_a()
+              resolve_b()
+            },
+          )
+        }.bind(this),
+      )
+    }.bind(this)).then(function() {
+      return this.updatePTMData()
+    }.bind(this))
+  }
+
+  unsetFragmentLabel(peak, refresh) {
+    if (
+      this.state.selectedProteins == null ||
+      this.state.selectedPeptide == null ||
+      this.state.selectedScan == null ||
+      this.state.selectedPTM == null
     ) {
         return
     }
 
     return this.wrapSQLRun(
       "UPDATE fragments \
-      SET fragments.best=0 \
+      SET best=0 \
       WHERE fragments.peak_id=? AND scan_ptm_id IN ( \
         SELECT scan_ptms.scan_ptm_id \
         FROM scan_ptms \
@@ -445,17 +529,10 @@ class ViewBox extends React.Component {
         this.state.selectedScan,
         this.state.selectedPTM,
       ],
-    ).then(function () {
-      return this.wrapSQLRun(
-        "UPDATE fragments \
-        SET best=1 \
-        WHERE frag_id=?",
-        [
-          fragId,
-        ],
-      )
-    }.bind(this)).then(function() {
-      return this.updateScanData()
+    ).then(function() {
+      if (refresh == null || refresh) {
+        return this.updatePTMData()
+      }
     }.bind(this))
   }
 
@@ -1119,6 +1196,8 @@ class ViewBox extends React.Component {
           peak={this.state.selectedPeak}
           fragmentMatches={this.state.fragmentMatches}
           updateCallback={this.updateSelectedFragment.bind(this)}
+          newLabelCallback={this.newFragmentLabel.bind(this)}
+          noneCallback={this.unsetFragmentLabel.bind(this)}
           closeCallback={this.closeFragmentSelectionModal.bind(this)}
         />
         <ModalBYBox

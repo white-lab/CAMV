@@ -1,27 +1,76 @@
 import React from 'react'
-import { Modal, Button } from 'react-bootstrap'
+import { Modal, Button, Radio, FormGroup, FormControl, ControlLabel } from 'react-bootstrap'
 
 class ModalFragmentBox extends React.Component {
   constructor(props) {
     super(props)
     this.state = {
       peak: null,
-      fragmentMatches: [],
+      selectedFragment: "",
+      newLabelText: "",
+      radioChoice: null,
     }
   }
 
   componentWillReceiveProps(nextProps) {
     this.setState({
       peak: nextProps.peak,
-      fragmentMatches: nextProps.fragmentMatches,
+      selectedFragment: (
+        nextProps.fragmentMatches.length > 0 ?
+        nextProps.fragmentMatches[0].fragment_id : ""
+      ),
+      radioChoice: (
+        nextProps.fragmentMatches.length > 0 ?
+        'change' : 'none'
+      ),
+    })
+  }
+
+  radioChange(e) {
+    this.setState({
+      radioChoice: e.target.value,
+    })
+  }
+
+  newLabelChange(e) {
+    this.setState({
+      newLabelText: e.target.value,
+    })
+  }
+
+  selectedFragmentChange(e) {
+    this.setState({
+      selectedFragment: e.target.value,
     })
   }
 
   update() {
-    let fragId = $( "#fragmentSelect" ).val()
+    switch (this.state.radioChoice) {
+      case "change":
+        if (this.props.updateCallback != null) {
+          this.props.updateCallback(
+            this.state.peak,
+            this.state.selectedFragment,
+          )
+        }
+        break
 
-    if (this.props.updateCallback != null) {
-      this.props.updateCallback(peak, fragId)
+      case "new":
+        if (this.props.newLabelCallback != null) {
+          this.props.newLabelCallback(
+            this.state.peak,
+            this.state.newLabelText,
+          )
+        }
+        break
+
+      case "none":
+        if (this.props.noneCallback != null) {
+          this.props.noneCallback(
+            this.state.peak,
+          )
+        }
+        break
     }
 
     this.close()
@@ -65,35 +114,86 @@ class ModalFragmentBox extends React.Component {
             </Modal.Title>
           }
         </Modal.Header>
-        {
-          this.state.fragmentMatches.length > 0 &&
-          <Modal.Body>
-            New Label:&nbsp;
-            <select id="fragmentSelect">
-              {
-                this.state.fragmentMatches.map(
-                  (object, i) => {
-                    return (
-                      <option
-                        key={i}
-                        value={object.frag_id || object.ionId || object.id}
-                      >
-                        {
-                          object.name +
-                          ' - ' + object.mz.toFixed(5) +
-                          ' (' + object.ppm.toFixed(1) + ' ppm)'
-                        }
-                      </option>
+
+        <Modal.Body>
+          <FormGroup
+            controlId="radioChoice"
+          >
+            <Radio
+              value="change"
+              disabled={this.props.fragmentMatches.length <= 0}
+              checked={this.state.radioChoice == "change"}
+              onChange={this.radioChange.bind(this)}
+            >
+              <FormGroup
+                controlId="fragmentSelect"
+              >
+                <ControlLabel>
+                  Change Label
+                </ControlLabel>
+
+                <FormControl
+                  componentClass="select"
+                  placeholder="select"
+                  disabled={this.props.fragmentMatches.length <= 0}
+                  value={this.state.selectedFragment}
+                  onChange={this.selectedFragmentChange.bind(this)}
+                >
+                  {
+                    this.props.fragmentMatches.map(
+                      (object, i) => {
+                        return (
+                          <option
+                            key={i}
+                            value={object.fragment_id}
+                          >
+                            {
+                              object.name +
+                              ' - ' + object.mz.toFixed(5) +
+                              ' (' + object.ppm.toFixed(1) + ' ppm)'
+                            }
+                          </option>
+                        )
+                      }
                     )
                   }
-                )
-              }
-            </select>
-          </Modal.Body>
-        }
+                </FormControl>
+              </FormGroup>
+            </Radio>
+
+            <Radio
+              value="new"
+              checked={this.state.radioChoice == "new"}
+              onChange={this.radioChange.bind(this)}
+            >
+              <FormGroup
+                controlId="newLabelText"
+              >
+                <ControlLabel>
+                  New Label
+                </ControlLabel>
+
+                <FormControl
+                  type="text"
+                  placeholder="Enter text"
+                  value={this.state.newLabelText}
+                  onChange={this.newLabelChange.bind(this)}
+                />
+              </FormGroup>
+            </Radio>
+
+            <Radio
+              value="none"
+              checked={this.state.radioChoice == "none"}
+              onChange={this.radioChange.bind(this)}
+            >
+              None
+            </Radio>
+          </FormGroup>
+        </Modal.Body>
+
         <Modal.Footer>
           <Button
-            disabled={this.state.fragmentMatches.length == 0}
             onClick={this.update.bind(this)}
           >
             Update
@@ -101,7 +201,7 @@ class ModalFragmentBox extends React.Component {
           <Button
             onClick={this.close.bind(this)}
           >
-            Close
+            Cancel
           </Button>
         </Modal.Footer>
       </Modal>
@@ -111,11 +211,15 @@ class ModalFragmentBox extends React.Component {
 
 ModalFragmentBox.propTypes = {
   updateCallback: React.PropTypes.func,
+  newLabelCallback: React.PropTypes.func,
+  noneCallback: React.PropTypes.func,
   closeCallback: React.PropTypes.func,
 }
 
 ModalFragmentBox.defaultProps = {
   updateCallback: null,
+  newLabelCallback: null,
+  noneCallback: null,
   closeCallback: null,
 }
 
