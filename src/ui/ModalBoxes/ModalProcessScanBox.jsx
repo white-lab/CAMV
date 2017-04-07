@@ -8,10 +8,59 @@ class modalProcessScanBox extends React.Component {
   constructor(props) {
     super(props)
     this.state = {
-      ready: false,
       processing: false,
       pycamverterPath: null,
     }
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    if (
+      (prevProps.db == this.props.db) ||
+      this.props.db == null
+    ) { return }
+
+    this.props.db.get(
+      "SELECT * \
+      FROM camv_meta \
+      WHERE key=?",
+      [
+        "search_path",
+      ],
+      function(err, row) {
+        this.setState({
+          search_path: row.val,
+        })
+      }.bind(this)
+    )
+    this.props.db.get(
+      "SELECT * \
+      FROM camv_meta \
+      WHERE key=?",
+      [
+        "raw_paths",
+      ],
+      function(err, row) {
+        let raw_paths = row.val.split(";")
+        let raw_path = null
+
+        if (this.props.scan != null) {
+          for (let path of raw_paths) {
+            if (
+              path.replace(/^.*[\\\/]/, '') ==
+              this.props.scan.fileName.replace(/^.*[\\\/]/, '')
+            ) {
+              raw_path = path
+            }
+          }
+        } else {
+          raw_path = raw_paths[0]
+        }
+
+        this.setState({
+          raw_path: raw_path,
+        })
+      }.bind(this)
+    )
   }
 
   updatePycamverterPath() {
@@ -26,8 +75,43 @@ class modalProcessScanBox extends React.Component {
         if (fileNames === undefined) return;
 
         this.setState({
-          ready: true,
           pycamverterPath: fileNames[0],
+        })
+      }.bind(this)
+    )
+  }
+
+  updateRawPath() {
+    dialog.showOpenDialog(
+      {
+        filters: [{
+          name: 'RAW File',
+          extensions: ['raw', "mgf", "d", "wiff"],
+        }]
+      },
+      function (fileNames) {
+        if (fileNames === undefined) return;
+
+        this.setState({
+          raw_path: fileNames[0],
+        })
+      }.bind(this)
+    )
+  }
+
+  updateSearchPath() {
+    dialog.showOpenDialog(
+      {
+        filters: [{
+          name: 'Search File',
+          extensions: ['msf', "xml"],
+        }]
+      },
+      function (fileNames) {
+        if (fileNames === undefined) return;
+
+        this.setState({
+          search_path: fileNames[0],
         })
       }.bind(this)
     )
@@ -44,86 +128,38 @@ class modalProcessScanBox extends React.Component {
       processing: true,
     })
 
-    this.props.db.all(
-      "SELECT * \
-      FROM camv_meta \
-      WHERE key IN (?, ?)",
-      [
-        "search_path",
-        "raw_paths",
-      ],
-      function (err, rows) {
-        if (err != null || rows == null) {
-          console.error(err)
-          return
+    let args = [
+      "-vv",
+      "--reprocess",
+      "--scans", this.props.scan.scanNumber,
+      "--search_path", this.state.search_path,
+      "--raw_paths", this.state.raw_path,
+    ]
+
+    console.log(
+      this.state.pycamverterPath, args,
+    )
+
+    execFile(
+      this.state.pycamverterPath,
+      args,
+      (error, stdout, stderr) => {
+        if (error) {
+          console.error(error)
         }
 
-        let search_path = null
-        let raw_paths = null
+        console.log(stdout)
+        console.log(stderr)
 
-        for (let row of rows) {
-          if (row.key == "search_path") {
-            search_path = row.val
-          } else if (row.key == "raw_paths") {
-            raw_paths = row.val
-          } else {
-            console.error("Unexpected row:", row)
-            return
-          }
+        this.setState({
+          processing: false,
+        })
+
+        if (this.props.closeCallback != null) {
+          this.props.closeCallback(error == null)
         }
+      }
 
-        let raw_path = null
-
-        for (let path of raw_paths.split(";")) {
-          if (
-            path.replace(/^.*[\\\/]/, '') ==
-            this.props.scan.fileName.replace(/^.*[\\\/]/, '')
-          ) {
-            raw_path = path
-          }
-        }
-
-        if (raw_path == null) {
-          console.error(
-            "Unable to find raw path", raw_paths, this.props.scan.fileName
-          )
-          return
-        }
-
-        let args = [
-          "-vv",
-          "--reprocess",
-          "--scans", this.props.scan.scanNumber,
-          "--search_path", search_path,
-          "--raw_paths", raw_path,
-        ]
-
-        console.log(
-          this.state.pycamverterPath, args,
-        )
-
-        execFile(
-          this.state.pycamverterPath,
-          args,
-          (error, stdout, stderr) => {
-            if (error) {
-              console.error(error)
-            }
-
-            console.log(stdout)
-            console.log(stderr)
-
-            this.setState({
-              processing: false,
-            })
-
-            if (this.props.closeCallback != null) {
-              this.props.closeCallback(error == null)
-            }
-          }
-
-        )
-      }.bind(this)
     )
   }
 
@@ -147,7 +183,24 @@ class modalProcessScanBox extends React.Component {
               Scan {this.props.scan.scanNumber}
             </div>
             <div>
-              Filename: {this.props.scan.fileName}
+              <Button
+                id="fileSelect"
+                onClick={this.updateRawPath.bind(this)}
+                disabled={this.state.processing}
+              >
+                Raw File
+              </Button>
+              {this.state.raw_path}
+            </div>
+            <div>
+              <Button
+                id="fileSelect"
+                onClick={this.updateSearchPath.bind(this)}
+                disabled={this.state.processing}
+              >
+                Search File
+              </Button>
+              {this.state.search_path}
             </div>
             <div>
               <Button
@@ -164,9 +217,11 @@ class modalProcessScanBox extends React.Component {
         <Modal.Footer>
           <Button
             disabled={
-              !this.state.ready ||
               this.state.processing ||
-              this.props.scan == null
+              this.props.scan == null ||
+              this.state.pycamverterPath == null ||
+              this.state.search_path == null ||
+              this.state.raw_path == null
             }
             onClick={this.runProcess.bind(this)}
           >
