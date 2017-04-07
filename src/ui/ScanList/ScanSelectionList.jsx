@@ -176,7 +176,18 @@ class ScanSelectionList extends React.Component {
       indices = [0]
     }
 
-    switch (e.key) {
+    let desc = []
+
+    for (let mod of ["Shift", "Meta", "Alt", "Control"]) {
+      if (e.getModifierState(mod)) {
+        desc.push(mod)
+      }
+    }
+
+    desc.push(e.key)
+    desc = desc.join(" ")
+
+    switch (desc) {
       case 'ArrowLeft':
         indices = this.selectLeft(indices)
         break
