@@ -29,11 +29,10 @@ class ScanSelectionList extends React.Component {
             selectedKeys: [nextProps.selectedNode.map(i => i.join(",")).join("-")]
           })
         }
-      } else {
-        this.setState({selectedNode: nextProps.selectedNode})
       }
-    }
 
+      this.setState({selectedNode: nextProps.selectedNode})
+    }
   }
 
   cmp(a, b) {
