@@ -264,10 +264,10 @@ class ViewBox extends React.Component {
       if (nodes[1] != null && nodes[1] != prev_nodes[1]) {
         promises.push(this.updatePeptide())
       }
-      if (
-        (nodes[2] != null && nodes[2] != prev_nodes[2]) ||
+      if (nodes[2] != null && (
+        nodes[2] != prev_nodes[2] ||
         (nodes[3] == null && prev_nodes[3] != null)
-      ) {
+      )) {
         promises.push(this.updateScan())
         promises.push(this.updateScanData())
       }

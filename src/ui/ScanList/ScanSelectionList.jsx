@@ -1,9 +1,68 @@
 import React from 'react'
-
-import ScanListItem from './ScanListItem'
+import Tree, { TreeNode } from 'rc-tree'
 
 class ScanSelectionList extends React.Component {
-  update(nodes) {
+  componentWillUpdate(nextProps, nextState) {
+    if (
+      nextProps.tree == this.props.tree
+    ) {
+      this.notReRender = true
+    } else {
+      this.notReRender = false
+    }
+  }
+
+  cmp(a, b) {
+    if (Array.isArray(a) && Array.isArray(b)) {
+      return a.length == b.length && a.every((v, i) => this.cmp(v, b[i]))
+    } else {
+      return a == b
+    }
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    if (!this.cmp(prevProps.selectedNode, this.props.selectedNode)) {
+      let tree = this.refs["tree"]
+      if (tree != null) {
+        console.log(this.props.selectedNode.filter(i => i != null).map(i => Array.isArray(i) ? i.join(",") : i).join("-"))
+        tree.setState({
+          selectedKeys: [this.props.selectedNode.filter(i => i != null).map(i => Array.isArray(i) ? i.join(",") : i).join("-")]
+        })
+      }
+    }
+  }
+
+  selectNode(nodes) {
+    let tree = this.refs["tree"]
+    console.log(nodes)
+    if (tree != null) {
+      tree.setState({
+        selectedKeys: nodes.map(i => Array.isArray(i) ? i.join(",") : i).join("-")
+      })
+    }
+
+    console.log("selected", nodes)
+
+    if (this.props.updateAllCallback != null) {
+      this.props.updateAllCallback(nodes)
+    }
+  }
+
+  update(selectedKeys, info) {
+    console.log(selectedKeys, info)
+    info.node.onExpand()
+
+    let key = info.node.props.eventKey
+    let node = key
+    let nodes = node.split("-").map(
+      i => {
+        let j = i.split(",").map(parseInt)
+        return j.length > 1 ? j : j[0]
+      }
+    )
+
+    console.log("selected", nodes)
+
     if (this.props.updateAllCallback != null) {
       this.props.updateAllCallback(nodes)
     }
@@ -217,38 +276,71 @@ class ScanSelectionList extends React.Component {
 
     while (node.length < 4) { node.push(null) }
 
-    this.update(node)
+    this.selectNode(node)
 
     // TODO: Expand the tree as needed
   }
 
   render() {
-    return (
-      <ul className="tree">
-        {
-          this.props.tree.map(
-            (child) => {
-              return (
-                <ScanListItem
-                  key={
-                    child.overrideKey != null ?
-                    child.overrideKey : child.nodeId
-                  }
-                  nodeId={child.nodeId}
-                  name={child.name}
-                  children={child.children}
-                  truncated={child.truncated}
+    const loop = (data, base) => {
+      // console.log(data, base)
 
-                  update={this.update.bind(this)}
-
-                  selectedNode={this.props.selectedNode}
-                />
-              )
-            }
+      return data.map((item) => {
+        // console.log(item)
+        if (item.children) {
+          // console.log('children', item.children)
+          return (
+            <TreeNode
+              key={base + item.nodeId}
+              title={item.name}
+              className={
+                item.choice != null ?
+                item.choice : (
+                  item.truncated != null && item.truncated ?
+                  'truncated' : 'undecided'
+                )
+              }
+            >
+              {loop(item.children, base + item.nodeId + "-")}
+            </TreeNode>
           )
         }
-      </ul>
-    )
+        return (
+          <TreeNode
+            key={base + item.nodeId}
+            title={item.name}
+            className={
+              item.choice != null ?
+              item.choice : (
+                item.truncated != null && item.truncated ?
+                'truncated' : 'undecided'
+              )
+            }
+          />
+        )
+      })
+    }
+
+    let tree = this.props.tree
+    // console.log(tree)
+    let treeNodes
+    if (this.treeNodes && this.notReRender) {
+      treeNodes = this.treeNodes
+    } else {
+      treeNodes = (
+        tree.length > 0 &&
+        <Tree
+          showLine
+          onSelect={this.update.bind(this)}
+          ref="tree"
+        >
+          { loop(tree, "") }
+        </Tree>
+      )
+      this.treeNodes = treeNodes
+    }
+
+    return treeNodes
   }
 }
 
@@ -261,7 +353,7 @@ ScanSelectionList.propTypes = {
 }
 
 ScanSelectionList.defaultProps = {
-  proteins: null,
+  tree: [],
 
   updateAllCallback: null,
 

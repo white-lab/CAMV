@@ -2,6 +2,8 @@ import React from 'react'
 import { Modal, Button } from 'react-bootstrap'
 import { execFile } from 'child_process'
 
+ import fs from 'fs'
+
 const { dialog } = require('electron').remote
 
 class modalProcessScanBox extends React.Component {
@@ -10,6 +12,8 @@ class modalProcessScanBox extends React.Component {
     this.state = {
       processing: false,
       pycamverterPath: null,
+      search_path: null,
+      raw_path: null,
     }
   }
 
@@ -19,47 +23,58 @@ class modalProcessScanBox extends React.Component {
       this.props.db == null
     ) { return }
 
-    this.props.db.get(
+    this.props.db.all(
       "SELECT * \
       FROM camv_meta \
       WHERE key=?",
       [
         "search_path",
       ],
-      function(err, row) {
+      (err, rows) => {
+        let search_path = null
+        for (let path of rows) {
+          if (fs.existsSync(path)) {
+            search_path = path
+          }
+        }
         this.setState({
-          search_path: row.val,
+          search_path: search_path,
         })
-      }.bind(this)
+      }
     )
-    this.props.db.get(
+    this.props.db.all(
       "SELECT * \
       FROM camv_meta \
       WHERE key=?",
       [
-        "raw_paths",
+        "raw_path",
       ],
-      function(err, row) {
-        let raw_paths = row.val.split(";")
+      (err, rows) => {
+        if (err != null || rows == null) {
+          console.error(err)
+          return
+        }
+
         let raw_path = null
 
         if (this.props.scan != null) {
-          for (let path of raw_paths) {
+          for (let path of rows) {
             if (
               path.replace(/^.*[\\\/]/, '') ==
-              this.props.scan.fileName.replace(/^.*[\\\/]/, '')
+              this.props.scan.fileName.replace(/^.*[\\\/]/, '') &&
+              fs.existsSync(path)
             ) {
               raw_path = path
             }
           }
         } else {
-          raw_path = raw_paths[0]
+          raw_path = rows[0]
         }
 
         this.setState({
           raw_path: raw_path,
         })
-      }.bind(this)
+      }
     )
   }
 
@@ -71,13 +86,13 @@ class modalProcessScanBox extends React.Component {
           extensions: ['exe'],
         }]
       },
-      function (fileNames) {
+      (fileNames) => {
         if (fileNames === undefined) return;
 
         this.setState({
           pycamverterPath: fileNames[0],
         })
-      }.bind(this)
+      }
     )
   }
 
@@ -89,13 +104,13 @@ class modalProcessScanBox extends React.Component {
           extensions: ['raw', "mgf", "d", "wiff"],
         }]
       },
-      function (fileNames) {
+      (fileNames) => {
         if (fileNames === undefined) return;
 
         this.setState({
           raw_path: fileNames[0],
         })
-      }.bind(this)
+      }
     )
   }
 
@@ -107,13 +122,13 @@ class modalProcessScanBox extends React.Component {
           extensions: ['msf', "xml"],
         }]
       },
-      function (fileNames) {
+      (fileNames) => {
         if (fileNames === undefined) return;
 
         this.setState({
           search_path: fileNames[0],
         })
-      }.bind(this)
+      }
     )
   }
 
@@ -155,11 +170,20 @@ class modalProcessScanBox extends React.Component {
           processing: false,
         })
 
+        this.props.db.run(
+          "INSERT OR IGNORE INTO camv_meta \
+          (key, val) \
+          VALUES (?, ?)",
+          [
+            ("search_path", this.state.search_path),
+            ("raw_path", this.state.raw_path),
+          ],
+        )
+
         if (this.props.closeCallback != null) {
           this.props.closeCallback(error == null)
         }
       }
-
     )
   }
 

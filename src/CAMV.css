@@ -158,24 +158,30 @@ input:disabled {
   background-color: LightGray;
 }
 
-li[class=accept] > span {
+li[class=accept] > a {
   color: #5CB85C;
 }
 
-li[class=maybe] > span {
+li[class=maybe] > a {
   color: yellow;
 }
 
-li[class=reject] > span {
+li[class=reject] > a {
   color: red;
 }
 
-li[class=truncated] > span {
+li[class=truncated] > a {
   color: orange;
 }
 
-li[class=undecided] > span {
+li[class=undecided] > a {
   color: black;
+}
+
+.rc-tree-node-selected {
+  background-color: #ffe6b0;
+  border: 1px #ffb951 solid;
+  opacity: 0.8;
 }
 
 ul {
