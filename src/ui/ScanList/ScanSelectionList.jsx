@@ -2,6 +2,13 @@ import React from 'react'
 import Tree, { TreeNode } from 'rc-tree'
 
 class ScanSelectionList extends React.Component {
+  constructor(props) {
+    super(props)
+    this.state = {
+      selectedNode: [],
+    }
+  }
+
   componentWillUpdate(nextProps, nextState) {
     if (
       nextProps.tree == this.props.tree
@@ -10,6 +17,23 @@ class ScanSelectionList extends React.Component {
     } else {
       this.notReRender = false
     }
+
+    if (!this.cmp(nextProps.selectedNode, this.props.selectedNode)) {
+      if (!this.cmp(nextProps.selectedNode, this.state.selectedNode)) {
+        let tree = this.refs["tree"]
+        if (tree != null) {
+          console.log(nextProps.selectedNode)
+          console.log('selectedKeys2', nextProps.selectedNode.map(i => i.join(",")).join("-"))
+          tree.setState({
+            expandedKeys: this.toExpandKeys(nextProps.selectedNode),
+            selectedKeys: [nextProps.selectedNode.map(i => i.join(",")).join("-")]
+          })
+        }
+      } else {
+        this.setState({selectedNode: nextProps.selectedNode})
+      }
+    }
+
   }
 
   cmp(a, b) {
@@ -20,52 +44,61 @@ class ScanSelectionList extends React.Component {
     }
   }
 
-  componentDidUpdate(prevProps, prevState) {
-    if (!this.cmp(prevProps.selectedNode, this.props.selectedNode)) {
-      let tree = this.refs["tree"]
-      if (tree != null) {
-        console.log(this.props.selectedNode.filter(i => i != null).map(i => Array.isArray(i) ? i.join(",") : i).join("-"))
-        tree.setState({
-          selectedKeys: [this.props.selectedNode.filter(i => i != null).map(i => Array.isArray(i) ? i.join(",") : i).join("-")]
-        })
+  toExpandKeys(nodes) {
+    let tree = this.refs["tree"]
+    let expandedKeys = tree != null ? tree.state.expandedKeys : []
+
+    for (let index = 1; index < nodes.length; index++) {
+      let slice = nodes.slice(0, index).map(i => i.join(",")).join("-")
+      if (!expandedKeys.includes(slice)) {
+        expandedKeys.push(slice)
       }
     }
+
+    return expandedKeys
   }
 
   selectNode(nodes) {
     let tree = this.refs["tree"]
-    console.log(nodes)
     if (tree != null) {
       tree.setState({
-        selectedKeys: nodes.map(i => Array.isArray(i) ? i.join(",") : i).join("-")
+        expandedKeys: this.toExpandKeys(nodes),
+        selectedKeys: [nodes.map(i => i.join(",")).join("-")]
       })
     }
 
-    console.log("selected", nodes)
-
-    if (this.props.updateAllCallback != null) {
-      this.props.updateAllCallback(nodes)
-    }
+    this.setState({
+      selectedNode: nodes,
+    }, () => {
+      if (this.props.updateAllCallback != null) {
+        this.props.updateAllCallback(nodes)
+      }
+    })
   }
 
   update(selectedKeys, info) {
-    console.log(selectedKeys, info)
     info.node.onExpand()
 
-    let key = info.node.props.eventKey
-    let node = key
-    let nodes = node.split("-").map(
-      i => {
-        let j = i.split(",").map(parseInt)
-        return j.length > 1 ? j : j[0]
+    if (selectedKeys.length <= 0) {
+      let tree = this.refs["tree"]
+      if (tree != null) {
+        tree.setState({
+          selectedKeys: [this.state.selectedNode.map(i => i.join(",")).join("-")]
+        })
       }
-    )
-
-    console.log("selected", nodes)
-
-    if (this.props.updateAllCallback != null) {
-      this.props.updateAllCallback(nodes)
+      return
     }
+
+    let key = info.node.props.eventKey
+    let nodes = key.split("-").map(i => i.split(",").map(j => parseInt(j)))
+
+    this.setState({
+      selectedNode: nodes,
+    }, () => {
+      if (this.props.updateAllCallback != null) {
+        this.props.updateAllCallback(nodes)
+      }
+    })
   }
 
   selectLeft(node) {
@@ -201,7 +234,7 @@ class ScanSelectionList extends React.Component {
     let children = node
 
     for (let nodeId of nodes) {
-      let index = children.findIndex(child => child.nodeId == nodeId)
+      let index = children.findIndex(child => this.cmp(child.nodeId, nodeId))
       node = children[index]
       children = node.children
       indices.push(index)
@@ -226,10 +259,7 @@ class ScanSelectionList extends React.Component {
   }
 
   handleHotkey(e) {
-    let node = this.props.selectedNode
-    node = node.filter((i) => { return i != null })
-
-    let indices = this.getIndices(node)
+    let indices = this.getIndices(this.state.selectedNode)
 
     if (indices.length < 1) {
       indices = [0]
@@ -272,10 +302,7 @@ class ScanSelectionList extends React.Component {
         return
     }
 
-    node = this.getNode(indices)
-
-    while (node.length < 4) { node.push(null) }
-
+    let node = this.getNode(indices)
     this.selectNode(node)
 
     // TODO: Expand the tree as needed
@@ -283,12 +310,8 @@ class ScanSelectionList extends React.Component {
 
   render() {
     const loop = (data, base) => {
-      // console.log(data, base)
-
       return data.map((item) => {
-        // console.log(item)
         if (item.children) {
-          // console.log('children', item.children)
           return (
             <TreeNode
               key={base + item.nodeId}
@@ -322,12 +345,9 @@ class ScanSelectionList extends React.Component {
     }
 
     let tree = this.props.tree
-    // console.log(tree)
-    let treeNodes
-    if (this.treeNodes && this.notReRender) {
-      treeNodes = this.treeNodes
-    } else {
-      treeNodes = (
+
+    if (this.treeNodes == null || !this.notReRender) {
+      this.treeNodes = (
         tree.length > 0 &&
         <Tree
           showLine
@@ -337,10 +357,9 @@ class ScanSelectionList extends React.Component {
           { loop(tree, "") }
         </Tree>
       )
-      this.treeNodes = treeNodes
     }
 
-    return treeNodes
+    return this.treeNodes
   }
 }
 

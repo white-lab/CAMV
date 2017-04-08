@@ -39,6 +39,7 @@ class ViewBox extends React.Component {
       /* Selected PTM / Scan / Peptide / Protein */
       selectedProteins: null,
       selectedPeptide: null,
+      selectedModState: null,
       selectedScan: null,
       selectedPTM: null,
 
@@ -240,7 +241,8 @@ class ViewBox extends React.Component {
   }
 
   updateAll(nodes) {
-    while (nodes.length < 4) { nodes.push(null) }
+    nodes = nodes.slice()
+    while (nodes.length < 4) { nodes.push([null, null]) }
 
     this.state.db.interrupt()
     let prev_nodes = this.getSelectedNode()
@@ -248,10 +250,11 @@ class ViewBox extends React.Component {
     return new Promise(function(resolve) {
       this.setState(
         {
-          selectedProteins: nodes[0],
-          selectedPeptide: nodes[1],
-          selectedScan: nodes[2],
-          selectedPTM: nodes[3],
+          selectedProteins: nodes[0][0],
+          selectedPeptide: nodes[1][0],
+          selectedModState: nodes[1][1],
+          selectedScan: nodes[2][0],
+          selectedPTM: nodes[3][0],
         },
         function () { resolve() },
       )
@@ -805,7 +808,7 @@ class ViewBox extends React.Component {
           if (row.scan_ptm_id != last_row.scan_ptm_id) {
             ptms.push({
               name: last_row.name,
-              nodeId: last_row.ptm_id,
+              nodeId: [last_row.ptm_id],
               choice: last_row.choice,
             })
           }
@@ -813,7 +816,7 @@ class ViewBox extends React.Component {
           if (row.scan_num != last_row.scan_num) {
             scans.push({
               name: "Scan " + last_row.scan_num,
-              nodeId: last_row.scan_id,
+              nodeId: [last_row.scan_id],
               children: ptms,
               truncated: last_row.truncated != 0,
             })
@@ -826,8 +829,7 @@ class ViewBox extends React.Component {
           ) {
             peptides.push({
               name: last_row.peptide_seq + " " + last_row.mod_desc,
-              nodeId: last_row.peptide_id,
-              overrideKey: [last_row.peptide_id, last_row.mod_state_id],
+              nodeId: [last_row.peptide_id, last_row.mod_state_id],
               children: scans,
             })
             scans = []
@@ -836,7 +838,7 @@ class ViewBox extends React.Component {
           if (row.protein_set_id != last_row.protein_set_id) {
             proteins.push({
               name: last_row.protein_set_name,
-              nodeId: last_row.protein_set_id,
+              nodeId: [last_row.protein_set_id],
               children: peptides,
             })
             peptides = []
@@ -854,11 +856,11 @@ class ViewBox extends React.Component {
 
   getSelectedNode() {
     return [
-      this.state.selectedProteins,
-      this.state.selectedPeptide,
-      this.state.selectedScan,
-      this.state.selectedPTM,
-    ]
+      [this.state.selectedProteins],
+      [this.state.selectedPeptide, this.state.selectedModState],
+      [this.state.selectedScan],
+      [this.state.selectedPTM],
+    ].filter(i => i != null && i.filter(i => i != null).length > 0)
   }
 
   updateProtein() {

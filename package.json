@@ -21,7 +21,6 @@
     "react-hot-loader": "^3.0.0-beta.6",
     "react-hotkey": "^0.7.0",
     "react-native-fs": "^2.1.0-rc.1",
-    "react-treebeard": "^1.1.4",
     "sqlite3": "^3.1.8"
   },
   "devDependencies": {
