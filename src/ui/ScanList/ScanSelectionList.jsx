@@ -21,9 +21,8 @@ class ScanSelectionList extends React.Component {
     if (!this.cmp(nextProps.selectedNode, this.props.selectedNode)) {
       if (!this.cmp(nextProps.selectedNode, this.state.selectedNode)) {
         let tree = this.refs["tree"]
+
         if (tree != null) {
-          console.log(nextProps.selectedNode)
-          console.log('selectedKeys2', nextProps.selectedNode.map(i => i.join(",")).join("-"))
           tree.setState({
             expandedKeys: this.toExpandKeys(nextProps.selectedNode),
             selectedKeys: [nextProps.selectedNode.map(i => i.join(",")).join("-")]
