@@ -1,5 +1,12 @@
 # Change Log
 
+## 0.4.0 (2017-04-08)
+
+Features
+
+  - Somewhat improved performance of TreeView, using rc-tree package.
+  - Allow calling pycamverter from CAMV as an alternative to opening a database.
+
 ## 0.3.3 (2017-04-06)
 
 Features

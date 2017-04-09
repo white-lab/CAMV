@@ -12,6 +12,8 @@ install:
     - "npm install"
     - "npm install bower -g"
     - "bower install"
+    - ps: $json = curl -fsSL https://api.github.com/repos/white-lab/pycamverter/releases | ConvertFrom-Json
+    - ps: Start-FileDownload $json[0].assets.browser_download_url
 
 # test_script:
 #     - npm test

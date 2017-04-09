@@ -1,6 +1,6 @@
 {
   "name": "camv",
-  "version": "0.3.3",
+  "version": "0.4.0",
   "main": "src/main.js",
   "productName": "CAMV",
   "dependencies": {
@@ -51,6 +51,7 @@
     "node_modules/",
     ".babelrc",
     ".bowerrc",
+    "PyCamverter.exe",
     "src/bower_components/",
     "src/*.css",
     "src/*.html",
