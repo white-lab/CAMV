@@ -1,4 +1,5 @@
 import React from 'react'
+import PropTypes from 'prop-types'
 
 class SequenceElement extends React.Component {
   render() {
@@ -13,7 +14,7 @@ class SequenceElement extends React.Component {
 }
 
 SequenceElement.propTypes = {
-  AA: React.PropTypes.string.isRequired,
+  AA: PropTypes.string.isRequired,
 }
 
 module.exports = SequenceElement

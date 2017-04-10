@@ -1,4 +1,5 @@
 import React from 'react'
+import PropTypes from 'prop-types'
 import { Button } from 'react-bootstrap'
 
 class RejectButton extends React.Component {
@@ -23,8 +24,8 @@ class RejectButton extends React.Component {
 }
 
 RejectButton.propTypes = {
-  disabled: React.PropTypes.bool,
-  callback: React.PropTypes.func,
+  disabled: PropTypes.bool,
+  callback: PropTypes.func,
 }
 
 RejectButton.defaultProps = {

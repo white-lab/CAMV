@@ -1,4 +1,5 @@
 import React from 'react'
+import PropTypes from 'prop-types'
 
 class ScanDataBox extends React.Component {
   render() {
@@ -60,8 +61,8 @@ class ScanDataBox extends React.Component {
 }
 
 ScanDataBox.propTypes = {
-  scan: React.PropTypes.object,
-  proteins: React.PropTypes.object,
+  scan: PropTypes.object,
+  proteins: PropTypes.object,
 }
 
 ScanDataBox.defaultProps = {

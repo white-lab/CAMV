@@ -1,4 +1,5 @@
 import React from 'react'
+import PropTypes from 'prop-types'
 import { Modal, Button, FormGroup, FormControl, Radio, ControlLabel } from 'react-bootstrap'
 import { execFile } from 'child_process'
 import path from 'path'
@@ -185,7 +186,7 @@ class ModalImportBox extends React.Component {
             <Radio
               value="open"
               checked={this.state.radioChoice == "open"}
-              onClick={this.radioChange.bind(this)}
+              onChange={this.radioChange.bind(this)}
             >
               <FormGroup
                 controlId="formControlsFile"
@@ -209,7 +210,7 @@ class ModalImportBox extends React.Component {
             <Radio
               value="process"
               checked={this.state.radioChoice == "process"}
-              onClick={this.radioChange.bind(this)}
+              onChange={this.radioChange.bind(this)}
             >
               <FormGroup
                 controlId="formControlsFile"
@@ -302,9 +303,9 @@ class ModalImportBox extends React.Component {
 }
 
 ModalImportBox.propTypes = {
-  importCallback: React.PropTypes.func,
-  closeCallback: React.PropTypes.func,
-  showModal: React.PropTypes.bool.isRequired,
+  importCallback: PropTypes.func,
+  closeCallback: PropTypes.func,
+  showModal: PropTypes.bool.isRequired,
 }
 
 ModalImportBox.defaultProps = {

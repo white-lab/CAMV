@@ -1,4 +1,5 @@
 import React from 'react'
+import PropTypes from 'prop-types'
 
 import IonElement from './IonElement'
 import SequenceElement from './SequenceElement'
@@ -120,9 +121,9 @@ class SequenceBox extends React.Component {
 }
 
 SequenceBox.propTypes = {
-  ptm: React.PropTypes.object,
-  spectrumData: React.PropTypes.array,
-  clickCallback: React.PropTypes.func,
+  ptm: PropTypes.object,
+  spectrumData: PropTypes.array,
+  clickCallback: PropTypes.func,
 }
 
 SequenceBox.defaultProps = {

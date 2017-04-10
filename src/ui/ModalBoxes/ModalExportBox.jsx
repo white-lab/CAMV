@@ -1,4 +1,5 @@
 import React from 'react'
+import PropTypes from 'prop-types'
 import { Modal, Checkbox, Button } from 'react-bootstrap'
 
 const { dialog } = require('electron').remote
@@ -141,9 +142,9 @@ class ModalExportBox extends React.Component {
 }
 
 ModalExportBox.propTypes = {
-  exportCallback: React.PropTypes.func.isRequired,
-  closeCallback: React.PropTypes.func.isRequired,
-  showModal: React.PropTypes.bool.isRequired,
+  exportCallback: PropTypes.func.isRequired,
+  closeCallback: PropTypes.func.isRequired,
+  showModal: PropTypes.bool.isRequired,
 }
 
 module.exports = ModalExportBox

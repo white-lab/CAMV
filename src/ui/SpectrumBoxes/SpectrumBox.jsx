@@ -1,4 +1,5 @@
 import React from 'react'
+import PropTypes from 'prop-types'
 
 import AcceptButton from './Buttons/AcceptButton'
 import MaybeButton from './Buttons/MaybeButton'
@@ -240,15 +241,15 @@ class SpectrumBox extends React.Component {
 }
 
 SpectrumBox.propTypes = {
-  spectrumData: React.PropTypes.array,
-  inputDisabled: React.PropTypes.bool,
-  collisionType: React.PropTypes.string,
+  spectrumData: PropTypes.array,
+  inputDisabled: PropTypes.bool,
+  collisionType: PropTypes.string,
 
-  selectedScan: React.PropTypes.number,
-  selectedPTM: React.PropTypes.number,
+  selectedScan: PropTypes.number,
+  selectedPTM: PropTypes.number,
 
-  updateChoice: React.PropTypes.func,
-  pointChosenCallback: React.PropTypes.func,
+  updateChoice: PropTypes.func,
+  pointChosenCallback: PropTypes.func,
 }
 
 SpectrumBox.defaultProps = {

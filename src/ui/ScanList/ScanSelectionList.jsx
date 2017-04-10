@@ -1,4 +1,5 @@
 import React from 'react'
+import PropTypes from 'prop-types'
 import Tree, { TreeNode } from 'rc-tree'
 
 class ScanSelectionList extends React.Component {
@@ -362,11 +363,11 @@ class ScanSelectionList extends React.Component {
 }
 
 ScanSelectionList.propTypes = {
-  tree: React.PropTypes.array,
+  tree: PropTypes.array,
 
-  updateAllCallback: React.PropTypes.func,
+  updateAllCallback: PropTypes.func,
 
-  selectedNode: React.PropTypes.array,
+  selectedNode: PropTypes.array,
 }
 
 ScanSelectionList.defaultProps = {

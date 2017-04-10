@@ -1,4 +1,5 @@
 import React from 'react'
+import PropTypes from 'prop-types'
 
 class PrecursorSpectrumBox extends React.Component {
   constructor(props) {
@@ -205,14 +206,14 @@ class PrecursorSpectrumBox extends React.Component {
 }
 
 PrecursorSpectrumBox.propTypes = {
-  chargeState: React.PropTypes.number,
-  isolationWindow: React.PropTypes.array,
-  c13Num: React.PropTypes.number,
-  ppm: React.PropTypes.number,
-  precursorMz: React.PropTypes.number,
-  spectrumData: React.PropTypes.array,
+  chargeState: PropTypes.number,
+  isolationWindow: PropTypes.array,
+  c13Num: PropTypes.number,
+  ppm: PropTypes.number,
+  precursorMz: PropTypes.number,
+  spectrumData: PropTypes.array,
 
-  pointChosenCallback: React.PropTypes.func,
+  pointChosenCallback: PropTypes.func,
 }
 
 PrecursorSpectrumBox.defaultProps = {

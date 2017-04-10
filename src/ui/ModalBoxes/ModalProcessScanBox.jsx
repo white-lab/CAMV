@@ -1,4 +1,5 @@
 import React from 'react'
+import PropTypes from 'prop-types'
 import { Modal, Button } from 'react-bootstrap'
 import { execFile } from 'child_process'
 
@@ -268,13 +269,13 @@ class modalProcessScanBox extends React.Component {
 }
 
 modalProcessScanBox.propTypes = {
-  importCallback: React.PropTypes.func,
-  closeCallback: React.PropTypes.func,
+  importCallback: PropTypes.func,
+  closeCallback: PropTypes.func,
 
-  showModal: React.PropTypes.bool.isRequired,
+  showModal: PropTypes.bool.isRequired,
 
-  scan: React.PropTypes.object,
-  db: React.PropTypes.object,
+  scan: PropTypes.object,
+  db: PropTypes.object,
 }
 
 modalProcessScanBox.defaultProps = {

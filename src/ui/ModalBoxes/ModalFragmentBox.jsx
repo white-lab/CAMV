@@ -1,4 +1,5 @@
 import React from 'react'
+import PropTypes from 'prop-types'
 import { Modal, Button, Radio, FormGroup, FormControl, ControlLabel } from 'react-bootstrap'
 
 class ModalFragmentBox extends React.Component {
@@ -210,10 +211,10 @@ class ModalFragmentBox extends React.Component {
 }
 
 ModalFragmentBox.propTypes = {
-  updateCallback: React.PropTypes.func,
-  newLabelCallback: React.PropTypes.func,
-  noneCallback: React.PropTypes.func,
-  closeCallback: React.PropTypes.func,
+  updateCallback: PropTypes.func,
+  newLabelCallback: PropTypes.func,
+  noneCallback: PropTypes.func,
+  closeCallback: PropTypes.func,
 }
 
 ModalFragmentBox.defaultProps = {

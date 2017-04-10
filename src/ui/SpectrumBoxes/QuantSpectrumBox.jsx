@@ -1,4 +1,5 @@
 import React from 'react'
+import PropTypes from 'prop-types'
 
 class QuantSpectrumBox extends React.Component {
   constructor(props) {
@@ -163,11 +164,11 @@ class QuantSpectrumBox extends React.Component {
 }
 
 QuantSpectrumBox.propTypes = {
-  ppm: React.PropTypes.number,
-  quantMz: React.PropTypes.arrayOf(React.PropTypes.object),
-  spectrumData: React.PropTypes.array,
+  ppm: PropTypes.number,
+  quantMz: PropTypes.arrayOf(PropTypes.object),
+  spectrumData: PropTypes.array,
 
-  pointChosenCallback: React.PropTypes.func,
+  pointChosenCallback: PropTypes.func,
 }
 
 QuantSpectrumBox.defaultProps = {

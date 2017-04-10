@@ -1,4 +1,5 @@
 import React from 'react'
+import PropTypes from 'prop-types'
 
 class IonElement extends React.Component {
   handleClick(e) {
@@ -23,10 +24,10 @@ class IonElement extends React.Component {
 }
 
 IonElement.propTypes = {
-  bion: React.PropTypes.bool.isRequired,
-  index: React.PropTypes.number.isRequired,
-  found: React.PropTypes.bool,
-  clickCallback: React.PropTypes.func,
+  bion: PropTypes.bool.isRequired,
+  index: PropTypes.number.isRequired,
+  found: PropTypes.bool,
+  clickCallback: PropTypes.func,
 }
 
 IonElement.defaultProps = {

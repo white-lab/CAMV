@@ -1,4 +1,5 @@
 import React from 'react'
+import PropTypes from 'prop-types'
 import { Modal, Button, FormGroup, ControlLabel, FormControl, HelpBlock } from 'react-bootstrap'
 import hotkey from 'react-hotkey'
 
@@ -134,9 +135,9 @@ class ModalSearchBox extends React.Component {
 }
 
 ModalSearchBox.propTypes = {
-  searchCallback: React.PropTypes.func,
-  closeCallback: React.PropTypes.func,
-  showModal: React.PropTypes.bool.isRequired,
+  searchCallback: PropTypes.func,
+  closeCallback: PropTypes.func,
+  showModal: PropTypes.bool.isRequired,
 }
 
 ModalSearchBox.defaultProps = {

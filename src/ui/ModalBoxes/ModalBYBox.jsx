@@ -1,4 +1,5 @@
 import React from 'react'
+import PropTypes from 'prop-types'
 import { Modal, Button } from 'react-bootstrap'
 
 class ModalBYBox extends React.Component {
@@ -74,10 +75,10 @@ class ModalBYBox extends React.Component {
 }
 
 ModalBYBox.propTypes = {
-  clickCallback: React.PropTypes.func,
-  closeCallback: React.PropTypes.func,
-  bIons: React.PropTypes.array,
-  yIons: React.PropTypes.array,
+  clickCallback: PropTypes.func,
+  closeCallback: PropTypes.func,
+  bIons: PropTypes.array,
+  yIons: PropTypes.array,
 }
 
 ModalBYBox.defaultProps = {
