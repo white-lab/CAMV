@@ -51,7 +51,7 @@ class ScanSelectionList extends React.Component {
 
   toExpandKeys(nodes) {
     let tree = this.refs["tree"]
-    let expandedKeys = tree != null ? tree.state.expandedKeys : []
+    let expandedKeys = tree != null ? tree.state.expandedKeys.slice() : []
 
     for (let index = 1; index < nodes.length; index++) {
       let slice = nodes.slice(0, index).map(i => i.join(",")).join("-")

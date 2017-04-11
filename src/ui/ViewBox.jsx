@@ -211,7 +211,7 @@ class ViewBox extends React.Component {
         this.state.selectedPTM,
       ],
       function(resolve, reject, rows) {
-        let data = this.state.scanData
+        let data = this.state.scanData.slice()
 
         rows.forEach(function (row) {
           if (
@@ -242,10 +242,12 @@ class ViewBox extends React.Component {
 
   updateAll(nodes) {
     nodes = nodes.slice()
-    while (nodes.length < 4) { nodes.push([null, null]) }
 
     this.state.db.interrupt()
     let prev_nodes = this.getSelectedNode()
+
+    while (nodes.length < 4) { nodes.push([null, null]) }
+    while (prev_nodes.length < 4) { prev_nodes.push([null, null]) }
 
     return new Promise(function(resolve) {
       this.setState(
@@ -256,7 +258,7 @@ class ViewBox extends React.Component {
           selectedScan: nodes[2][0],
           selectedPTM: nodes[3][0],
         },
-        function () { resolve() },
+        resolve,
       )
     }.bind(this)).then(function() {
       let promises = []
@@ -268,13 +270,19 @@ class ViewBox extends React.Component {
         promises.push(this.updatePeptide())
       }
       if (nodes[2][0] != null && (
-        nodes[2] != prev_nodes[2] ||
-        (nodes[3] == null && prev_nodes[3] != null)
+        nodes[2][0] != prev_nodes[2][0] ||
+        (nodes[3][0] == null && prev_nodes[3][0] != null)
       )) {
         promises.push(this.updateScan())
         promises.push(this.updateScanData())
       }
-      if (nodes[3][0] != null && nodes.slice(2) != prev_nodes.slice(2)) {
+      if (
+        nodes[3][0] != null &&
+        (
+          nodes[2][0] != prev_nodes[2][0] ||
+          nodes[3][0] != prev_nodes[3][0]
+        )
+      ) {
         promises.push(this.updatePTM())
       }
 
@@ -286,7 +294,13 @@ class ViewBox extends React.Component {
     }).then(function() {
       let promises = []
 
-      if (nodes[3][0] != null && nodes.slice(2) != prev_nodes.slice(2)) {
+      if (
+        nodes[3][0] != null &&
+        (
+          nodes[2][0] != prev_nodes[2][0] ||
+          nodes[3][0] != prev_nodes[3][0]
+        )
+      ) {
         promises.push(this.updatePTMData())
       }
 
@@ -295,8 +309,6 @@ class ViewBox extends React.Component {
       if (err != null && err.errno != sqlite3.INTERRUPT) {
         console.error(err)
       }
-    }.bind(this)).then(function() {
-      this.redrawCharts()
     }.bind(this))
   }
 
@@ -341,7 +353,7 @@ class ViewBox extends React.Component {
       console.log("interrupted")
       // this.state.db.interrupt()
     } else {
-      console.log(error)
+      console.error(error)
     }
   }
 
