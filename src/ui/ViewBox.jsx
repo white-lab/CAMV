@@ -261,20 +261,20 @@ class ViewBox extends React.Component {
     }.bind(this)).then(function() {
       let promises = []
 
-      if (nodes[0] != null && nodes[0] != prev_nodes[0]) {
+      if (nodes[0][0] != null && nodes[0] != prev_nodes[0]) {
         promises.push(this.updateProtein())
       }
-      if (nodes[1] != null && nodes[1] != prev_nodes[1]) {
+      if (nodes[1][0] != null && nodes[1][1] != null && nodes[1] != prev_nodes[1]) {
         promises.push(this.updatePeptide())
       }
-      if (nodes[2] != null && (
+      if (nodes[2][0] != null && (
         nodes[2] != prev_nodes[2] ||
         (nodes[3] == null && prev_nodes[3] != null)
       )) {
         promises.push(this.updateScan())
         promises.push(this.updateScanData())
       }
-      if (nodes[3] != null && nodes.slice(2) != prev_nodes.slice(2)) {
+      if (nodes[3][0] != null && nodes.slice(2) != prev_nodes.slice(2)) {
         promises.push(this.updatePTM())
       }
 
@@ -286,7 +286,7 @@ class ViewBox extends React.Component {
     }).then(function() {
       let promises = []
 
-      if (nodes[3] != null && nodes.slice(2) != prev_nodes.slice(2)) {
+      if (nodes[3][0] != null && nodes.slice(2) != prev_nodes.slice(2)) {
         promises.push(this.updatePTMData())
       }
 
