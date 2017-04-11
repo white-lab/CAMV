@@ -37,7 +37,13 @@ class ScanSelectionList extends React.Component {
 
   cmp(a, b) {
     if (Array.isArray(a) && Array.isArray(b)) {
-      return a.length == b.length && a.every((v, i) => this.cmp(v, b[i]))
+      return (
+        a === b ||
+        (
+          a.length == b.length &&
+          a.every((v, i) => this.cmp(v, b[i]))
+        )
+      )
     } else {
       return a == b
     }
@@ -76,17 +82,29 @@ class ScanSelectionList extends React.Component {
   }
 
   update(selectedKeys, info) {
-    info.node.onExpand()
-
     if (selectedKeys.length <= 0) {
       let tree = this.refs["tree"]
       if (tree != null) {
+        let lastKey = this.state.selectedNode.map(i => i.join(",")).join("-")
+        let expandedKeys = tree.state.expandedKeys.slice()
+
+        let index = expandedKeys.indexOf(lastKey)
+
+        if (index >= 0) {
+          expandedKeys.splice(index, 1)
+        } else {
+          expandedKeys.push(lastKey)
+        }
+
         tree.setState({
-          selectedKeys: [this.state.selectedNode.map(i => i.join(",")).join("-")]
+          selectedKeys: [lastKey],
+          expandedKeys: expandedKeys,
         })
       }
       return
     }
+
+    info.node.onExpand()
 
     let key = info.node.props.eventKey
     let nodes = key.split("-").map(i => i.split(",").map(j => parseInt(j)))
