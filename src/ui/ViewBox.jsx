@@ -1122,13 +1122,15 @@ class ViewBox extends React.Component {
             this.state.selectedScan,
           ],
           function(resolve, reject, rows) {
+            let data = this.state.quantData.slice()
+
             rows.forEach(function (row) {
               if (row.scan_id != this.state.selectedScan) {
                 reject({errno: sqlite3.INTERRUPT})
                 return
               }
 
-              let errs = this.state.quantData.map(
+              let errs = data.map(
                 (peak) => {
                   return 1e6 * Math.abs(peak.mz - row.mz) / row.mz
                 }
@@ -1138,16 +1140,23 @@ class ViewBox extends React.Component {
                 return
 
               let min_err = Math.min.apply(Math, errs)
-              let peak = this.state.quantData[errs.indexOf(min_err)]
+              let peak = data[errs.indexOf(min_err)]
 
               if (peak == null) { return }
+
+              peak = {mz: peak.mz, into: peak.into, peak_id: peak.peak_id}
 
               peak.name = row.name
               peak.exp_mz = row.mz
               peak.ppm = min_err
+              data[peak.peak_id] = peak
             }.bind(this))
 
-            resolve()
+            console.log('re-setting')
+
+            this.setState({
+              quantData: data,
+            }, resolve)
           }.bind(this),
         )
       }.bind(this))

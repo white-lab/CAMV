@@ -1,6 +1,8 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
+import { cmp } from '../../utils/utils'
+
 class QuantSpectrumBox extends React.Component {
   constructor(props) {
     super(props)
@@ -33,7 +35,8 @@ class QuantSpectrumBox extends React.Component {
 
   componentDidUpdate(prevProps, prevState) {
     if (this.state.chartLoaded) {
-      if (prevProps.spectrumData != this.props.spectrumData) {
+      console.log("updating", prevProps.spectrumData, this.props.spectrumData)
+      if (!cmp(prevProps.spectrumData, this.props.spectrumData)) {
         this.drawChart()
       }
     }

@@ -2,6 +2,8 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import Tree, { TreeNode } from 'rc-tree'
 
+import { cmp } from '../../utils/utils'
+
 class ScanSelectionList extends React.Component {
   constructor(props) {
     super(props)
@@ -19,8 +21,8 @@ class ScanSelectionList extends React.Component {
       this.notReRender = false
     }
 
-    if (!this.cmp(nextProps.selectedNode, this.props.selectedNode)) {
-      if (!this.cmp(nextProps.selectedNode, this.state.selectedNode)) {
+    if (!cmp(nextProps.selectedNode, this.props.selectedNode)) {
+      if (!cmp(nextProps.selectedNode, this.state.selectedNode)) {
         let tree = this.refs["tree"]
 
         if (tree != null) {
@@ -32,20 +34,6 @@ class ScanSelectionList extends React.Component {
       }
 
       this.setState({selectedNode: nextProps.selectedNode})
-    }
-  }
-
-  cmp(a, b) {
-    if (Array.isArray(a) && Array.isArray(b)) {
-      return (
-        a === b ||
-        (
-          a.length == b.length &&
-          a.every((v, i) => this.cmp(v, b[i]))
-        )
-      )
-    } else {
-      return a == b
     }
   }
 
@@ -251,7 +239,7 @@ class ScanSelectionList extends React.Component {
     let children = node
 
     for (let nodeId of nodes) {
-      let index = children.findIndex(child => this.cmp(child.nodeId, nodeId))
+      let index = children.findIndex(child => cmp(child.nodeId, nodeId))
       node = children[index]
       children = node.children
       indices.push(index)

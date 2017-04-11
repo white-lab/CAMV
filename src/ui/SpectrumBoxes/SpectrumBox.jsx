@@ -5,6 +5,8 @@ import AcceptButton from './Buttons/AcceptButton'
 import MaybeButton from './Buttons/MaybeButton'
 import RejectButton from './Buttons/RejectButton'
 
+import { cmp } from '../../utils/utils'
+
 class SpectrumBox extends React.Component {
   constructor(props) {
     super(props)
@@ -36,24 +38,10 @@ class SpectrumBox extends React.Component {
       })
   }
 
-  cmp(a, b) {
-    if (Array.isArray(a) && Array.isArray(b)) {
-      return (
-        a === b ||
-        (
-          a.length == b.length &&
-          a.every((v, i) => this.cmp(v, b[i]))
-        )
-      )
-    } else {
-      return a == b
-    }
-  }
-
   componentDidUpdate(prevProps, prevState) {
     if (this.state.chartLoaded) {
       if (
-        !this.cmp(prevProps.spectrumData, this.props.spectrumData) ||
+        !cmp(prevProps.spectrumData, this.props.spectrumData) ||
         prevProps.selectedScan != this.props.selectedScan ||
         prevProps.selectedPTM != this.props.selectedPTM
       ) {
