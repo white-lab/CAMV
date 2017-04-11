@@ -35,7 +35,6 @@ class QuantSpectrumBox extends React.Component {
 
   componentDidUpdate(prevProps, prevState) {
     if (this.state.chartLoaded) {
-      console.log("updating", prevProps.spectrumData, this.props.spectrumData)
       if (!cmp(prevProps.spectrumData, this.props.spectrumData)) {
         this.drawChart()
       }

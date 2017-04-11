@@ -1152,8 +1152,6 @@ class ViewBox extends React.Component {
               data[peak.peak_id] = peak
             }.bind(this))
 
-            console.log('re-setting')
-
             this.setState({
               quantData: data,
             }, resolve)
