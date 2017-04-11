@@ -42,8 +42,7 @@ class SpectrumBox extends React.Component {
     if (this.state.chartLoaded) {
       if (
         !cmp(prevProps.spectrumData, this.props.spectrumData) ||
-        prevProps.selectedScan != this.props.selectedScan ||
-        prevProps.selectedPTM != this.props.selectedPTM
+        prevProps.ptmSet != this.props.ptmSet
       ) {
         this.drawChart()
       }
@@ -102,7 +101,7 @@ class SpectrumBox extends React.Component {
         let style = ''
 
         if (mz > minMZ && mz < maxMZ) {
-          if (this.props.selectedPTM != null) {
+          if (this.props.ptmSet) {
             style = 'point {size: 3; fill-color: red; visible: true}'
           } else {
             style = 'point {size: 3; fill-color: red; visible: false}'
@@ -247,8 +246,7 @@ SpectrumBox.propTypes = {
   inputDisabled: PropTypes.bool,
   collisionType: PropTypes.string,
 
-  selectedScan: PropTypes.number,
-  selectedPTM: PropTypes.number,
+  ptmSet: PropTypes.bool,
 
   updateChoice: PropTypes.func,
   pointChosenCallback: PropTypes.func,
@@ -259,8 +257,7 @@ SpectrumBox.defaultProps = {
   inputDisabled: true,
   collisionType: null,
 
-  selectedScan: null,
-  selectedPTM: null,
+  ptmSet: false,
 
   updateChoice: null,
   pointChosenCallback: null,

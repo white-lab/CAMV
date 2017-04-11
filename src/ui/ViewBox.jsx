@@ -50,6 +50,7 @@ class ViewBox extends React.Component {
       scanData: [],
       precursorData: [],
       quantData: [],
+      ptmSet: false,
 
       /* Peak labeling states */
       selectedPeak: null,
@@ -183,6 +184,7 @@ class ViewBox extends React.Component {
 
         this.setState({
           scanData: data,
+          ptmSet: false,
         }, resolve)
       }.bind(this)
     )
@@ -235,6 +237,7 @@ class ViewBox extends React.Component {
 
         this.setState({
           scanData: data,
+          ptmSet: true,
         }, resolve)
       }.bind(this),
     )
@@ -1375,9 +1378,7 @@ class ViewBox extends React.Component {
                   this.state.scan.collisionType : null
                 }
                 inputDisabled={this.state.ptm == null}
-
-                selectedScan={this.state.selectedScan}
-                selectedPTM={this.state.selectedPTM}
+                ptmSet={this.state.ptmSet}
 
                 updateChoice={this.setChoice.bind(this)}
                 pointChosenCallback={this.updatePeak.bind(this)}
