@@ -1,5 +1,15 @@
 # Change Log
 
+## 0.5.0 (2017-04-11)
+
+Features
+
+  - Greatly improved performance of interface on large data sets.
+
+Bugfixes
+
+  - Fixed residual bugs in selecting / expanding nodes in scan selection list.
+
 ## 0.4.0 (2017-04-08)
 
 Features
