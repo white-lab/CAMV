@@ -63,7 +63,7 @@
   width: 75%;
 }
 
-#fragmentGoogleChart {
+.fragmentGoogleChart {
   height: 92.5%;
   width: 100%;
 }
@@ -88,7 +88,7 @@
   width: 100%;
 }
 
-#precursorGoogleChart {
+.precursorGoogleChart {
   height: 100%;
   width: 100%;
 }
@@ -98,7 +98,7 @@
   width: 100%;
 }
 
-#quantGoogleChart {
+.quantGoogleChart {
   height: 100%;
   width: 100%;
 }

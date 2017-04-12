@@ -2,7 +2,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import Tree, { TreeNode } from 'rc-tree'
 
-import { cmp } from '../../utils/utils'
+import cmp from '../../utils/cmp'
 
 class ScanSelectionList extends React.Component {
   constructor(props) {

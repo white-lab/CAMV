@@ -1,158 +1,26 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
-import { cmp } from '../../utils/utils'
+import BaseSpectrum from './BaseSpectrum'
 
-class PrecursorSpectrumBox extends React.Component {
-  constructor(props) {
-    super(props)
-    this.state = {
-      chartLoaded: false,
-    }
-  }
+import cmp from '../../utils/cmp'
 
-  componentDidMount() {
-    window.addEventListener('resize', this.handleResize.bind(this))
-
-    let component = this
-
-    // Load the chart API
-    return jQuery.ajax({
-      dataType: "script",
-      cache: true,
-      url: "https://www.google.com/jsapi",
-    })
-      .done(function () {
-        google.load("visualization", "1", {
-          packages:["corechart"],
-          callback: function () {
-            component.drawChart()
-            component.setState({chartLoaded: true})
-          },
-        })
-      })
-  }
-
-  componentDidUpdate(prevProps, prevState) {
-    if (this.state.chartLoaded) {
-      if (!cmp(prevProps.spectrumData, this.props.spectrumData)) {
-        this.drawChart()
-      }
-    }
-  }
-
-  componentWillUnmount() {
-    window.removeEventListener('resize', this.handleResize.bind(this))
-  }
-
-  drawChart() {
-    if (!this.state.chartLoaded) { return }
-
-    let data = new google.visualization.DataTable()
-
-    data.addColumn('number', 'mz')
-    data.addColumn('number', 'Intensity')
-    data.addColumn({'type': 'string', 'role': 'style'})
-    data.addColumn({'type': 'string', 'role': 'annotation'})
-    data.addColumn('number', 'Isolation')
-
-    let precursorMz = this.props.precursorMz
-    let minMZ = precursorMz - 1
-    let maxMZ = precursorMz + 1
-    let chargeState = this.props.chargeState
-    let ppm = this.props.ppm
-
-    if (this.props.spectrumData.length > 0) {
-      let max_y = Math.max.apply(
-        null,
-        this.props.spectrumData.filter(
-          (element) => { return element.mz >= minMZ && element.mz <= maxMZ }
-        ).map(
-          (element) => { return element.into }
-        )
-      )
-
-      data.addRows([[minMZ, 0, null, null, null]])
-
-      /* Draw a box for the isolation window, if data is available */
-      if (this.props.isolationWindow != null) {
-        let lower_window = precursorMz - this.props.isolationWindow[0]
-        let upper_window = precursorMz + this.props.isolationWindow[1]
-
-        data.addRows([
-          [lower_window, 0, null, null, 0],
-          [lower_window, 0, null, null, max_y * 1.1],
-          [upper_window, 0, null, null, max_y * 1.1],
-          [upper_window, 0, null, null, 0]
-        ])
-      }
-
-      let ionSeries = []
-
-      for (let i = -this.props.c13Num; i <= 5; i++) {
-        ionSeries.push(i)
-      }
-
-      let indices = ionSeries.map(
-        function(val) {
-          let errs = this.props.spectrumData.map(
-            peak => 1e6 * Math.abs(peak.mz - (precursorMz + 1.003355 * val / chargeState)) / peak.mz
-          )
-
-          if (errs.every(val => val > ppm))
-            return null
-
-          return errs.indexOf(Math.min.apply(Math, errs))
-        }.bind(this)
-      )
-
-      this.props.spectrumData.forEach(function(peak, index) {
-        let mz = peak.mz
-        let into = peak.into
-        let name = ''
-        let found = (indices.indexOf(index) != -1)
-
-        let contaminant = !found && this.props.isolationWindow != null && (
-          mz >= precursorMz - this.props.isolationWindow[0] &&
-          mz <= precursorMz + this.props.isolationWindow[1]
-        )
-
-        let style = ''
-
-        if (found) {
-          style = 'point {size: 5; fill-color: #5CB85C; visible: true}'
-        } else if (contaminant) {
-          style = 'point {size: 3; fill-color: red; visible: true}'
-        } else {
-          style = 'point {size: 5; fill-color: #5CB85C; visible: false}'
-        }
-
-        data.addRows([
-          [mz, 0,    null,  null, null],
-          [mz, into, style, name, null],
-          [mz, 0,    null,  null, null]
-        ])
-      }.bind(this))
-
-      data.addRows([
-        [maxMZ, 0, null, null, null]
-      ])
-    }
-
-    let options = {
+class PrecursorSpectrumBox extends BaseSpectrum {
+  getOptions() {
+    return {
       title: 'Precursor',
       hAxis: {
         // title: 'mz',
         gridlines: { color: 'transparent' },
-        minValue: this.props.spectrumData.length > 0 ? minMZ : 0,
-        maxValue: this.props.spectrumData.length > 0 ? maxMZ : 100,
+        minValue: this.minMZ,
+        maxValue: this.maxMZ,
       },
       vAxis: {
         // title: 'Intensity',
         gridlines: { color: 'transparent' },
         format: 'scientific',
         minValue: 0,
-        maxValue: this.props.spectrumData.length > 0 ? null : 100,
+        maxValue: this.maxY,
       },
       chartArea: { left: "15%", bottom: "15%", width: "75%", height: "75%" },
       annotations: { textStyle: { }, stemColor: 'none' },
@@ -164,44 +32,119 @@ class PrecursorSpectrumBox extends React.Component {
         maxZoomIn: 0.01,
       },
     }
+  }
 
-    let chart = new google.visualization.AreaChart(
-      document.getElementById('precursorGoogleChart')
+  updatePeaks() {
+    if (this.props.spectrumData.length <= 0) { return }
+
+    let precursorMz = this.props.precursorMz
+    this.minMZ = precursorMz - 1
+    this.maxMZ = precursorMz + 1
+
+    this.maxY = Math.max.apply(
+      null,
+      this.props.spectrumData.filter(
+        element => element.mz >= this.minMZ && element.mz <= this.maxMZ
+      ).map(
+        element => element.into
+      ),
     )
 
-    if (this.props.pointChosenCallback != null) {
-      google.visualization.events.addListener(
-        chart, 'select',
-        function (e) {
-          let selectedItem = chart.getSelection()[0]
-
-          if (selectedItem) {
-            if (
-              data.getValue(selectedItem.row, 1) == 0 ||
-              data.getValue(selectedItem.row, 4) != null
-            ) { return}
-
-            let mz = data.getValue(selectedItem.row, 0)
-            let peak = this.props.spectrumData.find(
-              peak => peak.mz === mz
-            )
-            this.props.pointChosenCallback(peak)
-          }
-        }.bind(this)
+    if (this.maxY < 0) {
+      this.maxY = Math.max.apply(
+        null,
+        this.props.spectrumData.map(element => element.into)
       )
     }
 
-    chart.draw(data, options)
+    let ionSeries = []
+
+    for (let i = -this.props.c13Num; i <= 5; i++) {
+      ionSeries.push(i)
+    }
+
+    let indices = ionSeries.map(
+      val => {
+        let errs = this.props.spectrumData.map(
+          peak => 1e6 * Math.abs(
+            peak.mz - (precursorMz + 1.003355 * val / this.props.chargeState)
+          ) / peak.mz
+        )
+
+        if (errs.every(val => val > this.props.ppm))
+          return null
+
+        return errs.indexOf(Math.min.apply(Math, errs))
+      }
+    )
+
+    this.props.spectrumData.forEach((peak, index) => {
+      let name = ''
+      let ionIndex = indices.indexOf(index)
+      let found = (ionIndex != -1)
+
+      let contaminant = !found && this.props.isolationWindow != null && (
+        peak.mz >= precursorMz - this.props.isolationWindow[0] &&
+        peak.mz <= precursorMz + this.props.isolationWindow[1]
+      )
+
+      let style = ''
+
+      if (found) {
+        style = 'point {size: 5; fill-color: #5CB85C; visible: true}'
+      } else if (contaminant) {
+        style = 'point {size: 3; fill-color: red; visible: true}'
+      } else {
+        style = 'point {size: 5; fill-color: #5CB85C; visible: false}'
+      }
+
+      peak.style = style
+      peak.peak_name = name
+    })
   }
 
-  handleResize() {
-    this.drawChart()
+  getData() {
+    let arr = [
+      [
+        {label: "mz", type: "number"},
+        {label: "Intensity", type: "number"},
+        {type: 'string', role: 'style'},
+        {type: 'string', role: 'annotation'},
+        {label: "Isolation", type:'number'},
+      ],
+    ]
+
+    if (this.props.spectrumData.length > 0) {
+      if (this.props.isolationWindow != null) {
+        let lower_window = this.props.precursorMz - this.props.isolationWindow[0]
+        let upper_window = this.props.precursorMz + this.props.isolationWindow[1]
+
+        arr.push([lower_window, 0, null, null, 0])
+        arr.push([lower_window, 0, null, null, this.maxY * 1.1])
+        arr.push([upper_window, 0, null, null, this.maxY * 1.1])
+        arr.push([upper_window, 0, null, null, 0])
+      }
+
+      arr.push([this.minMZ, 0, null, null, null])
+
+      this.props.spectrumData.forEach(peak => {
+        arr.push([peak.mz, 0, null, null, null])
+        arr.push([peak.mz, peak.into, peak.style, peak.peak_name, null])
+        arr.push([peak.mz, 0, null, null, null])
+      })
+      arr.push([this.maxMZ, 0, null, null, null])
+    }
+
+    return arr
   }
 
   render() {
     return (
       <div>
-        <div id="precursorGoogleChart" />
+        <div
+          id={this.chartId}
+          className="precursorGoogleChart"
+        />
       </div>
     )
   }
