@@ -2,6 +2,7 @@
 
 [![Build Status](https://img.shields.io/travis/white-lab/CAMV.svg)](https://travis-ci.org/white-lab/CAMV)
 [![Build status](https://ci.appveyor.com/api/projects/status/iva4po0glnswboc1?svg=true)](https://ci.appveyor.com/project/naderm/camv)
+[![Dependency Status](https://gemnasium.com/badges/github.com/white-lab/CAMV.svg)](https://gemnasium.com/github.com/white-lab/CAMV)
 
 Tool for validation proteomic mass spectrometry peptide assignments.
 
