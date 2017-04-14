@@ -29,13 +29,13 @@ class SequenceBox extends React.Component {
     let bFound = []
     let yFound = []
 
-    this.props.spectrumData.forEach(function(peak, index) {
+    this.props.spectrumData.forEach((peak) => {
       if (peak.ionType == 'b') {
         bFound.push([peak.ionPos, peak])
       } else if (peak.ionType == 'y') {
         yFound.push([peak.ionPos, peak])
       }
-    }.bind(this))
+    })
 
     return [bFound, yFound]
   }
@@ -50,7 +50,7 @@ class SequenceBox extends React.Component {
       let ys = [<td key={0} />]
 
       sequence.slice(0, -1).forEach(
-        function (item, i) {
+        (item, i) => {
           let found = bFound.map(i => i[0])
             .indexOf(i + 1) > -1
 
@@ -64,11 +64,11 @@ class SequenceBox extends React.Component {
             />
           )
           bs.push(<td key={i * 2 + 2} />)
-        }.bind(this)
+        }
       )
 
       sequence.forEach(
-        function (item, i) {
+        (item, i) => {
           seq.push(
             <SequenceElement
               AA={item}
@@ -76,11 +76,11 @@ class SequenceBox extends React.Component {
             />
           )
           seq.push(<td key={i * 2 + 1} />)
-        }.bind(this)
+        }
       )
 
       sequence.slice(0, -1).forEach(
-        function (item, i) {
+        (item, i) => {
           let found = yFound.map(i => i[0])
             .indexOf(sequence.length - i - 1) > -1
 
@@ -94,7 +94,7 @@ class SequenceBox extends React.Component {
             />
           )
           ys.push(<td key={i * 2 + 2} />)
-        }.bind(this)
+        }
       )
 
       let rows = [bs, seq, ys]

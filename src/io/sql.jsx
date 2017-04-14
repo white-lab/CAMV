@@ -9,7 +9,7 @@ import sqlite3 from 'sqlite3'
 exports.loadSQL = function(fileName, cb) {
   let db = new sqlite3.cached.Database(
     fileName, sqlite3.OPEN_READWRITE,
-    function(err) {
+    (err) => {
       if (err != null) {
         dialog.showErrorBox("File Save Error", err.message)
       }

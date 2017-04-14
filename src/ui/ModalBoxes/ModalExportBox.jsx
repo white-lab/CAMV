@@ -25,7 +25,7 @@ class ModalExportBox extends React.Component {
         title: "Export Spectra",
         properties: ["createDirectory", "openDirectory"]
       },
-      function(dirName) {
+      (dirName) => {
         if (dirName === undefined || dirName.length != 1)
           return;
 

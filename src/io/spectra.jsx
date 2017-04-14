@@ -37,12 +37,7 @@ exports.spectraToImage = async function(vb, dirName, export_spectras) {
   let spectrum = vb.refs["fragmentSpectrum"]
   spectrum.setState({exporting: true})
 
-  let current_node = [
-    scan_list.props.selectedProtein,
-    scan_list.props.selectedPeptide,
-    scan_list.props.selectedScan,
-    scan_list.props.selectedPTM
-  ]
+  let current_node = vb.getSelectedNode()
 
   let promises = []
 
@@ -61,7 +56,6 @@ exports.spectraToImage = async function(vb, dirName, export_spectras) {
         bgcolor: 'white',
         dpi: 600,
       },
-      function () {}
     )
     promises.push(
       fs.writeFile(
@@ -70,24 +64,21 @@ exports.spectraToImage = async function(vb, dirName, export_spectras) {
         // dataUrl.slice("data:image/svg+xml;charset=utf-8,".length),
         path.join(dirName, out_name + ".png"),
         decodeBase64Image(dataUrl).data,
-        function () {}
       )
     )
   }
 
-  Promise.all(promises).then(
-    function() {
-      vb.setState({exporting: false})
-      win.setResizable(true)
+  Promise.all(promises).then(() => {
+    vb.setState({exporting: false})
+    win.setResizable(true)
 
-      if (maximized) {
-        win.maximize()
-      } else {
-        win.setSize(sizes.width, sizes.height)
-      }
+    if (maximized) {
+      win.maximize()
+    } else {
+      win.setSize(sizes.width, sizes.height)
+    }
 
-      vb.refs["scanSelectionList"].update(current_node)
-      spectrum.setState({exporting: false})
-    }.bind(vb)
-  )
+    vb.refs["scanSelectionList"].update(current_node)
+    spectrum.setState({exporting: false})
+  })
 }

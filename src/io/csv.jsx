@@ -32,6 +32,5 @@ exports.exportCSV = function(vb, path) {
   fs.writeFile(
     path,
     rows.join("\n"),
-    function () {}
   )
 }

@@ -154,7 +154,7 @@ class ViewBox extends React.Component {
 
   blob_to_peaks(blob) {
     return new TextDecoder("utf-8").decode(blob).split(";").map(
-      function(i, index) {
+      (i, index) => {
         let [mz, intensity] = i.split(',')
         mz = parseFloat(mz)
         intensity = parseFloat(intensity)
@@ -174,7 +174,7 @@ class ViewBox extends React.Component {
         this.state.selectedScan,
         "ms2",
       ],
-      function(resolve, reject, row) {
+      (resolve, reject, row) => {
         if (row.scan_id != this.state.selectedScan) {
           reject({errno: sqlite3.INTERRUPT})
           return
@@ -186,7 +186,7 @@ class ViewBox extends React.Component {
           scanData: data,
           ptmSet: false,
         }, resolve)
-      }.bind(this)
+      }
     )
   }
 
@@ -212,10 +212,10 @@ class ViewBox extends React.Component {
         this.state.selectedScan,
         this.state.selectedPTM,
       ],
-      function(resolve, reject, rows) {
+      (resolve, reject, rows) => {
         let data = this.state.scanData.slice()
 
-        rows.forEach(function (row) {
+        rows.forEach((row) => {
           if (
             row.scan_id != this.state.selectedScan ||
             row.ptm_id != this.state.selectedPTM
@@ -233,13 +233,13 @@ class ViewBox extends React.Component {
           peak.ionType = row.ion_type
           peak.ionPos = row.ion_pos
           peak.ppm = 1e6 * Math.abs(peak.mz - row.mz) / row.mz
-        }.bind(this))
+        })
 
         this.setState({
           scanData: data,
           ptmSet: true,
         }, resolve)
-      }.bind(this),
+      },
     )
   }
 
@@ -252,7 +252,7 @@ class ViewBox extends React.Component {
     while (nodes.length < 4) { nodes.push([null, null]) }
     while (prev_nodes.length < 4) { prev_nodes.push([null, null]) }
 
-    return new Promise(function(resolve) {
+    return new Promise((resolve) => {
       this.setState(
         {
           selectedProteins: nodes[0][0],
@@ -263,7 +263,7 @@ class ViewBox extends React.Component {
         },
         resolve,
       )
-    }.bind(this)).then(function() {
+    }).then(() => {
       let promises = []
 
       if (nodes[0][0] != null && nodes[0] != prev_nodes[0]) {
@@ -290,11 +290,11 @@ class ViewBox extends React.Component {
       }
 
       return Promise.all(promises)
-    }.bind(this)).catch(function(err) {
+    }).catch((err) => {
       if (err != null && err.errno != sqlite3.INTERRUPT) {
         console.error(err)
       }
-    }).then(function() {
+    }).then(() => {
       let promises = []
 
       if (
@@ -308,11 +308,11 @@ class ViewBox extends React.Component {
       }
 
       return Promise.all(promises)
-    }.bind(this)).catch(function(err) {
+    }).catch((err) => {
       if (err != null && err.errno != sqlite3.INTERRUPT) {
         console.error(err)
       }
-    }.bind(this))
+    })
   }
 
   redrawCharts() {
@@ -391,7 +391,7 @@ class ViewBox extends React.Component {
         this.state.selectedPTM,
         peak.peak_id,
       ],
-      function (resolve, reject, rows) {
+      (resolve, reject, rows) => {
         let matches = rows.filter(
           (item) => {
             item.ppm = 1e6 * Math.abs(item.mz - peak.mz) / peak.mz
@@ -402,7 +402,7 @@ class ViewBox extends React.Component {
         this.setState({
           fragmentMatches: matches,
         }, resolve)
-      }.bind(this),
+      },
     )
   }
 
@@ -461,7 +461,7 @@ class ViewBox extends React.Component {
         return
     }
 
-    return this.unsetFragmentLabel(peak, false).then(function () {
+    return this.unsetFragmentLabel(peak, false).then(() => {
       return this.wrapSQLRun(
         "UPDATE fragments \
         SET best=1 \
@@ -470,9 +470,9 @@ class ViewBox extends React.Component {
           fragId,
         ],
       )
-    }.bind(this)).then(function() {
+    }).then(() => {
       return this.updatePTMData()
-    }.bind(this))
+    })
   }
 
   newFragmentLabel(peak, label) {
@@ -485,7 +485,7 @@ class ViewBox extends React.Component {
         return
     }
 
-    return this.unsetFragmentLabel(peak, false).then(function () {
+    return this.unsetFragmentLabel(peak, false).then(() => {
       return this.wrapSQLGet(
         "SELECT scan_ptms.scan_ptm_id \
         FROM scan_ptms \
@@ -494,7 +494,7 @@ class ViewBox extends React.Component {
           this.state.selectedScan,
           this.state.selectedPTM,
         ],
-        function(resolve_a, reject_a, row) {
+        (resolve_a, reject_a, row) => {
           this.wrapSQLRun(
             "INSERT INTO fragments ( \
               scan_ptm_id, \
@@ -512,16 +512,16 @@ class ViewBox extends React.Component {
               peak.mz,
               1,
             ],
-            function(resolve_b, reject_b) {
+            (resolve_b, reject_b) => {
               resolve_a()
               resolve_b()
             },
           )
-        }.bind(this),
+        },
       )
-    }.bind(this)).then(function() {
+    }).then(() => {
       return this.updatePTMData()
-    }.bind(this))
+    })
   }
 
   unsetFragmentLabel(peak, refresh) {
@@ -547,11 +547,11 @@ class ViewBox extends React.Component {
         this.state.selectedScan,
         this.state.selectedPTM,
       ],
-    ).then(function() {
+    ).then(() => {
       if (refresh == null || refresh) {
         return this.updatePTMData()
       }
-    }.bind(this))
+    })
   }
 
   closeImportModal() {
@@ -620,7 +620,7 @@ class ViewBox extends React.Component {
     if (exportTables || export_spectras.some(i => i)) {
       fs.mkdir(
         dirName,
-        function() {
+        () => {
           if (exportTables) {
             exportCSV(
               this,
@@ -633,7 +633,7 @@ class ViewBox extends React.Component {
           }
 
           spectraToImage(this, dirName, export_spectras)
-        }.bind(this)
+        }
       )
     }
   }
@@ -719,9 +719,9 @@ class ViewBox extends React.Component {
         this.state.selectedScan,
         this.state.selectedPTM
       ],
-    ).then(function () {
+    ).then(() => {
       return this.buildNodeTree()
-    }.bind(this))
+    })
   }
 
   openImport() {
@@ -807,7 +807,7 @@ class ViewBox extends React.Component {
       ORDER BY protein_sets.protein_set_name, peptides.peptide_seq, \
       mod_states.mod_desc, scans.scan_num, ptms.name",
       [],
-      function (resolve, reject, rows) {
+      (resolve, reject, rows) => {
         let proteins = []
         let peptides = []
         let scans = []
@@ -865,7 +865,7 @@ class ViewBox extends React.Component {
         this.setState({
           nodeTree: proteins,
         }, resolve)
-      }.bind(this)
+      }
     )
   }
 
@@ -890,7 +890,7 @@ class ViewBox extends React.Component {
       [
         this.state.selectedProteins,
       ],
-      function(resolve, reject, row) {
+      (resolve, reject, row) => {
         if (row.protein_set_id != this.state.selectedProteins) {
           reject({errno: sqlite3.INTERRUPT})
           return
@@ -898,7 +898,7 @@ class ViewBox extends React.Component {
         this.setState({
           proteins: row,
         }, resolve)
-      }.bind(this),
+      },
     )
   }
 
@@ -910,7 +910,7 @@ class ViewBox extends React.Component {
       [
         this.state.selectedPeptide,
       ],
-      function(resolve, reject, row) {
+      (resolve, reject, row) => {
         if (row.peptide_id != this.state.selectedPeptide) {
           reject({errno: sqlite3.INTERRUPT})
           return
@@ -918,16 +918,16 @@ class ViewBox extends React.Component {
         this.setState({
           peptide: row,
         }, resolve)
-      }.bind(this),
+      },
     )
   }
 
   wrapSQLGet(query, params, cb) {
-    return new Promise(function(resolve, reject) {
+    return new Promise((resolve, reject) => {
       this.state.db.get(
         query,
         params,
-        function (err, ret) {
+        (err, ret) => {
           if (err != null || ret == null) {
             this.handleSQLError(err)
             this.state.db.interrupt()
@@ -940,17 +940,17 @@ class ViewBox extends React.Component {
           } else {
             resolve()
           }
-        }.bind(this)
+        }
       )
-    }.bind(this))
+    })
   }
 
   wrapSQLRun(query, params, cb) {
-    return new Promise(function(resolve, reject) {
+    return new Promise((resolve, reject) => {
       this.state.db.run(
         query,
         params,
-        function (err) {
+        (err) => {
           if (err != null) {
             this.handleSQLError(err)
             this.state.db.interrupt()
@@ -963,17 +963,17 @@ class ViewBox extends React.Component {
           } else {
             resolve()
           }
-        }.bind(this)
+        }
       )
-    }.bind(this))
+    })
   }
 
   wrapSQLAll(query, params, cb) {
-    return new Promise(function(resolve, reject) {
+    return new Promise((resolve, reject) => {
       this.state.db.all(
         query,
         params,
-        function (err, ret) {
+        (err, ret) => {
           if (err != null || ret == null) {
             this.handleSQLError(err)
             this.state.db.interrupt()
@@ -986,9 +986,9 @@ class ViewBox extends React.Component {
           } else {
             resolve()
           }
-        }.bind(this)
+        }
       )
-    }.bind(this))
+    })
   }
 
   updateScan() {
@@ -1020,7 +1020,7 @@ class ViewBox extends React.Component {
         [
           this.state.selectedScan,
         ],
-        function(resolve, reject, row) {
+        (resolve, reject, row) => {
           if (row.scan_id != this.state.selectedScan) {
             reject({errno: sqlite3.INTERRUPT})
             return
@@ -1032,8 +1032,8 @@ class ViewBox extends React.Component {
           this.setState({
             scan: row,
           }, resolve)
-        }.bind(this),
-      ).then(function () {
+        },
+      ).then(() => {
         return this.wrapSQLGet(
           "SELECT scan_data.data_blob, scan_data.scan_id \
           FROM scan_data \
@@ -1042,7 +1042,7 @@ class ViewBox extends React.Component {
             "precursor",
             this.state.selectedScan,
           ],
-          function(resolve, reject, row) {
+          (resolve, reject, row) => {
             if (row.scan_id != this.state.selectedScan) {
               reject({errno: sqlite3.INTERRUPT})
               return
@@ -1084,9 +1084,9 @@ class ViewBox extends React.Component {
             this.setState({
               precursorData: peaks,
             }, resolve)
-          }.bind(this),
+          },
         )
-      }.bind(this))
+      })
     )
 
     promises.push(
@@ -1098,7 +1098,7 @@ class ViewBox extends React.Component {
           "quant",
           this.state.selectedScan,
         ],
-        function(resolve, reject, row) {
+        (resolve, reject, row) => {
           if (row.scan_id != this.state.selectedScan) {
             reject({errno: sqlite3.INTERRUPT})
             return
@@ -1106,8 +1106,8 @@ class ViewBox extends React.Component {
           this.setState({
             quantData: this.blob_to_peaks(row.data_blob),
           }, resolve)
-        }.bind(this),
-      ).then(function () {
+        },
+      ).then(() => {
         return this.wrapSQLAll(
           "SELECT \
           quant_mz_peaks.mz, \
@@ -1124,10 +1124,10 @@ class ViewBox extends React.Component {
           [
             this.state.selectedScan,
           ],
-          function(resolve, reject, rows) {
+          (resolve, reject, rows) => {
             let data = this.state.quantData.slice()
 
-            rows.forEach(function (row) {
+            rows.forEach((row) => {
               if (row.scan_id != this.state.selectedScan) {
                 reject({errno: sqlite3.INTERRUPT})
                 return
@@ -1153,14 +1153,14 @@ class ViewBox extends React.Component {
               peak.exp_mz = row.mz
               peak.ppm = min_err
               data[peak.peak_id] = peak
-            }.bind(this))
+            })
 
             this.setState({
               quantData: data,
             }, resolve)
-          }.bind(this),
+          },
         )
-      }.bind(this))
+      })
     )
 
     return Promise.all(promises)
@@ -1174,7 +1174,7 @@ class ViewBox extends React.Component {
       [
         this.state.selectedPTM,
       ],
-      function(resolve, reject, row) {
+      (resolve, reject, row) => {
         if (row.ptm_id != this.state.selectedPTM) {
           reject({errno: sqlite3.INTERRUPT})
           return
@@ -1182,7 +1182,7 @@ class ViewBox extends React.Component {
         this.setState({
           ptm: row,
         }, resolve)
-      }.bind(this),
+      },
     )
   }
 
