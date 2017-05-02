@@ -15,7 +15,7 @@
     "electron-compilers": "^5.8.3",
     "prop-types": "^15.5.8",
     "rc-tree": "github:naderm/tree#precompiled",
-    "react": "^15.4.4",
+    "react": "^15.5.4",
     "react-addons-update": "^15.5.2",
     "react-bootstrap": "^0.31.0",
     "react-dom": "^15.5.4",
