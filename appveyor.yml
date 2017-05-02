@@ -13,7 +13,7 @@ install:
     - "npm install bower -g"
     - "bower install"
     - ps: $pycamverter_version = git ls-remote --tags git://github.com/white-lab/pycamverter.git | cut -f 2 | cut -d / -f 3 | cut -d ^ -f 1 | tail -n1
-    - ps: Start-FileDownload https://github.com/white-lab/pycamverter/releases/download/$(pycamverter_version)/PyCAMVerter.exe
+    - ps: Start-FileDownload https://github.com/white-lab/pycamverter/releases/download/${pycamverter_version}/PyCAMVerter.exe
     - ps: $camv_version = node -e "console.log(require('./package.json').version);"
 
 # test_script:
@@ -24,7 +24,7 @@ build_script:
     - "ls -lh out/make/"
 
 artifacts:
-    - path: "out/make/CAMV-win32-x64-$(camv_version).zip"
+    - path: "out/make/CAMV-win32-x64-${camv_version}.zip"
 
 deploy:
     - provider: GitHub
