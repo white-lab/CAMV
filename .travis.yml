@@ -41,7 +41,7 @@ install:
 
 script:
   - travis_wait 30 npm run make
-  - ls -l out/make/
+  - ls -lhR out/
 
 deploy:
   provider: releases

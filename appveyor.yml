@@ -21,7 +21,7 @@ install:
 
 build_script:
     - npm run make
-    - "ls -lR out/"
+    - "ls -lRh out/"
 
 artifacts:
     - path: "out/make/CAMV-win32-x64-$(camv_version).zip"
