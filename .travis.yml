@@ -14,7 +14,7 @@ matrix:
   include:
     - os: linux
       node_js: '7'
-      env: DEPLOY_FILE=out/make/CAMV-linux-x64.zip
+      env:
       addons:
          apt:
             sources: [ 'ubuntu-toolchain-r-test','llvm-toolchain-precise-3.5', 'gcc-multilib', 'g++-multilib', 'libsqlite3-dev:i386' ]
@@ -24,10 +24,14 @@ matrix:
       env: DEPLOY_FILE=out/make/CAMV-darwin-x64.zip
 
 before_install:
-
+  - export CAMV_VERSION=$(node -e "console.log(require('./package.json').version);")
+  - uname -s
   - if [[ $(uname -s) == 'Linux' ]]; then
       export CXX="clang++-3.5";
       export CC="clang-3.5";
+      export DEPLOY_FILE=out/make/CAMV-linux-x64-${CAMV_VERSION}.zip;
+    elif [[ $(uname -s) == 'Darwin' ]] ; then
+      export DEPLOY_FILE=out/make/CAMV-darwin-x64-${CAMV_VERSION}.zip;
     fi;
 
 install:
