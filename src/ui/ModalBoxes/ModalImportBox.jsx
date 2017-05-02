@@ -19,6 +19,7 @@ class ModalImportBox extends React.Component {
         "..\\..\\..\\PyCamverter.exe"
       ),
       raw_paths: [],
+      mat_paths: [],
       search_path: null,
       radioChoice: 'open',
     }
@@ -105,6 +106,27 @@ class ModalImportBox extends React.Component {
     )
   }
 
+  changeMatPaths() {
+    dialog.showOpenDialog(
+      {
+        properties: [
+          'multiSelections',
+        ],
+        filters: [{
+          name: 'CAMV-Matlab Data',
+          extensions: ['mat'],
+        }],
+      },
+      (fileNames) => {
+        if (fileNames === undefined) return;
+
+        this.setState({
+          mat_paths: fileNames,
+        })
+      }
+    )
+  }
+
   closeCallback() {
     if (
       !this.state.processing &&
@@ -123,6 +145,10 @@ class ModalImportBox extends React.Component {
       "--search_path", this.state.search_path,
       "--raw_paths", this.state.raw_paths,
     ]
+
+    if (this.state.mat_paths.length > 0) {
+      args = args.concat(["--mat-sessions"]).concat(this.state.mat_paths)
+    }
 
     let out_path = this.state.search_path.replace(/\.[^/.]+$/, ".camv.db")
 
@@ -263,6 +289,24 @@ class ModalImportBox extends React.Component {
                     this.state.raw_paths != null ?
                     this.state.raw_paths :
                     ("No file selected.")
+                  }
+                </div>
+              </FormGroup>
+              <FormGroup
+                controlId="formControlsFile"
+              >
+                <Button
+                  id="fileSelect"
+                  onClick={this.changeMatPaths.bind(this)}
+                  disabled={this.state.radioChoice != "process" || this.state.processing}
+                >
+                  CAMV-Matlab Sessions
+                </Button>
+                <div>
+                  {
+                    this.state.mat_paths != null ?
+                    this.state.mat_paths :
+                    ("No files selected.")
                   }
                 </div>
               </FormGroup>

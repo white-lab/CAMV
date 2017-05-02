@@ -1,5 +1,11 @@
 # Change Log
 
+## 0.6.0 (2017-05-02)
+
+Features
+
+  - Added the ability to import validation data from CAMV-Matlab sessions.
+
 ## 0.5.2 (2017-04-11)
 
 Features
