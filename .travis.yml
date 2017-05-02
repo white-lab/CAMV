@@ -21,7 +21,6 @@ matrix:
             packages: [ 'clang-3.5' ]
     - os: osx
       node_js: '7'
-      env: DEPLOY_FILE=out/make/CAMV-darwin-x64.zip
 
 before_install:
   - export CAMV_VERSION=$(node -e "console.log(require('./package.json').version);")
