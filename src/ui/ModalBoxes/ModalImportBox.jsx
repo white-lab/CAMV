@@ -143,8 +143,11 @@ class ModalImportBox extends React.Component {
 
     let args = [
       "--search_path", this.state.search_path,
-      "--raw_paths", this.state.raw_paths,
     ]
+
+    if (this.state.raw_paths.length > 0) {
+      args = args.concat(["--raw_paths"]).concat(this.state.raw_paths)
+    }
 
     if (this.state.mat_paths.length > 0) {
       args = args.concat(["--mat-sessions"]).concat(this.state.mat_paths)
