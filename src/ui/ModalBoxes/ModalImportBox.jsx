@@ -286,8 +286,8 @@ class ModalImportBox extends React.Component {
                 </Button>
                 <div>
                   {
-                    this.state.raw_paths != null ?
-                    this.state.raw_paths :
+                    this.state.raw_paths.length > 0 ?
+                    this.state.raw_paths.join(', ') :
                     ("No file selected.")
                   }
                 </div>
@@ -304,8 +304,8 @@ class ModalImportBox extends React.Component {
                 </Button>
                 <div>
                   {
-                    this.state.mat_paths != null ?
-                    this.state.mat_paths :
+                    this.state.mat_paths.length > 0 ?
+                    this.state.mat_paths.join(', ') :
                     ("No files selected.")
                   }
                 </div>
