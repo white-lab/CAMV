@@ -12,7 +12,7 @@
     "babel-preset-react": "^6.24.1",
     "dom-to-image": "github:naderm/dom-to-image",
     "electron-compile": "^6.4.1",
-    "electron-compilers": "^5.8.3",
+    "electron-compilers": "^5.9.0",
     "prop-types": "^15.5.8",
     "rc-tree": "github:naderm/tree#precompiled",
     "react": "^15.5.4",
@@ -27,7 +27,7 @@
   "devDependencies": {
     "babel-eslint": "^7.2.3",
     "cross-env": "^4.0.0",
-    "electron-forge": "^3.0.0",
+    "electron-forge": "^3.0.1",
     "electron-prebuilt-compile": "1.6.2",
     "eslint": "^3.19.0",
     "eslint-formatter-pretty": "^1.1.0",
