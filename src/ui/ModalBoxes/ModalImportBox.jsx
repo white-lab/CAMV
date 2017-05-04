@@ -141,6 +141,10 @@ class ModalImportBox extends React.Component {
       processing: true,
     })
 
+    if (this.props.database != null) {
+      this.props.database.close()
+    }
+
     let args = [
       "--search-path", this.state.search_path,
     ]
@@ -353,11 +357,13 @@ ModalImportBox.propTypes = {
   importCallback: PropTypes.func,
   closeCallback: PropTypes.func,
   showModal: PropTypes.bool.isRequired,
+  database: PropTypes.object,
 }
 
 ModalImportBox.defaultProps = {
   importCallback: null,
   closeCallback: null,
+  database: null,
 }
 
 module.exports = ModalImportBox

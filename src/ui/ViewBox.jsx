@@ -1199,6 +1199,7 @@ class ViewBox extends React.Component {
           showModal={this.state.modalImportOpen}
           importCallback={this.runImport.bind(this)}
           closeCallback={this.closeImportModal.bind(this)}
+          database={this.state.db}
         />
         <ModalExportBox
           ref="modalExportBox"
