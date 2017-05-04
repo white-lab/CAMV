@@ -837,7 +837,7 @@ class ViewBox extends React.Component {
           }
 
           if (
-            row.peptide_id != last_row.peptide_id &&
+            row.peptide_id != last_row.peptide_id ||
             row.mod_state_id != last_row.mod_state_id
           ) {
             peptides.push({

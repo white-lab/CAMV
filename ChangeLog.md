@@ -1,5 +1,11 @@
 # Change Log
 
+## 0.7.1 (2017-05-04)
+
+Bugfixes
+
+  - Fixed bug where peptides with different mod states were merged together.
+
 ## 0.7.0 (2017-05-04)
 
 Features
