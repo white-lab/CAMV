@@ -1,4 +1,5 @@
 import React from 'react'
+import ReactDOM from 'react-dom'
 import PropTypes from 'prop-types'
 import Tree, { TreeNode } from 'rc-tree'
 
@@ -11,6 +12,20 @@ class ScanSelectionList extends React.Component {
       selectedNode: [],
     }
   }
+
+  findTreeNode(ref) {
+    let treeNode = this.refs["tree"]
+    let runningKey = 'treeNode'
+
+    for (const key of ref.split('-')) {
+      if (treeNode === undefined) { break }
+      runningKey = `${runningKey}-${key}`
+      treeNode = treeNode.refs[runningKey]
+    }
+
+    return treeNode
+  }
+
 
   componentWillUpdate(nextProps, nextState) {
     if (
@@ -26,10 +41,15 @@ class ScanSelectionList extends React.Component {
         let tree = this.refs["tree"]
 
         if (tree != null) {
+          let key = nextProps.selectedNode.map(i => i.join(",")).join("-")
+
           tree.setState({
             expandedKeys: this.toExpandKeys(nextProps.selectedNode),
-            selectedKeys: [nextProps.selectedNode.map(i => i.join(",")).join("-")]
+            selectedKeys: [key],
           })
+
+          let treeNode = this.findTreeNode(key.split("-")[0])
+          ReactDOM.findDOMNode(treeNode).scrollIntoView()
         }
       }
 
@@ -54,10 +74,15 @@ class ScanSelectionList extends React.Component {
   selectNode(nodes) {
     let tree = this.refs["tree"]
     if (tree != null) {
+      let key = nodes.map(i => i.join(",")).join("-")
+
       tree.setState({
         expandedKeys: this.toExpandKeys(nodes),
-        selectedKeys: [nodes.map(i => i.join(",")).join("-")]
+        selectedKeys: [key]
       })
+
+      let treeNode = this.findTreeNode(key.split("-")[0])
+      ReactDOM.findDOMNode(treeNode).scrollIntoView()
     }
 
     this.setState({
@@ -309,8 +334,6 @@ class ScanSelectionList extends React.Component {
 
     let node = this.getNode(indices)
     this.selectNode(node)
-
-    // TODO: Expand the tree as needed
   }
 
   render() {

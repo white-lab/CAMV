@@ -650,7 +650,6 @@ class ViewBox extends React.Component {
       modalSearchOpen: false,
     })
 
-    // TODO Search lookup
     for (let protein of this.state.nodeTree) {
       if (
         proteinMatch != '' &&
@@ -659,7 +658,6 @@ class ViewBox extends React.Component {
         this.updateAll(
           this.getBase([protein.nodeId])
         )
-
         return
       }
 

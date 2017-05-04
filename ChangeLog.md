@@ -1,5 +1,11 @@
 # Change Log
 
+## 0.7.0 (2017-05-04)
+
+Features
+
+  - Scroll scan selection list when using keyboard navigation or search.
+
 ## 0.6.0 (2017-05-02)
 
 Features
