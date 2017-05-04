@@ -1191,7 +1191,7 @@ class ViewBox extends React.Component {
         id="viewBox"
         style={{
           margin: this.state.exporting ? '0px' : '10px',
-          height: this.state.exporting ? "100%" : "calc(100% - 29px)",
+          height: this.state.exporting ? "100%" : "calc(100% - 30px)",
         }}
       >
         <ModalImportBox
