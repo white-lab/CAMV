@@ -284,13 +284,16 @@ class ViewBox extends React.Component {
         nodes[2][0] != prev_nodes[2][0]
       ) {
         promises.push(this.updateScan())
+      }
 
-        if (
-            nodes[3][0] == null &&
-            prev_nodes[3][0] != null
-        ) {
-          promises.push(this.updateScanData())
-        }
+      if ((
+        nodes[2][0] != null &&
+        nodes[2][0] != prev_nodes[2][0]
+      ) || (
+        nodes[3][0] == null &&
+        prev_nodes[3][0] != null
+      )) {
+        promises.push(this.updateScanData())
       }
       if (
         nodes[3][0] != null &&
