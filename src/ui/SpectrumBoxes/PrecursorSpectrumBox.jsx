@@ -38,8 +38,16 @@ class PrecursorSpectrumBox extends BaseSpectrum {
     if (this.props.spectrumData.length <= 0) { return }
 
     let precursorMz = this.props.precursorMz
-    this.minMZ = precursorMz - 1
-    this.maxMZ = precursorMz + 1
+    this.minMZ = (
+      precursorMz -
+      (this.props.isolationWindow != null ? this.props.isolationWindow[0] : 0)
+      - 1
+    )
+    this.maxMZ = (
+      precursorMz +
+      (this.props.isolationWindow != null ? this.props.isolationWindow[1] : 0)
+      + 1
+    )
 
     this.maxY = Math.max.apply(
       null,
