@@ -1079,7 +1079,7 @@ class ViewBox extends React.Component {
                   peak => 1e6 * Math.abs(peak.mz - exp_mz) / peak.mz
                 )
 
-                if (errs.every(val => val > this.state.maxPPM))
+                if (errs.every(val => val > this.state.maxPPM || isNaN(val)))
                   return
 
                 let ppm = Math.min.apply(Math, errs)
