@@ -21,13 +21,16 @@ After opening your processed CAMV file, you should see a list of proteins with i
 CAMV supports several shortcuts for navigating a data set:
 
 ```
-Down / j: Next spectrum
-Up / k: Previous spectrum
+Down / j: Down in tree
+Up / k: Up in tree
 Left / Right: Expand / collapse tree
+n / m: Next / Previous Spectrum
 a: Accept spectra
 s: Maybe spectra
 d: Reject spectra
-Contrl-F: Search proteins / peptides / scans
+Control-O: Open Data Set
+Control-E: Export Data Set
+Control-F: Search proteins / peptides / scans
 ```
 
 ## Development
