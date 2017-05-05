@@ -1,8 +1,14 @@
 # Change Log
 
+## 0.7.2 (2017-05-04)
+
+Bug fixes
+
+  - Don't refresh precursor / quant scans unnecessarily.
+
 ## 0.7.1 (2017-05-04)
 
-Bugfixes
+Bug fixes
 
   - Fixed bug where peptides with different mod states were merged together.
 
@@ -26,7 +32,7 @@ Features
 
 ## 0.5.1 (2017-04-11)
 
-Bugfixes
+Bug fixes
 
   - Fixed bugs in updating precursor + quantification peaks.
 
@@ -36,7 +42,7 @@ Features
 
   - Greatly improved performance of interface on large data sets.
 
-Bugfixes
+Bug fixes
 
   - Fixed residual bugs in selecting / expanding nodes in scan selection list.
 
@@ -75,7 +81,7 @@ Features
     fetches / updates data on the fly. +These changes are not backwards
     compatible with old CAMV / pycamverter data+.
 
-Bugfixes
+Bug fixes
 
   - Fixed bug on selecting peaks with no matches.
 
@@ -93,7 +99,7 @@ Features
 
   - Added a icon to CAMV packaged executable
 
-Bugfixes
+Bug fixes
 
   - Include electron-compile to fix windows error
 
@@ -125,7 +131,7 @@ Features
   - Reduced label clutter on spectra
   - Show observed vs. expected m/z values
 
-Bugfixes
+Bug fixes
 
   - Corrected modified cysteine mass
   - Fixed bug with loading large files
