@@ -49,7 +49,10 @@ class ScanSelectionList extends React.Component {
           })
 
           let treeNode = this.findTreeNode(key.split("-")[0])
-          ReactDOM.findDOMNode(treeNode).scrollIntoView()
+
+          if (treeNode != null) {
+            ReactDOM.findDOMNode(treeNode).scrollIntoView()
+          }
         }
       }
 
