@@ -753,6 +753,7 @@ class ViewBox extends React.Component {
 
       selectedProteins: null,
       selectedPeptide: null,
+      selectedModState: null,
       selectedScan: null,
       selectedPTM: null,
 
