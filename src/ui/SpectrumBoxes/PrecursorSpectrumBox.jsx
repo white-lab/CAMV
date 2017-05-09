@@ -20,6 +20,7 @@ class PrecursorSpectrumBox extends BaseSpectrum {
     options.hideLabels = true
     options.xlabel = ''
     options.ylabel = ''
+    options.xticks = 3
     return options
   }
 

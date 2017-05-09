@@ -1,5 +1,11 @@
 # Change Log
 
+## 0.9.0 (2017-05-09)
+
+Features
+
+  - Improved display of peak labels, show lower peaks on zoom in.
+
 ## 0.8.0 (2017-05-09)
 
 Features

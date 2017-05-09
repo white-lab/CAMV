@@ -11,6 +11,7 @@ class QuantSpectrumBox extends BaseSpectrum {
     options.title = "Quantification"
     options.xlabel = ''
     options.ylabel = ''
+    options.xticks = 5
     return options
   }
 
@@ -18,8 +19,8 @@ class QuantSpectrumBox extends BaseSpectrum {
     if (this.props.spectrumData.length <= 0) { return }
 
     let quantMz = this.props.spectrumData
-    this.minMZ = Math.round(2 * Math.min.apply(null, quantMz.map(i => i.mz))) / 2 - 1
-    this.maxMZ = Math.round(2 * Math.max.apply(null, quantMz.map(i => i.mz))) / 2 + 1
+    this.minMZ = Math.min.apply(null, quantMz.map(i => i.mz)) - 1
+    this.maxMZ = Math.max.apply(null, quantMz.map(i => i.mz)) + 1
     this.maxY = Math.max.apply(null, quantMz.map(i => i.into))
 
     let ppm_cutoff = 10

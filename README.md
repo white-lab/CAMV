@@ -14,7 +14,7 @@ Upon opening CAMV, you will be prompted to open a .camv.gz file. These are gener
 
 After opening your processed CAMV file, you should see a list of proteins with individual spectra that can be accepted or rejected:
 
-![CAMV - pY](https://i.imgur.com/45Dv8eo.png)
+![CAMV - pY](https://i.imgur.com/X2XOQQr.png)
 
 ### Shortcuts
 
