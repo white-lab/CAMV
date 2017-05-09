@@ -6,9 +6,9 @@
 }
 
 text.shadow {
-    stroke: white;
-    stroke-width: .05px;
-    opacity: 1;
+  stroke: white;
+  stroke-width: .05px;
+  opacity: 1;
 }
 
 #scanSelectionList {
@@ -17,6 +17,12 @@ text.shadow {
   height: 100%;
   overflow: scroll;
   padding: 0;
+}
+
+#sequenceSpectraContainer {
+  height: 100%;
+  width: 80%;
+  float: right;
 }
 
 #sequenceBox {
@@ -56,12 +62,6 @@ text.shadow {
   height: 85%;
   margin-bottom: 0%;
   width: auto;
-}
-
-#sequenceSpectraContainer {
-  height: 100%;
-  width: 80%;
-  float: right;
 }
 
 #fragmentSpectrumBox {
