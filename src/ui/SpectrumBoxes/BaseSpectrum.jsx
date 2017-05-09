@@ -54,10 +54,20 @@ class BaseSpectrum extends React.Component {
   updatePeaks() {
     if (this.props.spectrumData.length <= 0) { return }
 
-    this.maxMZ = Math.ceil(
-      this.props.spectrumData[this.props.spectrumData.length - 1].mz + 1
-    )
-    this.maxY = null
+    if (this.props.spectrumData.length > 0) {
+      this.maxMZ = Math.ceil(
+        this.props.spectrumData[this.props.spectrumData.length - 1].mz + 1
+      )
+
+      this.maxY = Math.max.apply(
+        null,
+        this.props.spectrumData.filter(
+          element => (element.mz >= this.minMZ && element.mz <= this.maxMZ)
+        ).map(
+          element => element.into
+        )
+      )
+    }
 
     let ppm_cutoff = 10
 
