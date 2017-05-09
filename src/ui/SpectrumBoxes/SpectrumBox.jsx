@@ -72,11 +72,7 @@ class SpectrumBox extends BaseSpectrum {
             peak.name.match(/^[abcxyz][^-]*$/) != null
           )
 
-          name = (
-            (
-              !isotope && ((into >= this.maxY / 10) || by_ion)
-            ) ? peak.name : null
-          )
+          name = !isotope ? peak.name : ''
 
           if (peak.ppm != null && peak.ppm < ppm_cutoff) {
             if (isotope) {
