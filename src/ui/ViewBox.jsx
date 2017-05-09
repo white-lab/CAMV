@@ -17,6 +17,7 @@ import ModalBYBox from './ModalBoxes/ModalBYBox'
 import ModalProcessScanBox from './ModalBoxes/ModalProcessScanBox'
 
 import SpectrumBox from './SpectrumBoxes/SpectrumBox'
+import ChoiceBox from './SpectrumBoxes/ChoiceBox'
 import PrecursorSpectrumBox from './SpectrumBoxes/PrecursorSpectrumBox'
 import QuantSpectrumBox from './SpectrumBoxes/QuantSpectrumBox'
 
@@ -1393,11 +1394,16 @@ class ViewBox extends React.Component {
                   this.state.scan != null ?
                   this.state.scan.collisionType : null
                 }
-                inputDisabled={this.state.ptm == null}
                 ptmSet={this.state.ptmSet}
 
-                updateChoice={this.setChoice.bind(this)}
                 pointChosenCallback={this.updatePeak.bind(this)}
+
+                style={{height: this.state.exporting ? "100%" : "92.5%"}}
+              />
+              <ChoiceBox
+                inputDisabled={this.state.ptm == null}
+                updateChoice={this.setChoice.bind(this)}
+                style={{display: this.state.exporting ? 'none' : null}}
               />
             </div>
           </div>
