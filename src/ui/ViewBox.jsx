@@ -1386,6 +1386,7 @@ class ViewBox extends React.Component {
             </div>
             <div
               id="fragmentSpectrumBox"
+              style={{height: this.state.exporting ? "100%" : "92.5%"}}
             >
               <SpectrumBox
                 ref="fragmentSpectrum"
@@ -1397,13 +1398,15 @@ class ViewBox extends React.Component {
                 ptmSet={this.state.ptmSet}
 
                 pointChosenCallback={this.updatePeak.bind(this)}
-
-                style={{height: this.state.exporting ? "100%" : "92.5%"}}
               />
+            </div>
+            <div
+              id="updateBox"
+              style={{display: this.state.exporting ? 'none' : null}}
+            >
               <ChoiceBox
                 inputDisabled={this.state.ptm == null}
                 updateChoice={this.setChoice.bind(this)}
-                style={{display: this.state.exporting ? 'none' : null}}
               />
             </div>
           </div>

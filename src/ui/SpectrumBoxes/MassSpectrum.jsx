@@ -5,7 +5,6 @@ class MassSpectrum {
   constructor(elemid, data, options) {
     this.elemid = elemid
     this.chart = document.getElementById(elemid)
-    console.log(this.elemid, this.chart)
 
     this.cx = this.chart.clientWidth
     this.cy = this.chart.clientHeight
@@ -17,12 +16,14 @@ class MassSpectrum {
     this.options.ymin = options.ymin || 0
     this.options.isolationWindow = options.isolationWindow || []
     this.options.hideLabels = options.hideLabels || false
+    this.options.xticks = options.xticks || 5
+    this.options.yticks = options.yticks || 5
 
     this.padding = {
        "top":    this.options.title  ? 40 : 20,
        "right":                 30,
        "bottom": this.options.xlabel ? 60 : 30,
-       "left":   this.options.ylabel ? 70 : 45
+       "left":   this.options.ylabel ? 75 : 50
     }
 
     this.size = {
@@ -67,19 +68,24 @@ class MassSpectrum {
       .scaleExtent([1, 100000])
       .on("zoom", this.zoomed())
 
-    this.plot.call(this.scaler)
+    this.vis.call(this.scaler)
 
     this.yAxis = d3.axisLeft(this.y)
       .tickFormat(d3.format(".0e"))
+      .ticks(this.options.yticks)
 
     this.gY = this.vis.append("g")
       .attr("transform", "translate(0, 0)")
       .call(this.yAxis)
 
     this.xAxis = d3.axisBottom(this.x)
+      .ticks(this.options.xticks)
+
     this.gX = this.vis.append("g")
       .attr("transform", `translate(0, ${this.size.height})`)
       .call(this.xAxis)
+
+    this.updateXY()
 
     // Add the x-axis label
     if (this.options.xlabel) {
@@ -88,6 +94,8 @@ class MassSpectrum {
         .text(this.options.xlabel)
         .attr("x", this.size.width/2)
         .attr("y", this.size.height)
+        .attr("font-family", "sans-serif")
+        .attr("font-size", 18)
         .attr("dy","2.4em")
         .style("text-anchor","middle")
     }
@@ -98,7 +106,9 @@ class MassSpectrum {
         .attr("class", "axis")
         .text(this.options.ylabel)
         .style("text-anchor","middle")
-        .attr("transform", `translate(-40, ${this.size.height/2}) rotate(-90)`)
+        .attr("font-family", "sans-serif")
+        .attr("font-size", 18)
+        .attr("transform", `translate(-50, ${this.size.height/2}) rotate(-90)`)
     }
 
     // add Chart Title
@@ -109,6 +119,8 @@ class MassSpectrum {
         .attr("x", this.size.width / 2)
         .attr("dy","-0.8em")
         .style("text-anchor", "middle")
+        .attr("font-size", 18)
+        .attr("font-family", "sans-serif")
     }
 
     this.drawBars(this.data, this.x, this.y)
@@ -178,12 +190,13 @@ class MassSpectrum {
             .data(scatterPoints)
           .enter().append('text')
             .text((d) => d.name)
-            .attr('x', (d) => x(d.mz))
-            .attr('y', (d) => y(d.into))
+            // .attr('x', (d) => x(d.mz))
+            // .attr('y', (d) => y(d.into))
             .attr('dx', 4)
             .style('text-anchor', 'start')
-            // .attr("transform", (d) => `rotate(-90) translate(${x(d.mz)}, ${y(d.into)})`)
-            .attr("class", "shadow")
+            .attr("font-family", "sans-serif")
+            .attr("transform", (d) => `translate(${x(d.mz)}, ${y(d.into)}) rotate(-90)`)
+            // .attr("class", "shadow")
             .attr('fill', '#3366cc')
             .on('click', (d) => this.clicked(d))
       }
@@ -197,6 +210,16 @@ class MassSpectrum {
       )
       this.options.clickCallback(peak)
     }
+  }
+
+  updateXY() {
+    this.gY.selectAll("text")
+      .attr("font-family", "sans-serif")
+      .attr("font-size", 14)
+
+    this.gX.selectAll("text")
+      .attr("font-family", "sans-serif")
+      .attr("font-size", 14)
   }
 
   zoomed() {
@@ -227,6 +250,8 @@ class MassSpectrum {
 
       this.gX.call(this.xAxis.scale(newx))
       this.gY.call(this.yAxis.scale(newy))
+
+      this.updateXY()
 
       if (this.bars != null) {
         this.bars.remove()

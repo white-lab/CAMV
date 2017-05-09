@@ -6,6 +6,12 @@ import BaseSpectrum from './BaseSpectrum'
 import cmp from '../../utils/cmp'
 
 class SpectrumBox extends BaseSpectrum {
+  getOptions() {
+    let options = super.getOptions()
+    options.xticks = 10
+    return options
+  }
+
   componentDidUpdate(prevProps, prevState) {
     if (
       !cmp(prevProps.spectrumData, this.props.spectrumData) ||

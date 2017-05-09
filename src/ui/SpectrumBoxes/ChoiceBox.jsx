@@ -8,23 +8,19 @@ import RejectButton from './Buttons/RejectButton'
 class ChoiceBox extends React.Component {
   render() {
     return (
-      <div
-        id="updateBox"
-      >
-        <div id="choiceBox">
-          <AcceptButton
-            callback={this.props.updateChoice}
-            disabled={this.props.inputDisabled}
-          />
-          <MaybeButton
-            callback={this.props.updateChoice}
-            disabled={this.props.inputDisabled}
-          />
-          <RejectButton
-            callback={this.props.updateChoice}
-            disabled={this.props.inputDisabled}
-          />
-        </div>
+      <div id="choiceBox">
+        <AcceptButton
+          callback={this.props.updateChoice}
+          disabled={this.props.inputDisabled}
+        />
+        <MaybeButton
+          callback={this.props.updateChoice}
+          disabled={this.props.inputDisabled}
+        />
+        <RejectButton
+          callback={this.props.updateChoice}
+          disabled={this.props.inputDisabled}
+        />
       </div>
     )
   }
