@@ -69,7 +69,7 @@ text.shadow {
   width: 75%;
 }
 
-.fragmentChart {
+.baseSpectrumChart {
   height: 100%;
   width: 100%;
 }
@@ -94,18 +94,8 @@ text.shadow {
   width: 100%;
 }
 
-.precursorChart {
-  height: 100%;
-  width: 100%;
-}
-
 #quantSpectrumBox {
   height: 50%;
-  width: 100%;
-}
-
-.quantChart {
-  height: 100%;
   width: 100%;
 }
 

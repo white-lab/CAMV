@@ -58,18 +58,6 @@ class QuantSpectrumBox extends BaseSpectrum {
       peak.peak_name = name
     })
   }
-
-  render() {
-    // this.drawChart()
-    return (
-      <div>
-        <div
-          id={this.chartId}
-          className="quantChart"
-        />
-      </div>
-    )
-  }
 }
 
 QuantSpectrumBox.propTypes = {

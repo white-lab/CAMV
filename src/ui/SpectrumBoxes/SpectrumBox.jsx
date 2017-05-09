@@ -104,18 +104,6 @@ class SpectrumBox extends BaseSpectrum {
       }
     })
   }
-
-  render() {
-    // this.drawChart()
-    return (
-      <div>
-        <div
-          id={this.chartId}
-          className="fragmentChart"
-        />
-      </div>
-    )
-  }
 }
 
 SpectrumBox.propTypes = {

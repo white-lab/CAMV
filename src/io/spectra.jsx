@@ -43,7 +43,7 @@ exports.spectraToImage = async function(vb, dirName, export_spectras) {
 
   for (let vals of vb.iterate_spectra(export_spectras)) {
     let [nodes, prot, pep, scan, score, state] = vals
-    let out_name = prot + " - " + pep + " - " + scan
+    let out_name = `${prot.replace('/', '_')} - ${pep} - ${scan}`
 
     await vb.updateAll(nodes)
 
@@ -78,7 +78,7 @@ exports.spectraToImage = async function(vb, dirName, export_spectras) {
       win.setSize(sizes.width, sizes.height)
     }
 
-    vb.refs["scanSelectionList"].update(current_node)
+    vb.updateAll(current_node)
     spectrum.setState({exporting: false})
   })
 }

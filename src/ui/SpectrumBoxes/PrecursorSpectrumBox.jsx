@@ -105,18 +105,6 @@ class PrecursorSpectrumBox extends BaseSpectrum {
       peak.peak_name = name
     })
   }
-
-  render() {
-    // this.drawChart()
-    return (
-      <div>
-        <div
-          id={this.chartId}
-          className="precursorChart"
-        />
-      </div>
-    )
-  }
 }
 
 PrecursorSpectrumBox.propTypes = {

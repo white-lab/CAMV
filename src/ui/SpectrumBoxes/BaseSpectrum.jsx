@@ -20,6 +20,7 @@ class BaseSpectrum extends React.Component {
 
   componentDidMount() {
     window.addEventListener('resize', this.handleResize.bind(this))
+    this.drawChart()
   }
 
   componentDidUpdate(prevProps, prevState) {
@@ -96,31 +97,6 @@ class BaseSpectrum extends React.Component {
     })
   }
 
-  getData() {
-    let arr = [
-      [
-        {label: "mz", type: "number"},
-        {label: "Intensity", type: "number"},
-        {type: 'string', role: 'style'},
-        {type: 'string', role: 'annotation'},
-      ],
-    ]
-
-    if (this.props.spectrumData.length > 0) {
-      arr.push([this.minMZ, 0, null, null])
-
-      this.props.spectrumData.forEach(peak => {
-        arr.push([peak.mz, 0, null, null])
-        arr.push([peak.mz, peak.into, peak.style, peak.peak_name])
-        arr.push([peak.mz, 0, null, null])
-      })
-
-      arr.push([this.maxMZ, 0, null, null])
-    }
-
-    return arr
-  }
-
   drawChart() {
     if (this.graph != null) {
       this.graph.remove()
@@ -138,7 +114,6 @@ class BaseSpectrum extends React.Component {
   }
 
   render() {
-    // this.drawChart()
     return (
       <div>
         <div
