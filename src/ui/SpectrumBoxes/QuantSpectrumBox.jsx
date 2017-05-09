@@ -7,30 +7,11 @@ import cmp from '../../utils/cmp'
 
 class QuantSpectrumBox extends BaseSpectrum {
   getOptions() {
-    return {
-      title: 'Quantification',
-      hAxis: {
-        // title: 'mz',
-        gridlines: { color: 'transparent' },
-        minValue: this.minMZ,
-        maxValue: this.maxMZ,
-      },
-      vAxis: {
-        // title: 'Intensity'
-        gridlines: { color: 'transparent' },
-        format: 'scientific',
-        maxValue: this.maxY,
-      },
-      chartArea: { left: "15%", bottom: "15%", width: "75%", height: "75%" },
-      annotations: { textStyle: { }, stemColor: 'none' },
-      legend: 'none',
-      tooltip: {trigger: 'none'},
-      explorer: {
-        actions: ['dragToZoom', 'rightClickToReset'],
-        axis: 'horizontal',
-        maxZoomIn: 0.00001,
-      },
-    }
+    let options = super.getOptions()
+    options.title = "Quantification"
+    options.xlabel = ''
+    options.ylabel = ''
+    return options
   }
 
   updatePeaks() {
@@ -39,7 +20,7 @@ class QuantSpectrumBox extends BaseSpectrum {
     let quantMz = this.props.spectrumData
     this.minMZ = Math.round(2 * Math.min.apply(null, quantMz.map(i => i.mz))) / 2 - 1
     this.maxMZ = Math.round(2 * Math.max.apply(null, quantMz.map(i => i.mz))) / 2 + 1
-    this.maxY = null
+    this.maxY = Math.max.apply(null, quantMz.map(i => i.into))
 
     let ppm_cutoff = 10
 
@@ -52,30 +33,39 @@ class QuantSpectrumBox extends BaseSpectrum {
     this.props.spectrumData.forEach(peak => {
       let name = ''
       let style = ''
+      let color = '#5CB85C'
+      let visible = true
+      let shape = 'circle'
+      let size = 5
 
       if (peak.name != null) {
         name = peak.name
 
         if (peak.ppm < ppm_cutoff) {
-          style = 'point {size: 5; fill-color: #5CB85C; visible: true}'
         } else {
-          style = 'point {size: 5; shape-type: star; fill-color: #FF00FF; visible: true}'
+          shape = 'star'
+          color = '#FF00FF'
         }
       } else {
         style = 'point {size: 5; fill-color: #5CB85C; visible: false}'
+        visible = false
       }
 
-      peak.style = style
+      peak.size = size
+      peak.color = color
+      peak.visible = visible
+      peak.shape = shape
       peak.peak_name = name
     })
   }
 
   render() {
+    // this.drawChart()
     return (
       <div>
         <div
           id={this.chartId}
-          className="quantGoogleChart"
+          className="quantChart"
         />
       </div>
     )

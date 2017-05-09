@@ -7,31 +7,20 @@ import cmp from '../../utils/cmp'
 
 class PrecursorSpectrumBox extends BaseSpectrum {
   getOptions() {
-    return {
-      title: 'Precursor',
-      hAxis: {
-        // title: 'mz',
-        gridlines: { color: 'transparent' },
-        minValue: this.minMZ,
-        maxValue: this.maxMZ,
-      },
-      vAxis: {
-        // title: 'Intensity',
-        gridlines: { color: 'transparent' },
-        format: 'scientific',
-        minValue: 0,
-        maxValue: this.maxY,
-      },
-      chartArea: { left: "15%", bottom: "15%", width: "75%", height: "75%" },
-      annotations: { textStyle: { }, stemColor: 'none' },
-      legend: 'none',
-      tooltip: {trigger: 'none'},
-      explorer: {
-        actions: ['dragToZoom', 'rightClickToReset'],
-        axis: 'horizontal',
-        maxZoomIn: 0.01,
-      },
+    let options = super.getOptions()
+
+    if (this.props.isolationWindow != null) {
+      options.isolationWindow = [
+        this.props.precursorMz - this.props.isolationWindow[0],
+        this.props.precursorMz + this.props.isolationWindow[1],
+      ]
     }
+
+    options.title = 'Precursor'
+    options.hideLabels = true
+    options.xlabel = ''
+    options.ylabel = ''
+    return options
   }
 
   updatePeaks() {
@@ -96,62 +85,34 @@ class PrecursorSpectrumBox extends BaseSpectrum {
         peak.mz <= precursorMz + this.props.isolationWindow[1]
       )
 
-      let style = ''
+      let size = 5
+      let color = '#5CB85C'
+      let shape = 'circle'
+      let visible = true
 
       if (found) {
-        style = 'point {size: 5; fill-color: #5CB85C; visible: true}'
       } else if (contaminant) {
-        style = 'point {size: 3; fill-color: red; visible: true}'
+        size = 3
+        color = 'red'
       } else {
-        style = 'point {size: 5; fill-color: #5CB85C; visible: false}'
+        visible = false
       }
 
-      peak.style = style
+      peak.size = size
+      peak.color = color
+      peak.visible = visible
+      peak.shape = shape
       peak.peak_name = name
     })
   }
 
-  getData() {
-    let arr = [
-      [
-        {label: "mz", type: "number"},
-        {label: "Intensity", type: "number"},
-        {type: 'string', role: 'style'},
-        {type: 'string', role: 'annotation'},
-        {label: "Isolation", type:'number'},
-      ],
-    ]
-
-    if (this.props.spectrumData.length > 0) {
-      if (this.props.isolationWindow != null) {
-        let lower_window = this.props.precursorMz - this.props.isolationWindow[0]
-        let upper_window = this.props.precursorMz + this.props.isolationWindow[1]
-
-        arr.push([lower_window, 0, null, null, 0])
-        arr.push([lower_window, 0, null, null, this.maxY * 1.1])
-        arr.push([upper_window, 0, null, null, this.maxY * 1.1])
-        arr.push([upper_window, 0, null, null, 0])
-      }
-
-      arr.push([this.minMZ, 0, null, null, null])
-
-      this.props.spectrumData.forEach(peak => {
-        arr.push([peak.mz, 0, null, null, null])
-        arr.push([peak.mz, peak.into, peak.style, peak.peak_name, null])
-        arr.push([peak.mz, 0, null, null, null])
-      })
-      arr.push([this.maxMZ, 0, null, null, null])
-    }
-
-    return arr
-  }
-
   render() {
+    // this.drawChart()
     return (
       <div>
         <div
           id={this.chartId}
-          className="precursorGoogleChart"
+          className="precursorChart"
         />
       </div>
     )

@@ -4,48 +4,30 @@ import PropTypes from 'prop-types'
 import cmp from '../../utils/cmp'
 import newId from '../../utils/newId'
 
+import MassSpectrum from './MassSpectrum'
+
 class BaseSpectrum extends React.Component {
   constructor(props) {
     super(props)
     this.state = {
-      chartLoaded: false,
       exporting: false,
     }
 
     this.chartId = newId()
     this.resetMinMax()
+    this.graph = null
   }
 
   componentDidMount() {
     window.addEventListener('resize', this.handleResize.bind(this))
-
-    let component = this
-
-    // Load the chart API
-    return jQuery.ajax({
-      dataType: "script",
-      cache: true,
-      url: "https://www.google.com/jsapi",
-    })
-      .done(() => {
-        google.load("visualization", "1", {
-          packages:["corechart"],
-          callback: () => {
-            this.setState({chartLoaded: true})
-          },
-        })
-      })
   }
 
   componentDidUpdate(prevProps, prevState) {
-    if (this.state.chartLoaded) {
-      if (
-        !cmp(prevProps.spectrumData, this.props.spectrumData) ||
-        prevState.chartLoaded != this.state.chartLoaded
-      ) {
-        this.updatePeaks()
-        this.drawChart()
-      }
+    if (
+      !cmp(prevProps.spectrumData, this.props.spectrumData)
+    ) {
+      this.updatePeaks()
+      this.drawChart()
     }
   }
 
@@ -61,27 +43,13 @@ class BaseSpectrum extends React.Component {
 
   getOptions() {
     return {
-      hAxis: {
-        // title: 'mz',
-        gridlines: { color: 'transparent' },
-        minValue: this.minMZ,
-        maxValue: this.maxMZ,
-      },
-      vAxis: {
-        // title: 'Intensity'
-        gridlines: { color: 'transparent' },
-        format: 'scientific',
-        maxValue: this.maxY,
-      },
-      chartArea: { left: "15%", bottom: "15%", width: "75%", height: "75%" },
-      annotations: { textStyle: { }, stemColor: 'none' },
-      legend: 'none',
-      tooltip: {trigger: 'none'},
-      explorer: {
-        actions: ['dragToZoom', 'rightClickToReset'],
-        axis: 'horizontal',
-        maxZoomIn: 0.00001,
-      },
+      "xmin": this.minMZ,
+      "xmax": this.maxMZ,
+      "ymin": 0,
+      "ymax": this.maxY * 1.1,
+      "xlabel": "m/z",
+      "ylabel": "Intensity",
+      "clickCallback": this.props.pointChosenCallback,
     }
   }
 
@@ -103,21 +71,27 @@ class BaseSpectrum extends React.Component {
 
     this.props.spectrumData.forEach(peak => {
       let name = ''
-      let style = ''
+      let size = 5
+      let color = '#5CB85C'
+      let visible = true
+      let shape = 'circle'
 
       if (peak.name != null) {
         name = peak.name
 
         if (peak.ppm < ppm_cutoff) {
-          style = 'point {size: 5; fill-color: #5CB85C; visible: true}'
         } else {
-          style = 'point {size: 5; shape-type: star; fill-color: #FF00FF; visible: true}'
+          color = "#FF00FF"
+          shape = 'star'
         }
       } else {
-        style = 'point {size: 5; fill-color: #5CB85C; visible: false}'
+        visible = false
       }
 
-      peak.style = style
+      peak.size = size
+      peak.color = color
+      peak.visible = visible
+      peak.shape = shape
       peak.peak_name = name
     })
   }
@@ -148,37 +122,15 @@ class BaseSpectrum extends React.Component {
   }
 
   drawChart() {
-    if (!this.state.chartLoaded) { return }
-
-    let data = new google.visualization.arrayToDataTable(
-      this.getData(), false,
-    )
-
-    let chart = new google.visualization.AreaChart(
-      document.getElementById(this.chartId)
-    )
-
-    if (this.props.pointChosenCallback != null) {
-      google.visualization.events.addListener(
-        chart, 'select',
-        e => {
-          let selectedItem = chart.getSelection()[0]
-
-          if (selectedItem) {
-            let name = data.getValue(selectedItem.row, 3)
-            if (name == null) { return }
-
-            let mz = data.getValue(selectedItem.row, 0)
-            let peak = this.props.spectrumData.find(
-              peak => peak.mz === mz
-            )
-            this.props.pointChosenCallback(peak)
-          }
-        }
-      )
+    if (this.graph != null) {
+      this.graph.remove()
     }
 
-    chart.draw(data, this.getOptions())
+    this.graph = new MassSpectrum(
+      this.chartId,
+      this.props.spectrumData,
+      this.getOptions(),
+    )
   }
 
   handleResize() {
@@ -186,6 +138,7 @@ class BaseSpectrum extends React.Component {
   }
 
   render() {
+    // this.drawChart()
     return (
       <div>
         <div
