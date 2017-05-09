@@ -1,5 +1,12 @@
 # Change Log
 
+## 0.8.0 (2017-05-09)
+
+Features
+
+  - Replaced Google Charts with d3 to render mass spectra, CAMV can now be used
+    offline.
+
 ## 0.7.2 (2017-05-04)
 
 Bug fixes
