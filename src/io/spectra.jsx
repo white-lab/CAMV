@@ -34,8 +34,6 @@ exports.spectraToImage = async function(vb, dirName, export_spectras) {
   win.closeDevTools()
 
   let scan_list = vb.refs["scanSelectionList"]
-  let spectrum = vb.refs["fragmentSpectrum"]
-  spectrum.setState({exporting: true})
 
   let current_node = vb.getSelectedNode()
 
@@ -79,6 +77,5 @@ exports.spectraToImage = async function(vb, dirName, export_spectras) {
     }
 
     vb.updateAll(current_node)
-    spectrum.setState({exporting: false})
   })
 }

@@ -9,9 +9,6 @@ import MassSpectrum from './MassSpectrum'
 class BaseSpectrum extends React.Component {
   constructor(props) {
     super(props)
-    this.state = {
-      exporting: false,
-    }
 
     this.chartId = newId()
     this.resetMinMax()
