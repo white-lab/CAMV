@@ -1,8 +1,8 @@
 #viewBox {
   /*height: calc(100% - 29px);*/
-  /*width: 98%;*/
   /*margin: 100px 500px;*/
   /*overflow:hidden;*/
+  display: flex;
 }
 
 text.shadow {
@@ -12,17 +12,16 @@ text.shadow {
 }
 
 #scanSelectionList {
-  float: left;
   width: 20%;
   height: 100%;
   overflow: scroll;
   padding: 0;
+  resize: horizontal;
 }
 
 #sequenceSpectraContainer {
   height: 100%;
-  width: 80%;
-  float: right;
+  flex-grow: 1;
 }
 
 #sequenceBox {
@@ -61,12 +60,19 @@ text.shadow {
 #spectra {
   height: 85%;
   margin-bottom: 0%;
-  width: auto;
+  display: flex;
+}
+
+#spectrumUpdateBox {
+  flex-grow: 1;
+}
+
+#precursorQuantContainer {
+  width: 25%;
 }
 
 #fragmentSpectrumBox {
   height: 100%;
-  width: 74%;
 }
 
 .baseSpectrumChart {
@@ -82,11 +88,6 @@ text.shadow {
 
 #choiceBox {
   float: right;
-}
-
-#precursorQuantContainer {
-  float: right;
-  width: 25%;
 }
 
 #precursorSpectrumBox {

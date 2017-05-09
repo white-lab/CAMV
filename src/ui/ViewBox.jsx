@@ -661,6 +661,7 @@ class ViewBox extends React.Component {
       modalSearchOpen: false,
     })
 
+    // XXX: TODO: Change to SQL query
     for (let protein of this.state.nodeTree) {
       if (
         proteinMatch != '' &&
@@ -1203,7 +1204,8 @@ class ViewBox extends React.Component {
         id="viewBox"
         style={{
           margin: this.state.exporting ? '0px' : '10px',
-          height: this.state.exporting ? "100%" : "calc(100% - 30px)",
+          height: this.state.exporting ? "calc(100% - 4px)" : "calc(100% - 30px)",
+          width: this.state.exporting ? "calc(100% - 4px)" : "calc(100% - 20px)",
         }}
       >
         <ModalImportBox
@@ -1267,7 +1269,6 @@ class ViewBox extends React.Component {
         </div>
         <div
           id="sequenceSpectraContainer"
-          style={{width: this.state.exporting ? "100%" : "80%"}}
         >
           <div
             className="panel panel-default"
@@ -1302,13 +1303,41 @@ class ViewBox extends React.Component {
             id="spectra"
           >
             <div
+              id="spectrumUpdateBox"
+            >
+              <div
+                id="fragmentSpectrumBox"
+                style={{height: this.state.exporting ? "100%" : "92.5%"}}
+              >
+                <SpectrumBox
+                  ref="fragmentSpectrum"
+                  spectrumData={this.state.scanData}
+                  collisionType={
+                    this.state.scan != null ?
+                    this.state.scan.collisionType : null
+                  }
+                  ptmSet={this.state.ptmSet}
+
+                  pointChosenCallback={this.updatePeak.bind(this)}
+                />
+              </div>
+              <div
+                id="updateBox"
+                style={{display: this.state.exporting ? 'none' : null}}
+              >
+                <ChoiceBox
+                  inputDisabled={this.state.ptm == null}
+                  updateChoice={this.setChoice.bind(this)}
+                />
+              </div>
+            </div>
+            <div
               id="precursorQuantContainer"
             >
               <div
                 id="precursorSpectrumBox"
                 style={{
                   height: this.state.exporting ? "50%" : "46.25%",
-                  width: this.state.exporting ? "95%" : "100%"
                 }}
               >
                 <PrecursorSpectrumBox
@@ -1339,7 +1368,6 @@ class ViewBox extends React.Component {
                 id="quantSpectrumBox"
                 style={{
                   height: this.state.exporting ? "50%" : "46.25%",
-                  width: this.state.exporting ? "95%" : "100%"
                 }}
               >
                 <QuantSpectrumBox
@@ -1377,31 +1405,6 @@ class ViewBox extends React.Component {
                   Export
                 </Button>
               </div>
-            </div>
-            <div
-              id="fragmentSpectrumBox"
-              style={{height: this.state.exporting ? "100%" : "92.5%"}}
-            >
-              <SpectrumBox
-                ref="fragmentSpectrum"
-                spectrumData={this.state.scanData}
-                collisionType={
-                  this.state.scan != null ?
-                  this.state.scan.collisionType : null
-                }
-                ptmSet={this.state.ptmSet}
-
-                pointChosenCallback={this.updatePeak.bind(this)}
-              />
-            </div>
-            <div
-              id="updateBox"
-              style={{display: this.state.exporting ? 'none' : null}}
-            >
-              <ChoiceBox
-                inputDisabled={this.state.ptm == null}
-                updateChoice={this.setChoice.bind(this)}
-              />
             </div>
           </div>
         </div>
