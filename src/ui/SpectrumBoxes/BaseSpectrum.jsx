@@ -80,8 +80,7 @@ class BaseSpectrum extends React.Component {
       if (peak.name != null) {
         name = peak.name
 
-        if (peak.ppm < ppm_cutoff) {
-        } else {
+        if (peak.ppm > ppm_cutoff) {
           color = "#FF00FF"
           shape = 'star'
         }

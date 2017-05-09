@@ -41,8 +41,7 @@ class QuantSpectrumBox extends BaseSpectrum {
       if (peak.name != null) {
         name = peak.name
 
-        if (peak.ppm < ppm_cutoff) {
-        } else {
+        if (peak.ppm > ppm_cutoff) {
           shape = 'star'
           color = '#FF00FF'
         }

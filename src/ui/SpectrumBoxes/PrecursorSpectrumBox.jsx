@@ -90,11 +90,10 @@ class PrecursorSpectrumBox extends BaseSpectrum {
       let shape = 'circle'
       let visible = true
 
-      if (found) {
-      } else if (contaminant) {
+      if (contaminant) {
         size = 3
         color = 'red'
-      } else {
+      } else if (!found) {
         visible = false
       }
 

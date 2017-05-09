@@ -332,12 +332,6 @@ class ViewBox extends React.Component {
     })
   }
 
-  redrawCharts() {
-    this.refs["fragmentSpectrum"].drawChart()
-    this.refs["precursorSpectrum"].drawChart()
-    this.refs["quantSpectrum"].drawChart()
-  }
-
   selectedPrecursorMz(peak) {
     if (
       this.state.selectedPTM == null ||

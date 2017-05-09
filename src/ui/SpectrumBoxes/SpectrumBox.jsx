@@ -78,10 +78,7 @@ class SpectrumBox extends BaseSpectrum {
             ) ? peak.name : null
           )
 
-          if (into == 0) {
-            // Plot intermediate line-plot points along x-axis
-            style = null
-          } else if (peak.ppm != null && peak.ppm < ppm_cutoff) {
+          if (peak.ppm != null && peak.ppm < ppm_cutoff) {
             if (isotope) {
               color = '#F0AD4E'
             } else {
