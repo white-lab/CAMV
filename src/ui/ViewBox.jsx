@@ -661,57 +661,119 @@ class ViewBox extends React.Component {
       modalSearchOpen: false,
     })
 
-    // XXX: TODO: Change to SQL query
-    for (let protein of this.state.nodeTree) {
-      if (
-        proteinMatch != '' &&
-        protein.name.toLowerCase().includes(proteinMatch.toLowerCase())
-      ) {
-        this.updateAll(
-          this.getBase([protein.nodeId])
-        )
-        return
-      }
+    let promises = []
+    let hits = []
 
-      for (let peptide of protein.children) {
-        if (
-          peptideMatch != '' &&
-          peptide.name.includes(peptideMatch.toUpperCase())
-        ) {
-          this.updateAll(
-            this.getBase([protein.nodeId, peptide.nodeId])
-          )
-          return
-        }
-
-        for (let scan of peptide.children) {
-          if (
-            scanMatch != '' &&
-            String(scan.name.split(" ")[1]) == scanMatch
-          ) {
-            this.updateAll(
-              this.getBase([protein.nodeId, peptide.nodeId, scan.nodeId])
+    if (proteinMatch.length > 0) {
+      promises.push(
+        this.wrapSQLAll(
+          "SELECT protein_sets.protein_set_id \
+          \
+          FROM protein_sets \
+          WHERE protein_sets.protein_set_name LIKE ? COLLATE NOCASE OR \
+          protein_sets.protein_set_accession LIKE ? COLLATE NOCASE",
+          [
+            `%${proteinMatch}%`,
+            `%${proteinMatch}%`,
+          ],
+          (resolve, reject, rows) => {
+            console.log('protein', rows)
+            hits = hits.concat(
+              rows.map(
+                i =>
+                `${i.protein_set_id}`
+              )
             )
-            return
+            resolve()
           }
-
-          for (let ptm of scan.children) {
-            if (
-              peptideMatch != '' &&
-              ptm.name.includes(peptideMatch)
-            ) {
-              this.updateAll([
-                protein.nodeId,
-                peptide.nodeId,
-                scan.nodeId,
-                ptm.nodeId,
-              ])
-              return
-            }
-          }
-        }
-      }
+        )
+      )
     }
+
+    if (peptideMatch.length > 0) {
+      promises.push(
+        this.wrapSQLAll(
+          //
+          "SELECT protein_sets.protein_set_id, \
+          peptides.peptide_id, \
+          mod_states.mod_state_id \
+          \
+          FROM mod_states \
+          \
+          JOIN peptides \
+          ON mod_states.peptide_id=peptides.peptide_id \
+          \
+          INNER JOIN protein_sets \
+          ON protein_sets.protein_set_id=peptides.protein_set_id \
+          \
+          WHERE peptides.peptide_seq LIKE ? COLLATE NOCASE",
+          [
+            `%${peptideMatch}%`,
+          ],
+          (resolve, reject, rows) => {
+            console.log('peptide', rows)
+            hits = hits.concat(
+              rows.map(
+                i =>
+                `${i.protein_set_id}-${i.peptide_id},${i.mod_state_id}`
+              )
+            )
+            resolve()
+          }
+        )
+      )
+    }
+
+    if (scanMatch.length > 0) {
+      promises.push(
+        this.wrapSQLAll(
+          "SELECT protein_sets.protein_set_id, \
+          peptides.peptide_id, \
+          mod_states.mod_state_id, \
+          scans.scan_id \
+          \
+          FROM scan_ptms \
+          \
+          INNER JOIN scans \
+          ON scan_ptms.scan_id=scans.scan_id \
+          \
+          JOIN ptms \
+          ON scan_ptms.ptm_id=ptms.ptm_id \
+          \
+          JOIN mod_states \
+          ON ptms.mod_state_id=mod_states.mod_state_id \
+          \
+          JOIN peptides \
+          ON mod_states.peptide_id=peptides.peptide_id \
+          \
+          INNER JOIN protein_sets \
+          ON protein_sets.protein_set_id=peptides.protein_set_id \
+          \
+          WHERE scans.scan_num LIKE ? COLLATE NOCASE",
+          [
+            `%${scanMatch}%`,
+          ],
+          (resolve, reject, rows) => {
+            console.log('scan', rows)
+            hits = hits.concat(
+              rows.map(
+                i =>
+                `${i.protein_set_id}-${i.peptide_id},${i.mod_state_id}-${i.scan_id}`
+              )
+            )
+            resolve()
+          }
+        )
+      )
+    }
+
+    Promise.all(promises).then(() => {
+      console.log(hits)
+      if (hits.length > 0) {
+        let node = hits[0].split("-").map(j => j.split(","))
+        this.updateAll(this.getBase(node))
+      }
+    })
   }
 
   setChoice(choice) {
