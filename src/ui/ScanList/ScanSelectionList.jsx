@@ -354,6 +354,7 @@ class ScanSelectionList extends React.Component {
                   'truncated' : 'undecided'
                 )
               }
+              isLeaf={base.split('-').length >= 2}
             >
               {loop(item.children, base + item.nodeId + "-")}
             </TreeNode>
