@@ -37,15 +37,12 @@ exports.spectraToImage = async function(vb, dirName, export_spectras) {
 
   let current_node = vb.getSelectedNode()
 
-  let promises = []
-
   vb.iterate_spectra(
     export_spectras,
-    async function(nodes, prot, pep, scan, score, state) {
-      let out_name = `${prot.replace('/', '_')} - ${pep} - ${scan}`
+    async function(nodes, row, resolve) {
+      let out_name = `${row.protein_set_name.replace('/', '_')} - ${row.peptide_seq} - ${row.scan_num}`
 
       await vb.updateAll(nodes)
-      console.log('iterate', prot, pep, scan)
 
       // let dataUrl = await domtoimage.toSvg(
       let dataUrl = await domtoimage.toPng(
@@ -57,29 +54,29 @@ exports.spectraToImage = async function(vb, dirName, export_spectras) {
           dpi: 600,
         },
       )
-      promises.push(
-        fs.writeFile(
-          // path.join(dirName, out_name + ".svg"),
-          // '<?xml version="1.0" encoding="UTF-8" standalone="no"?>' +
-          // dataUrl.slice("data:image/svg+xml;charset=utf-8,".length),
-          path.join(dirName, out_name + ".png"),
-          decodeBase64Image(dataUrl).data,
-        )
+      fs.writeFile(
+        // path.join(dirName, out_name + ".svg"),
+        // '<?xml version="1.0" encoding="UTF-8" standalone="no"?>' +
+        // dataUrl.slice("data:image/svg+xml;charset=utf-8,".length),
+        path.join(dirName, out_name + ".png"),
+        decodeBase64Image(dataUrl).data,
+        (err) => {
+          if (err != null) { console.error(err) }
+          resolve()
+        }
       )
     },
     () => {
-      Promise.all(promises).then(() => {
-        vb.setState({exporting: false})
-        win.setResizable(true)
+      vb.setState({exporting: false})
+      win.setResizable(true)
 
-        if (maximized) {
-          win.maximize()
-        } else {
-          win.setSize(sizes.width, sizes.height)
-        }
+      if (maximized) {
+        win.maximize()
+      } else {
+        win.setSize(sizes.width, sizes.height)
+      }
 
-        vb.updateAll(current_node)
-      })
+      vb.updateAll(current_node)
     },
   )
 }

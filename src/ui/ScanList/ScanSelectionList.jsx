@@ -172,16 +172,12 @@ class ScanSelectionList extends React.Component {
     let children = node
 
     for (let index of indices) {
-      console.log(index, node)
       if (children.props.children.length < 1 && children.props.isLeaf != true) {
-        console.log('expanding')
         await new Promise((resolve) => { this.getChildren(children, resolve) })
       }
       node = children
       children = node.props.children[index]
     }
-
-    console.log('max length', indices.join("-"), node.props.children.length)
 
     return node.props.children.length
   }
@@ -306,8 +302,6 @@ class ScanSelectionList extends React.Component {
       indices.push(index)
     }
 
-    console.log('indices', nodes.map(i => i.join(",")).join("-"), indices.join("-"))
-
     return indices
   }
 
@@ -327,18 +321,10 @@ class ScanSelectionList extends React.Component {
       nodes = (node.props.eventKey || node.key).split('-').map(i => i.split(','))
     }
 
-    console.log('getNode', indices.join("-"), nodes.map(i => i.join(",")).join("-"))
-
     return nodes
   }
 
   async handleHotkey(e) {
-    let indices = await this.getIndices(this.state.selectedNode)
-
-    if (indices.length < 1) {
-      indices = [0]
-    }
-
     let desc = []
 
     for (let mod of ["Shift", "Meta", "Alt", "Control"]) {
@@ -349,6 +335,12 @@ class ScanSelectionList extends React.Component {
 
     desc.push(e.key)
     desc = desc.join(" ")
+
+    let indices = await this.getIndices(this.state.selectedNode)
+
+    if (indices.length < 1) {
+      indices = [0]
+    }
 
     switch (desc) {
       case 'ArrowLeft':
@@ -381,7 +373,6 @@ class ScanSelectionList extends React.Component {
   }
 
   getPeptides(treeNode, node, resolve) {
-    console.log('getting peptides', node)
     this.props.db.each(
       "SELECT \
       peptides.peptide_id, peptides.peptide_seq, \
@@ -434,7 +425,6 @@ class ScanSelectionList extends React.Component {
   }
 
   getScans(treeNode, node, resolve) {
-    console.log('getting scans', node)
     let scan_ids = new Set()
 
     this.props.db.each(
@@ -505,7 +495,6 @@ class ScanSelectionList extends React.Component {
   }
 
   getPtms(treeNode, node, resolve) {
-    console.log("getting ptms", node)
     this.props.db.each(
       "SELECT \
       ptms.ptm_id, ptms.name, \

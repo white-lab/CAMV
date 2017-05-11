@@ -234,7 +234,6 @@ class ViewBox extends React.Component {
   }
 
   updateAll(nodes) {
-    console.log('updateAll', nodes)
     nodes = nodes.slice()
 
     this.state.db.interrupt()
@@ -575,19 +574,22 @@ class ViewBox extends React.Component {
     })
   }
 
-  iterate_spectra(export_spectras, cb, cb_done) {
+  async iterate_spectra(export_spectras, cb, cb_done) {
     while (export_spectras.length < 4) {
       export_spectras.push(false)
     }
+
+    let promises = []
 
     // XXX: Use SQL for choice restriction
     this.state.db.each(
       "SELECT \
       protein_sets.protein_set_id, protein_sets.protein_set_name, \
+      protein_sets.protein_set_accession, \
       peptides.peptide_id, peptides.peptide_seq, \
       mod_states.mod_state_id, mod_states.mod_desc, \
       scans.scan_id, scans.scan_num, \
-      scan_ptms.ptm_id, scan_ptms.choice, \
+      scan_ptms.ptm_id, scan_ptms.choice, scan_ptms.mascot_score, \
       ptms.name \
       \
       FROM scan_ptms \
@@ -633,17 +635,19 @@ class ViewBox extends React.Component {
           [row.ptm_id],
         ]
 
-        cb(
-          nodes,
-          row.protein_set_name,
-          row.name,
-          row.scan_num,
-          row.mod_desc,
+        promises.push(
+          new Promise(
+            (resolve) => cb(nodes, row, resolve)
+          )
         )
       },
-      (err, count) => {
+      async function(err, count) {
         if (err != null) {
           console.error(err)
+        }
+
+        for (let promise of promises) {
+          await promise
         }
 
         if (cb_done != null) {

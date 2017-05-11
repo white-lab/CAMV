@@ -3,23 +3,41 @@ import fs from 'fs'
 
 exports.exportCSV = function(vb, path) {
   // Export spectra as csv file
-  let dataOut = []
-  dataOut.push([
-    "Scan",
-    "Protein",
-    // "Accession",
-    "Sequence",
-    // "Score",
-    "Status",
-  ])
+  let stream = fs.createWriteStream(path)
 
-  for (let vals of vb.iterate_spectra([true, true, true, true])) {
-    let [nodes, prot, pep, scan, ptm, state] = vals;
+  stream.write(
+    [
+      "Scan",
+      "Protein",
+      "Accession",
+      "Sequence",
+      "Modifications",
+      "Score",
+      "Status",
+    ].join(",") + "\n",
+    (err) => {
+      if (err != null) { console.error(err) ; return }
 
-      fs.writeFile(
-        path,
-        rows.join("\n"),
+      vb.iterate_spectra(
+        [true, true, true, true],
+        (nodes, row, resolve) => {
+          stream.write(
+            [
+              row.scan_num,
+              `"${row.protein_set_name.replace("\"", "\"\"")}"`,
+              row.protein_set_accession,
+              row.name,
+              row.mod_desc,
+              row.mascot_score,
+              row.choice,
+            ].join(",") + "\n",
+            (err) => {
+              if (err != null) { console.error(err) }
+              resolve()
+            }
+          )
+        },
       )
-    },
+    }
   )
 }
