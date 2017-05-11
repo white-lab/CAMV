@@ -1,5 +1,12 @@
 # Change Log
 
+## 0.10.0 (2017-05-11)
+
+Features
+
+  - Major performance improvements, memory usage is now lower on large pS/T data
+    sets.
+
 ## 0.9.0 (2017-05-09)
 
 Features

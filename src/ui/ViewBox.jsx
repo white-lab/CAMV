@@ -449,7 +449,7 @@ class ViewBox extends React.Component {
 
     if (reprocessed) {
       // XXX: ID?
-      this.refs["scanSelectionList"].refresh()
+      this.refs["scanSelectionList"].refresh(this.getSelectedNode())
     }
   }
 
@@ -828,7 +828,7 @@ class ViewBox extends React.Component {
       ],
     ).then(() => {
       // XXX: Id?
-      this.refs["scanSelectionList"].refresh()
+      this.refs["scanSelectionList"].refresh(this.getSelectedNode())
     })
   }
 

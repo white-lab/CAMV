@@ -36,7 +36,6 @@ class ScanSelectionList extends React.Component {
     return treeNode
   }
 
-
   componentWillUpdate(nextProps, nextState) {
     if (
       nextState.tree == this.state.tree
@@ -606,6 +605,19 @@ class ScanSelectionList extends React.Component {
         {[]}
       </TreeNode>
     )
+  }
+
+  async refresh(key) {
+    let node = this.findTreeNode(
+      key.slice(0, -1).map(i => i.join(",")).join("-")
+    )
+
+    while (node.props.children.length > 0) {
+      node.props.children.pop()
+    }
+
+    await this.getIndices(key)
+    node.forceUpdate()
   }
 
   buildNodeTree() {
