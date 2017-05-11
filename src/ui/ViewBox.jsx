@@ -579,11 +579,20 @@ class ViewBox extends React.Component {
       export_spectras.push(false)
     }
 
-    let promises = []
+    if (export_spectras.every(i => !i)) {
+      cb_done()
+      return
+    }
 
-    // XXX: Use SQL for choice restriction
+    let promises = []
+    let params = []
+
+    if (export_spectras[0]) { params.push("accept") }
+    if (export_spectras[1]) { params.push("maybe") }
+    if (export_spectras[2]) { params.push("reject") }
+
     this.state.db.each(
-      "SELECT \
+      `SELECT \
       protein_sets.protein_set_id, protein_sets.protein_set_name, \
       protein_sets.protein_set_accession, \
       peptides.peptide_id, peptides.peptide_seq, \
@@ -609,22 +618,17 @@ class ViewBox extends React.Component {
       INNER JOIN protein_sets \
       ON protein_sets.protein_set_id=peptides.protein_set_id \
       \
+      WHERE \
+      scan_ptms.choice IN (${params.map(i => '?').join(', ')}) \
+      ${export_spectras[3] ? 'OR scan_ptms.choice IS NULL': ''} \
+      \
       ORDER BY \
       protein_sets.protein_set_name, peptides.peptide_seq, \
-      mod_states.mod_desc, ptms.name",
-      [],
+      mod_states.mod_desc, ptms.name`,
+      params,
       (err, row) => {
         if (err != null || row == null) {
           console.error(err)
-          return
-        }
-
-        if (
-          (row.choice == "accept" && !export_spectras[0]) ||
-          (row.choice == "maybe" && !export_spectras[1]) ||
-          (row.choice == "reject" && !export_spectras[2]) ||
-          (row.choice == null && !export_spectras[3])
-        ) {
           return
         }
 
