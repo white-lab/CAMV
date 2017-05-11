@@ -207,7 +207,12 @@ class modalProcessScanBox extends React.Component {
         <Modal.Header>
           <Modal.Title>
             <div>
-              Process Scan - {this.props.scan.scanNumber}
+              Process Scan
+              {
+                this.props.scan != null && (
+                  <span> {this.props.scan.scanNumber}</span>
+                )
+              }
             </div>
           </Modal.Title>
         </Modal.Header>
