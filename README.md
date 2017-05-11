@@ -19,7 +19,7 @@ as we depend on those libraries to read the raw mass spectrometry data.
 After opening your processed CAMV file, you should see a list of proteins with
 individual spectra that can be accepted or rejected:
 
-![CAMV - pY](https://i.imgur.com/X2XOQQr.png)
+![CAMV - pY](https://i.imgur.com/5Bsj995.png)
 
 ### Shortcuts
 
