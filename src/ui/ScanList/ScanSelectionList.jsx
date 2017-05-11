@@ -10,6 +10,16 @@ class ScanSelectionList extends React.Component {
     super(props)
     this.state = {
       selectedNode: [],
+      tree: [],
+    }
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    if (
+      prevProps.db != this.props.db &&
+      this.props.db != null
+    ) {
+      this.buildNodeTree()
     }
   }
 
@@ -29,7 +39,7 @@ class ScanSelectionList extends React.Component {
 
   componentWillUpdate(nextProps, nextState) {
     if (
-      nextProps.tree == this.props.tree
+      nextState.tree == this.state.tree
     ) {
       this.notReRender = true
     } else {
@@ -41,6 +51,10 @@ class ScanSelectionList extends React.Component {
         let tree = this.refs["tree"]
 
         if (tree != null) {
+          // Add nodes to tree
+          this.getIndices(nextProps.selectedNode)
+
+          // Select and expand nodes
           let key = nextProps.selectedNode.map(i => i.join(",")).join("-")
 
           tree.setState({
@@ -48,6 +62,7 @@ class ScanSelectionList extends React.Component {
             selectedKeys: [key],
           })
 
+          // Scroll into view
           let treeNode = this.findTreeNode(key.split("-")[0])
 
           if (treeNode != null) {
@@ -134,165 +149,191 @@ class ScanSelectionList extends React.Component {
     })
   }
 
-  selectLeft(node) {
-    if (node.length <= 1) {
-      return node
+  selectLeft(indices) {
+    if (indices.length <= 1) {
+      return indices
     }
 
-    node.pop()
-    return node
+    indices.pop()
+    return indices
   }
 
-  selectRight(node) {
-    if (node.length >= 4) {
-      return node
+  selectRight(indices) {
+    if (indices.length >= 4) {
+      return indices
     }
 
-    node.push(0)
-    return node
+    indices.push(0)
+    return indices
   }
 
-  getMaxLength(node) {
-    let children = this.props.tree
-    for (let i = 0; i < node.length - 1; i++) {
-      children = children[node[i]].children
-    }
-
-    return children.length
-  }
-
-  selectUp(node) {
-    if (node[node.length - 1] == 0) {
-      if (node.length > 1) {
-        node.pop()
-      }
-
-      return node
-    }
-
-    node[node.length - 1] -= 1
-
-    while(node.length < 4) {
-      node.push(0)
-      let max = this.getMaxLength(node)
-
-      if (max <= 0) {
-        node.pop()
-        break
-      }
-
-      node[node.length - 1] = max - 1
-    }
-
-    return node
-  }
-
-  selectDown(node) {
-    let init = node.slice(0)
-
-    if (node.length >= 4) {
-      node[node.length - 1] += 1
-    } else {
-      node.push(0)
-    }
-
-    while (node[node.length - 1] >= this.getMaxLength(node)) {
-      if (node.length <= 1) {
-        return init
-      }
-
-      node.pop()
-      node[node.length - 1] += 1
-    }
-
-    return node
-  }
-
-  selectNext(node) {
-    if (node.length < 4) {
-      while (node.length < 4) { node.push(0) }
-      return node
-    }
-
-    if (node.length >= 4) {
-      node[node.length - 1] += 1
-    } else {
-      node.push(0)
-    }
-
-    while (node[node.length - 1] >= this.getMaxLength(node)) {
-      if (node.length <= 1) {
-        return init
-      }
-
-      node.pop()
-      node[node.length - 1] += 1
-    }
-
-    while (node.length < 4) { node.push(0) }
-
-    return node
-  }
-
-  selectPrevious(node) {
-    while (node[node.length - 1] == 0 && node.length > 0) {
-      node.pop()
-    }
-
-    if (node.length < 1) {
-      return [0, 0, 0, 0]
-    }
-
-    node[node.length - 1] -= 1
-
-    while(node.length < 4) {
-      node.push(0)
-      let max = this.getMaxLength(node)
-
-      if (max <= 0) {
-        node.pop()
-        break
-      }
-
-      node[node.length - 1] = max - 1
-    }
-
-    return node
-  }
-
-  getIndices(nodes) {
-    let indices = []
-
-    let node = this.props.tree
+  async getMaxLength(indices) {
+    let node = this.refs["tree"].treeView
     let children = node
 
-    for (let nodeId of nodes) {
-      let index = children.findIndex(child => cmp(child.nodeId, nodeId))
-      node = children[index]
-      children = node.children
-      indices.push(index)
+    for (let index of indices) {
+      console.log(index, node)
+      if (children.props.children.length < 1 && children.props.isLeaf != true) {
+        console.log('expanding')
+        await new Promise((resolve) => { this.getChildren(children, resolve) })
+      }
+      node = children
+      children = node.props.children[index]
+    }
+
+    console.log('max length', indices.join("-"), node.props.children.length)
+
+    return node.props.children.length
+  }
+
+  async selectUp(indices) {
+    if (indices[indices.length - 1] == 0) {
+      if (indices.length > 1) {
+        indices.pop()
+      }
+
+      return indices
+    }
+
+    indices[indices.length - 1] -= 1
+
+    while(indices.length < 4) {
+      indices.push(0)
+      let max = await this.getMaxLength(indices)
+
+      if (max <= 0) {
+        indices.pop()
+        break
+      }
+
+      indices[indices.length - 1] = max - 1
     }
 
     return indices
   }
 
-  getNode(indices) {
+  async selectDown(indices) {
+    let init = indices.slice(0)
+
+    if (indices.length >= 4) {
+      indices[indices.length - 1] += 1
+    } else {
+      indices.push(0)
+    }
+
+    while (indices[indices.length - 1] >= await this.getMaxLength(indices)) {
+      if (indices.length <= 1) {
+        return init
+      }
+
+      indices.pop()
+      indices[indices.length - 1] += 1
+    }
+
+    return indices
+  }
+
+  async selectNext(indices) {
+    let init = indices.slice(0)
+
+    if (indices.length < 4) {
+      while (indices.length < 4) { indices.push(0) }
+      return indices
+    }
+
+    if (indices.length >= 4) {
+      indices[indices.length - 1] += 1
+    } else {
+      indices.push(0)
+    }
+
+    while (indices[indices.length - 1] >= await this.getMaxLength(indices)) {
+      if (indices.length <= 1) {
+        return init
+      }
+
+      indices.pop()
+      indices[indices.length - 1] += 1
+    }
+
+    while (indices.length < 4) { indices.push(0) }
+
+    return indices
+  }
+
+  async selectPrevious(indices) {
+    while (indices[indices.length - 1] == 0 && indices.length > 0) {
+      indices.pop()
+    }
+
+    if (indices.length < 1) {
+      return [0, 0, 0, 0]
+    }
+
+    indices[indices.length - 1] -= 1
+
+    while(indices.length < 4) {
+      indices.push(0)
+      let max = await this.getMaxLength(indices)
+
+      if (max <= 0) {
+        indices.pop()
+        break
+      }
+
+      indices[indices.length - 1] = max - 1
+    }
+
+    return indices
+  }
+
+  async getIndices(nodes) {
+    let indices = []
+
+    let node = this.refs['tree'].treeView
+    let base = []
+
+    for (let nodeId of nodes) {
+      base.push(nodeId)
+      if (node.props.children.length < 1) {
+        await new Promise((resolve) => { this.getChildren(node, resolve) })
+      }
+
+      let key = base.map(i => i.join(",")).join("-")
+      let index = node.props.children.findIndex(child => cmp(child.props.eventKey || child.key, key))
+
+      node = node.props.children[index]
+      indices.push(index)
+    }
+
+    console.log('indices', nodes.map(i => i.join(",")).join("-"), indices.join("-"))
+
+    return indices
+  }
+
+  async getNode(indices) {
     let nodes = []
 
-    let node = this.props.tree
+    let node = this.refs["tree"].treeView
     let children = node
 
     for (let index of indices) {
-      node = children[index]
-      children = node.children
-      nodes.push(node.nodeId)
+      if (children.props.children.length < 1) {
+        await new Promise((resolve) => { this.getChildren(children, resolve) })
+      }
+
+      node = children.props.children[index]
+      children = node
+      nodes = (node.props.eventKey || node.key).split('-').map(i => i.split(','))
     }
+
+    console.log('getNode', indices.join("-"), nodes.map(i => i.join(",")).join("-"))
 
     return nodes
   }
 
-  handleHotkey(e) {
-    let indices = this.getIndices(this.state.selectedNode)
+  async handleHotkey(e) {
+    let indices = await this.getIndices(this.state.selectedNode)
 
     if (indices.length < 1) {
       indices = [0]
@@ -311,32 +352,300 @@ class ScanSelectionList extends React.Component {
 
     switch (desc) {
       case 'ArrowLeft':
-        indices = this.selectLeft(indices)
+        indices = await this.selectLeft(indices)
         break
       case 'ArrowRight':
-        indices = this.selectRight(indices)
+        indices = await this.selectRight(indices)
         break
       case 'k':
       case 'ArrowUp':
-        indices = this.selectUp(indices)
+        indices = await this.selectUp(indices)
         break
       case 'j':
       case 'ArrowDown':
-        indices = this.selectDown(indices)
+        indices = await this.selectDown(indices)
         break
       case 'n':
-        indices = this.selectNext(indices)
+        indices = await this.selectNext(indices)
         break
       case 'm':
       case 'p':
-        indices = this.selectPrevious(indices)
+        indices = await this.selectPrevious(indices)
         break
       default:
         return
     }
 
-    let node = this.getNode(indices)
+    let node = await this.getNode(indices)
     this.selectNode(node)
+  }
+
+  getPeptides(treeNode, node, resolve) {
+    console.log('getting peptides', node)
+    this.props.db.each(
+      "SELECT \
+      peptides.peptide_id, peptides.peptide_seq, \
+      mod_states.mod_state_id, mod_states.mod_desc \
+      \
+      FROM \
+      mod_states \
+      \
+      JOIN peptides \
+      ON mod_states.peptide_id=peptides.peptide_id \
+      \
+      INNER JOIN protein_sets \
+      ON protein_sets.protein_set_id=peptides.protein_set_id \
+      \
+      WHERE protein_sets.protein_set_id=? \
+      \
+      ORDER BY peptides.peptide_seq, mod_states.mod_desc",
+      [
+        node[0][0],
+      ],
+      (err, row) => {
+        if (err != null || row == null) {
+          console.error(err, row)
+          return
+        }
+
+        let key = `${treeNode.props.eventKey}-${row.peptide_id},${row.mod_state_id}`
+
+        if (treeNode.props.children.map(i => i.props.eventKey || i.key).indexOf(key) >= 0) {
+          return
+        }
+
+        treeNode.props.children.push(
+          this.renderNode(
+            key,
+            `${row.peptide_seq} ${row.mod_desc}`,
+            null,
+            false,
+          )
+        )
+      },
+      (err, count) => {
+        if (err != null) {
+          console.error(err)
+          return
+        }
+        if (resolve != null) { resolve() }
+      }
+    )
+  }
+
+  getScans(treeNode, node, resolve) {
+    console.log('getting scans', node)
+    let scan_ids = new Set()
+
+    this.props.db.each(
+      "SELECT \
+      scans.scan_id, scans.scan_num, scans.truncated \
+      \
+      FROM \
+      scan_ptms \
+      \
+      INNER JOIN scans \
+      ON scan_ptms.scan_id=scans.scan_id \
+      \
+      JOIN ptms \
+      ON scan_ptms.ptm_id=ptms.ptm_id \
+      \
+      JOIN mod_states \
+      ON ptms.mod_state_id=mod_states.mod_state_id \
+      \
+      JOIN peptides \
+      ON mod_states.peptide_id=peptides.peptide_id \
+      \
+      INNER JOIN protein_sets \
+      ON protein_sets.protein_set_id=peptides.protein_set_id \
+      \
+      WHERE mod_states.mod_state_id=? AND \
+      peptides.peptide_id=? AND \
+      protein_sets.protein_set_id=? \
+      \
+      ORDER BY scans.scan_num",
+      [
+        node[1][1],
+        node[1][0],
+        node[0][0],
+      ],
+      (err, row) => {
+        if (err != null || row == null) {
+          console.error(err, row)
+        }
+
+        if (scan_ids.has(row.scan_id)) {
+          return
+        }
+
+        let key = `${treeNode.props.eventKey || treeNode.key}-${row.scan_id}`
+
+        if (treeNode.props.children.map(i => i.props.eventKey || i.key).indexOf(key) >= 0) {
+          return
+        }
+
+        treeNode.props.children.push(
+          this.renderNode(
+            key,
+            `Scan: ${row.scan_num}`,
+            null,
+            row.truncated,
+          )
+        )
+
+        scan_ids.add(row.scan_id)
+      },
+      (err, count) => {
+        if (err != null) {
+          console.error(err)
+        }
+        if (resolve != null) { resolve() }
+      }
+    )
+  }
+
+  getPtms(treeNode, node, resolve) {
+    console.log("getting ptms", node)
+    this.props.db.each(
+      "SELECT \
+      ptms.ptm_id, ptms.name, \
+      scan_ptms.choice \
+      \
+      FROM \
+      scan_ptms \
+      \
+      INNER JOIN scans \
+      ON scan_ptms.scan_id=scans.scan_id \
+      \
+      JOIN ptms \
+      ON scan_ptms.ptm_id=ptms.ptm_id \
+      \
+      JOIN mod_states \
+      ON ptms.mod_state_id=mod_states.mod_state_id \
+      \
+      JOIN peptides \
+      ON mod_states.peptide_id=peptides.peptide_id \
+      \
+      INNER JOIN protein_sets \
+      ON protein_sets.protein_set_id=peptides.protein_set_id \
+      \
+      WHERE scans.scan_id=? AND \
+      mod_states.mod_state_id=? AND \
+      peptides.peptide_id=? AND \
+      protein_sets.protein_set_id=? \
+      \
+      ORDER BY ptms.name",
+      [
+        node[2][0],
+        node[1][1],
+        node[1][0],
+        node[0][0],
+      ],
+      (err, row) => {
+        if (err != null || row == null) {
+          console.error(err, row)
+        }
+
+        let key = `${treeNode.props.eventKey || treeNode.key}-${row.ptm_id}`
+
+        if (treeNode.props.children.map(i => i.props.eventKey || i.key).indexOf(key) >= 0) {
+          return
+        }
+
+        treeNode.props.children.push(
+          this.renderNode(
+            key,
+            row.name,
+            row.choice,
+            false,
+          )
+        )
+      },
+      (err, count) => {
+        if (err != null) {
+          console.error(err)
+        }
+        if (resolve != null) { resolve() }
+      }
+    )
+  }
+
+  getChildren(treeNode, resolve) {
+    let node = (
+      treeNode.props.eventKey ||
+      treeNode.key
+    ).split("-").map(i => i.split(","))
+
+    if (node.length == 1) {
+      this.getPeptides(treeNode, node, resolve)
+    } else if (node.length == 2) {
+      this.getScans(treeNode, node, resolve)
+    } else if (node.length == 3) {
+      this.getPtms(treeNode, node, resolve)
+    } else {
+      console.error("Invalide node length")
+    }
+  }
+
+  loadData(treeNode) {
+    return new Promise((resolve) => {
+      if (
+        (
+          treeNode.props.children == null ||
+          treeNode.props.children.length < 1
+        ) &&
+        !treeNode.props.isLeaf
+      ) {
+        this.getChildren(treeNode, resolve)
+      } else {
+        resolve()
+      }
+    })
+  }
+
+  renderNode(key, title, choice, truncated) {
+    return (
+      <TreeNode
+        key={key}
+        title={title}
+        className={
+          choice != null ?
+          choice : (truncated ? 'truncated' : 'undecided')
+        }
+        isLeaf={key.split('-').length > 3}
+      >
+        {[]}
+      </TreeNode>
+    )
+  }
+
+  buildNodeTree() {
+    return this.props.db.all(
+      "SELECT \
+      protein_sets.protein_set_id, protein_sets.protein_set_name \
+      \
+      FROM protein_sets \
+      \
+      ORDER BY protein_sets.protein_set_name",
+      [],
+      (err, rows) => {
+        if (err != null || rows == null) {
+          console.error(err)
+          return
+        }
+
+        this.setState({
+          tree: rows.map(
+            row => {
+              return {
+                name: row.protein_set_name,
+                nodeId: [row.protein_set_id]
+              }
+            }
+          )
+        })
+      }
+    )
   }
 
   render() {
@@ -354,7 +663,7 @@ class ScanSelectionList extends React.Component {
                   'truncated' : 'undecided'
                 )
               }
-              isLeaf={base.split('-').length >= 2}
+              isLeaf={base.split('-').length > 3}
             >
               {loop(item.children, base + item.nodeId + "-")}
             </TreeNode>
@@ -371,12 +680,15 @@ class ScanSelectionList extends React.Component {
                 'truncated' : 'undecided'
               )
             }
-          />
+            isLeaf={base.split('-').length > 3}
+          >
+            {[]}
+          </TreeNode>
         )
       })
     }
 
-    let tree = this.props.tree
+    let tree = this.state.tree
 
     if (this.treeNodes == null || !this.notReRender) {
       this.treeNodes = (
@@ -384,6 +696,7 @@ class ScanSelectionList extends React.Component {
         <Tree
           showLine
           onSelect={this.update.bind(this)}
+          loadData={this.loadData.bind(this)}
           ref="tree"
         >
           { loop(tree, "") }
@@ -396,7 +709,7 @@ class ScanSelectionList extends React.Component {
 }
 
 ScanSelectionList.propTypes = {
-  tree: PropTypes.array,
+  db: PropTypes.object,
 
   updateAllCallback: PropTypes.func,
 
@@ -404,7 +717,7 @@ ScanSelectionList.propTypes = {
 }
 
 ScanSelectionList.defaultProps = {
-  tree: [],
+  db: null,
 
   updateAllCallback: null,
 

@@ -16,21 +16,10 @@ exports.exportCSV = function(vb, path) {
   for (let vals of vb.iterate_spectra([true, true, true, true])) {
     let [nodes, prot, pep, scan, ptm, state] = vals;
 
-    dataOut.push([
-      scan,
-      prot,
-      ptm,
-      state,
-    ])
-  }
-
-  let rows = []
-  for (let row of dataOut) {
-    rows.push(row.join(", "))
-  }
-
-  fs.writeFile(
-    path,
-    rows.join("\n"),
+      fs.writeFile(
+        path,
+        rows.join("\n"),
+      )
+    },
   )
 }

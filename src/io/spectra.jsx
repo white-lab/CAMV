@@ -39,43 +39,47 @@ exports.spectraToImage = async function(vb, dirName, export_spectras) {
 
   let promises = []
 
-  for (let vals of vb.iterate_spectra(export_spectras)) {
-    let [nodes, prot, pep, scan, score, state] = vals
-    let out_name = `${prot.replace('/', '_')} - ${pep} - ${scan}`
+  vb.iterate_spectra(
+    export_spectras,
+    async function(nodes, prot, pep, scan, score, state) {
+      let out_name = `${prot.replace('/', '_')} - ${pep} - ${scan}`
 
-    await vb.updateAll(nodes)
+      await vb.updateAll(nodes)
+      console.log('iterate', prot, pep, scan)
 
-    // let dataUrl = await domtoimage.toSvg(
-    let dataUrl = await domtoimage.toPng(
-      document.getElementById('viewBox'),
-      {
-        width: 1157,
-        height: 783,
-        bgcolor: 'white',
-        dpi: 600,
-      },
-    )
-    promises.push(
-      fs.writeFile(
-        // path.join(dirName, out_name + ".svg"),
-        // '<?xml version="1.0" encoding="UTF-8" standalone="no"?>' +
-        // dataUrl.slice("data:image/svg+xml;charset=utf-8,".length),
-        path.join(dirName, out_name + ".png"),
-        decodeBase64Image(dataUrl).data,
+      // let dataUrl = await domtoimage.toSvg(
+      let dataUrl = await domtoimage.toPng(
+        document.getElementById('viewBox'),
+        {
+          width: 1157,
+          height: 783,
+          bgcolor: 'white',
+          dpi: 600,
+        },
       )
-    )
-  }
+      promises.push(
+        fs.writeFile(
+          // path.join(dirName, out_name + ".svg"),
+          // '<?xml version="1.0" encoding="UTF-8" standalone="no"?>' +
+          // dataUrl.slice("data:image/svg+xml;charset=utf-8,".length),
+          path.join(dirName, out_name + ".png"),
+          decodeBase64Image(dataUrl).data,
+        )
+      )
+    },
+    () => {
+      Promise.all(promises).then(() => {
+        vb.setState({exporting: false})
+        win.setResizable(true)
 
-  Promise.all(promises).then(() => {
-    vb.setState({exporting: false})
-    win.setResizable(true)
+        if (maximized) {
+          win.maximize()
+        } else {
+          win.setSize(sizes.width, sizes.height)
+        }
 
-    if (maximized) {
-      win.maximize()
-    } else {
-      win.setSize(sizes.width, sizes.height)
-    }
-
-    vb.updateAll(current_node)
-  })
+        vb.updateAll(current_node)
+      })
+    },
+  )
 }

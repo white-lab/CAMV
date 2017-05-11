@@ -6,8 +6,7 @@ import fs from 'fs'
 import path from 'path'
 import sqlite3 from 'sqlite3'
 
-const remote = require('electron').remote
-const { dialog } = require('electron').remote
+import remote, { dialog } from 'electron'
 
 import ModalExportBox from './ModalBoxes/ModalExportBox'
 import ModalImportBox from './ModalBoxes/ModalImportBox'
@@ -70,7 +69,6 @@ class ViewBox extends React.Component {
 
       loaded: false,
       exporting: false,
-      nodeTree: [],
 
       /* Validation data */
       db: null,
@@ -130,15 +128,6 @@ class ViewBox extends React.Component {
             break
         }
       }
-    }
-  }
-
-  componentDidUpdate(prevProps, prevState) {
-    if (
-      prevState.db != this.state.db &&
-      this.state.db != null
-    ) {
-      this.buildNodeTree()
     }
   }
 
@@ -245,6 +234,7 @@ class ViewBox extends React.Component {
   }
 
   updateAll(nodes) {
+    console.log('updateAll', nodes)
     nodes = nodes.slice()
 
     this.state.db.interrupt()
@@ -457,8 +447,10 @@ class ViewBox extends React.Component {
       modalProcessScan: false,
     })
 
+
     if (reprocessed) {
-      this.buildNodeTree()
+      // XXX: ID?
+      this.refs["scanSelectionList"].refresh()
     }
   }
 
@@ -583,44 +575,82 @@ class ViewBox extends React.Component {
     })
   }
 
-  *iterate_spectra(export_spectras) {
+  iterate_spectra(export_spectras, cb, cb_done) {
     while (export_spectras.length < 4) {
       export_spectras.push(false)
     }
 
-    for (let protein of this.state.nodeTree) {
-      for (let peptide of protein.children) {
-        for (let scan of peptide.children) {
-          for (let ptm of scan.children) {
-            let state = ptm.choice
+    // XXX: Use SQL for choice restriction
+    this.state.db.each(
+      "SELECT \
+      protein_sets.protein_set_id, protein_sets.protein_set_name, \
+      peptides.peptide_id, peptides.peptide_seq, \
+      mod_states.mod_state_id, mod_states.mod_desc, \
+      scans.scan_id, scans.scan_num, \
+      scan_ptms.ptm_id, scan_ptms.choice, \
+      ptms.name \
+      \
+      FROM scan_ptms \
+      \
+      INNER JOIN scans \
+      ON scan_ptms.scan_id=scans.scan_id \
+      \
+      JOIN ptms \
+      ON scan_ptms.ptm_id=ptms.ptm_id \
+      \
+      JOIN mod_states \
+      ON ptms.mod_state_id=mod_states.mod_state_id \
+      \
+      JOIN peptides \
+      ON mod_states.peptide_id=peptides.peptide_id \
+      \
+      INNER JOIN protein_sets \
+      ON protein_sets.protein_set_id=peptides.protein_set_id \
+      \
+      ORDER BY \
+      protein_sets.protein_set_name, peptides.peptide_seq, \
+      mod_states.mod_desc, ptms.name",
+      [],
+      (err, row) => {
+        if (err != null || row == null) {
+          console.error(err)
+          return
+        }
 
-            if (
-              (state == "accept" && !export_spectras[0]) ||
-              (state == "maybe" && !export_spectras[1]) ||
-              (state == "reject" && !export_spectras[2]) ||
-              (state == null && !export_spectras[3])
-            ) {
-              continue
-            }
+        if (
+          (row.choice == "accept" && !export_spectras[0]) ||
+          (row.choice == "maybe" && !export_spectras[1]) ||
+          (row.choice == "reject" && !export_spectras[2]) ||
+          (row.choice == null && !export_spectras[3])
+        ) {
+          return
+        }
 
-            let nodes = [
-              protein.nodeId,
-              peptide.nodeId,
-              scan.nodeId,
-              ptm.nodeId,
-            ]
+        let nodes = [
+          [row.protein_set_id],
+          [row.peptide_id, row.mod_state_id],
+          [row.scan_id],
+          [row.ptm_id],
+        ]
 
-            yield [
-              nodes,
-              protein.name,
-              ptm.name,
-              scan.name.split(" ")[1],
-              state,
-            ]
-          }
+        cb(
+          nodes,
+          row.protein_set_name,
+          row.name,
+          row.scan_num,
+          row.mod_desc,
+        )
+      },
+      (err, count) => {
+        if (err != null) {
+          console.error(err)
+        }
+
+        if (cb_done != null) {
+          cb_done()
         }
       }
-    }
+    )
   }
 
   runExport(dirName, export_spectras, exportTables) {
@@ -649,11 +679,11 @@ class ViewBox extends React.Component {
     }
   }
 
-  getBase(node) {
+  async getBase(node) {
     let sl = this.refs["scanSelectionList"]
-    let indices = sl.getIndices(node)
+    let indices = await sl.getIndices(node)
     while (indices.length < 4) { indices.push(0) }
-    return sl.getNode(indices)
+    return await sl.getNode(indices)
   }
 
   runSearch(proteinMatch, peptideMatch, scanMatch) {
@@ -677,7 +707,6 @@ class ViewBox extends React.Component {
             `%${proteinMatch}%`,
           ],
           (resolve, reject, rows) => {
-            console.log('protein', rows)
             hits = hits.concat(
               rows.map(
                 i =>
@@ -711,7 +740,6 @@ class ViewBox extends React.Component {
             `%${peptideMatch}%`,
           ],
           (resolve, reject, rows) => {
-            console.log('peptide', rows)
             hits = hits.concat(
               rows.map(
                 i =>
@@ -754,7 +782,6 @@ class ViewBox extends React.Component {
             `%${scanMatch}%`,
           ],
           (resolve, reject, rows) => {
-            console.log('scan', rows)
             hits = hits.concat(
               rows.map(
                 i =>
@@ -767,13 +794,13 @@ class ViewBox extends React.Component {
       )
     }
 
-    Promise.all(promises).then(() => {
-      console.log(hits)
+    Promise.all(promises).then(async function() {
+      // XXX: Show modal of all hits?
       if (hits.length > 0) {
         let node = hits[0].split("-").map(j => j.split(","))
-        this.updateAll(this.getBase(node))
+        this.updateAll(await this.getBase(node))
       }
-    })
+    }.bind(this))
   }
 
   setChoice(choice) {
@@ -792,7 +819,8 @@ class ViewBox extends React.Component {
         this.state.selectedPTM
       ],
     ).then(() => {
-      return this.buildNodeTree()
+      // XXX: Id?
+      this.refs["scanSelectionList"].refresh()
     })
   }
 
@@ -828,8 +856,6 @@ class ViewBox extends React.Component {
       maxPPM: 100,  /* Max window for fragments that can be candidates */
       bIons: [],
       yIons: [],
-
-      nodeTree: [],
     })
 
     if (fileName != null && fileName.length > 0) {
@@ -847,99 +873,6 @@ class ViewBox extends React.Component {
     this.setState({
       modalExportOpen: true,
     })
-  }
-
-  buildNodeTree() {
-    return this.wrapSQLAll(
-      "SELECT \
-      protein_sets.protein_set_id, protein_sets.protein_set_name, \
-      peptides.peptide_id, peptides.peptide_seq, \
-      mod_states.mod_state_id, mod_states.mod_desc, \
-      scans.scan_id, scans.scan_num, scans.truncated, \
-      ptms.ptm_id, ptms.name, \
-      scan_ptms.scan_ptm_id, \
-      scan_ptms.choice \
-      \
-      FROM \
-      scan_ptms \
-      INNER JOIN scans \
-      ON scan_ptms.scan_id=scans.scan_id \
-      \
-      JOIN ptms \
-      ON scan_ptms.ptm_id=ptms.ptm_id \
-      \
-      JOIN mod_states \
-      ON ptms.mod_state_id=mod_states.mod_state_id \
-      \
-      JOIN peptides \
-      ON mod_states.peptide_id=peptides.peptide_id \
-      \
-      INNER JOIN protein_sets \
-      ON protein_sets.protein_set_id=peptides.protein_set_id \
-      \
-      ORDER BY protein_sets.protein_set_name, peptides.peptide_seq, \
-      mod_states.mod_desc, scans.scan_num, ptms.name",
-      [],
-      (resolve, reject, rows) => {
-        let proteins = []
-        let peptides = []
-        let scans = []
-        let ptms = []
-        let last_row = null
-
-        for (let row of rows) {
-          last_row = row
-          break
-        }
-
-        for (let row of rows.concat({})) {
-          if (row.scan_ptm_id != last_row.scan_ptm_id) {
-            ptms.push({
-              name: last_row.name,
-              nodeId: [last_row.ptm_id],
-              choice: last_row.choice,
-            })
-          }
-
-          if (row.scan_num != last_row.scan_num) {
-            scans.push({
-              name: "Scan " + last_row.scan_num,
-              nodeId: [last_row.scan_id],
-              children: ptms,
-              truncated: last_row.truncated != 0,
-            })
-            ptms = []
-          }
-
-          if (
-            row.peptide_id != last_row.peptide_id ||
-            row.mod_state_id != last_row.mod_state_id
-          ) {
-            peptides.push({
-              name: last_row.peptide_seq + " " + last_row.mod_desc,
-              nodeId: [last_row.peptide_id, last_row.mod_state_id],
-              children: scans,
-            })
-            scans = []
-          }
-
-          if (row.protein_set_id != last_row.protein_set_id) {
-            proteins.push({
-              name: last_row.protein_set_name,
-              nodeId: [last_row.protein_set_id],
-              children: peptides,
-            })
-            peptides = []
-          }
-
-          last_row = row
-        }
-
-        this.setState({
-          nodeTree: proteins,
-        }, resolve)
-      }
-    )
   }
 
   getSelectedNode() {
@@ -1322,7 +1255,7 @@ class ViewBox extends React.Component {
         >
           <ScanSelectionList
             ref="scanSelectionList"
-            tree={this.state.nodeTree}
+            db={this.state.db}
 
             updateAllCallback={this.updateAll.bind(this)}
 
