@@ -1,6 +1,6 @@
 {
   "name": "camv",
-  "version": "0.9.0",
+  "version": "0.10.0",
   "main": "src/main.js",
   "productName": "CAMV",
   "dependencies": {
@@ -14,7 +14,7 @@
     "dom-to-image": "github:naderm/dom-to-image",
     "electron-compile": "^6.4.1",
     "electron-compilers": "^5.9.0",
-    "prop-types": "^15.5.8",
+    "prop-types": "^15.5.9",
     "rc-tree": "github:naderm/tree#precompiled",
     "react": "^15.5.4",
     "react-addons-update": "^15.5.2",
