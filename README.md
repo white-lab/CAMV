@@ -42,7 +42,7 @@ Control-F: Search proteins / peptides / scans
 
 ### Dependencies
 
-You will first need to [install the Node.js 7](https://nodejs.org/en/) as
+You will first need to [install Node.js v7](https://nodejs.org/en/) as
 well as [git](https://git-scm.com/) (for `bower`).
 
 
@@ -72,4 +72,7 @@ From this directory, run:
 npm run make
 ```
 
-This will generate a zip using in `./out/make/` for your current platform. The full suite of Windows / OS X / Linux builds are created on tagged releases using [AppVeyor](https://github.com/white-lab/CAMV/blob/master/appveyor.yml) and [Travis-CI](https://github.com/white-lab/CAMV/blob/master/.travis.yml)
+This will generate a zip using in `./out/make/` for your current platform.
+The full suite of Windows / OS X / Linux builds are created on tagged releases
+using [AppVeyor](https://github.com/white-lab/CAMV/blob/master/appveyor.yml) and
+[Travis-CI](https://github.com/white-lab/CAMV/blob/master/.travis.yml).
