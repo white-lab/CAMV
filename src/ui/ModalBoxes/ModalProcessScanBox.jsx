@@ -4,6 +4,7 @@ import { Modal, Button } from 'react-bootstrap'
 import { execFile } from 'child_process'
 
  import fs from 'fs'
+ import path from 'path'
 
 const { dialog } = require('electron').remote
 
@@ -12,7 +13,10 @@ class modalProcessScanBox extends React.Component {
     super(props)
     this.state = {
       processing: false,
-      pycamverterPath: null,
+      pycamverterPath: path.resolve(
+        __filename.replace(/[\/\\][^\/\\]+$/, ""),
+        "..\\..\\..\\PyCamverter.exe"
+      ),
       search_path: null,
       raw_path: null,
     }
@@ -33,11 +37,14 @@ class modalProcessScanBox extends React.Component {
       ],
       (err, rows) => {
         let search_path = null
-        for (let path of rows) {
+        for (let row of rows) {
+          let path = row.val
           if (fs.existsSync(path)) {
             search_path = path
           }
         }
+        // XXX: Check current directory as well
+        console.log(rows, search_path)
         this.setState({
           search_path: search_path,
         })
@@ -58,8 +65,10 @@ class modalProcessScanBox extends React.Component {
 
         let raw_path = null
 
+        // XXX: Check current directory as well
         if (this.props.scan != null) {
-          for (let path of rows) {
+          for (let row of rows) {
+            let path = row.val
             if (
               path.replace(/^.*[\\\/]/, '') ==
               this.props.scan.fileName.replace(/^.*[\\\/]/, '') &&
@@ -69,8 +78,9 @@ class modalProcessScanBox extends React.Component {
             }
           }
         } else {
-          raw_path = rows[0]
+          raw_path = rows[0].val
         }
+        console.log(rows, raw_path)
 
         this.setState({
           raw_path: raw_path,
@@ -197,16 +207,13 @@ class modalProcessScanBox extends React.Component {
         <Modal.Header>
           <Modal.Title>
             <div>
-              Process Scan
+              Process Scan - {this.props.scan.scanNumber}
             </div>
           </Modal.Title>
         </Modal.Header>
         {
           this.props.scan != null &&
           <Modal.Body>
-            <div>
-              Scan {this.props.scan.scanNumber}
-            </div>
             <div>
               <Button
                 id="fileSelect"
@@ -215,7 +222,9 @@ class modalProcessScanBox extends React.Component {
               >
                 Raw File
               </Button>
-              {this.state.raw_path}
+              <div>
+                {this.state.raw_path}
+              </div>
             </div>
             <div>
               <Button
@@ -225,7 +234,9 @@ class modalProcessScanBox extends React.Component {
               >
                 Search File
               </Button>
-              {this.state.search_path}
+              <div>
+                {this.state.search_path}
+              </div>
             </div>
             <div>
               <Button
@@ -235,7 +246,9 @@ class modalProcessScanBox extends React.Component {
               >
                 Pycamverter Path
               </Button>
-              {this.state.pycamverterPath}
+              <div>
+                {this.state.pycamverterPath}
+              </div>
             </div>
           </Modal.Body>
         }
