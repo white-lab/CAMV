@@ -1,5 +1,11 @@
 # Change Log
 
+## 0.10.1 (2017-05-1)
+
+Bug fixes
+
+  - Fixed bug in showing reprocess scan window.
+
 ## 0.10.0 (2017-05-11)
 
 Features
