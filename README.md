@@ -8,11 +8,16 @@ Tool for validation proteomic mass spectrometry peptide assignments.
 
 ## Usage
 
-To download CAMV, visit our [releases](https://github.com/white-lab/CAMV/releases) page and select the version appropriate for your system.
+To download CAMV, visit our [releases](https://github.com/white-lab/CAMV/releases)
+page and select the version appropriate for your system.
 
-Upon opening CAMV, you will be prompted to open a .camv.gz file. These are generated using [PyCAMVerter](https://github.com/white-lab/pycamverter), which is Windows-only ([due to proprietary vendor libraries](http://proteowizard.sourceforge.net/formats/index.html)) and must be run separately.
+CAMV can either directly process ProteomeDiscoverer or MASCOT search data on
+Windows, or open previously-processed data sets on non-Windows computers.
+[This platform restriction is due to proprietary vendor libraries](http://proteowizard.sourceforge.net/formats/index.html))
+as we depend on those libraries to read the raw mass spectrometry data.
 
-After opening your processed CAMV file, you should see a list of proteins with individual spectra that can be accepted or rejected:
+After opening your processed CAMV file, you should see a list of proteins with
+individual spectra that can be accepted or rejected:
 
 ![CAMV - pY](https://i.imgur.com/X2XOQQr.png)
 
