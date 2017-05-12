@@ -22,12 +22,12 @@ class modalProcessScanBox extends React.Component {
     }
   }
 
-  componentDidUpdate(prevProps, prevState) {
-    if (
-      (prevProps.db == this.props.db) ||
-      this.props.db == null
-    ) { return }
+  refreshPaths() {
+    this.refreshSearchPath()
+    this.refreshRawPath()
+  }
 
+  refreshSearchPath() {
     this.props.db.all(
       "SELECT * \
       FROM camv_meta \
@@ -37,19 +37,29 @@ class modalProcessScanBox extends React.Component {
       ],
       (err, rows) => {
         let search_path = null
+
+        rows = rows.map(i => i.val)
+
+        // Check the directory local to the db file as well
+        rows.push(
+          this.props.db.filename.replace(/[\.].+$/, "") + '.msf'
+        )
+
         for (let row of rows) {
-          let path = row.val
-          if (fs.existsSync(path)) {
-            search_path = path
+          if (fs.existsSync(row)) {
+            search_path = row
+            break
           }
         }
-        // XXX: Check current directory as well
-        console.log(rows, search_path)
+
         this.setState({
           search_path: search_path,
         })
       }
     )
+  }
+
+  refreshRawPath() {
     this.props.db.all(
       "SELECT * \
       FROM camv_meta \
@@ -64,23 +74,33 @@ class modalProcessScanBox extends React.Component {
         }
 
         let raw_path = null
+        rows = rows.map(i => i.val)
 
-        // XXX: Check current directory as well
         if (this.props.scan != null) {
-          for (let row of rows) {
-            let path = row.val
-            if (
-              path.replace(/^.*[\\\/]/, '') ==
-              this.props.scan.fileName.replace(/^.*[\\\/]/, '') &&
-              fs.existsSync(path)
-            ) {
-              raw_path = path
-            }
-          }
+          let scanFile = this.props.scan.fileName.replace(/^.*[\\\/]/, '')
+          rows = rows.filter(i => i.replace(/.*[\\\/]/, '') == scanFile)
+
+          // Check the directory local to the db file as well
+          rows.push(
+            path.resolve(
+              this.props.db.filename.replace(/[\/\\][^\/\\]+$/, ""),
+              scanFile,
+            )
+          )
         } else {
-          raw_path = rows[0].val
+          for (let extension of ['.raw', '.mgf', '.d', '.wiff']) {
+            rows.push(
+              this.props.db.filename.replace(/[\.].+$/, '') + extension
+            )
+          }
         }
-        console.log(rows, raw_path)
+
+        for (let row of rows) {
+          if (fs.existsSync(row)) {
+            raw_path = row
+            break
+          }
+        }
 
         this.setState({
           raw_path: raw_path,

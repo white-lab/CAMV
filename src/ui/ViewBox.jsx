@@ -436,6 +436,8 @@ class ViewBox extends React.Component {
   }
 
   openProcessScan() {
+    this.refs["modalProcessScanBox"].refreshPaths()
+
     this.setState({
       modalProcessScan: true,
     })
@@ -448,7 +450,6 @@ class ViewBox extends React.Component {
 
 
     if (reprocessed) {
-      // XXX: ID?
       this.refs["scanSelectionList"].refresh(this.getSelectedNode())
     }
   }
@@ -827,7 +828,6 @@ class ViewBox extends React.Component {
         this.state.selectedPTM
       ],
     ).then(() => {
-      // XXX: Id?
       this.refs["scanSelectionList"].refresh(this.getSelectedNode())
     })
   }
