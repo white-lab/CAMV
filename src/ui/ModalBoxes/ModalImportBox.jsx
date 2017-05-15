@@ -383,6 +383,7 @@ class ModalImportBox extends React.Component {
                   componentClass="select"
                   value={this.state.cpus}
                   onChange={this.changeCPUCount.bind(this)}
+                  disabled={this.state.radioChoice != "process" || this.state.processing}
                 >
                   {
                     os.cpus().map(
