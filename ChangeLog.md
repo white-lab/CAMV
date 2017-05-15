@@ -1,5 +1,11 @@
 # Change Log
 
+## 0.11.0 (2017-05-15)
+
+Features
+
+  - Added scan lists and CPU count to import processing options.
+
 ## 0.10.2 (2017-05-15)
 
 Features
