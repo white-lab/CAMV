@@ -163,6 +163,8 @@ class ModalImportBox extends React.Component {
       this.state.pycamverterPath, args,
     )
 
+    // XXX: Modal view?
+
     execFile(
       this.state.pycamverterPath,
       args,
