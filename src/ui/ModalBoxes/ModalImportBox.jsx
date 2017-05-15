@@ -3,6 +3,7 @@ import PropTypes from 'prop-types'
 import { Modal, Button, FormGroup, FormControl, Radio, ControlLabel } from 'react-bootstrap'
 import { execFile } from 'child_process'
 import path from 'path'
+import os from 'os'
 
 const { dialog } = require('electron').remote
 
@@ -19,9 +20,11 @@ class ModalImportBox extends React.Component {
         "..\\..\\..\\PyCamverter.exe"
       ),
       raw_paths: [],
+      scan_lists: [],
       mat_paths: [],
       search_path: null,
       radioChoice: 'open',
+      cpus: os.cpus().length,
     }
   }
 
@@ -106,6 +109,27 @@ class ModalImportBox extends React.Component {
     )
   }
 
+  changeScanLists() {
+    dialog.showOpenDialog(
+      {
+        properties: [
+          'multiSelections',
+        ],
+        filters: [{
+          name: 'Scan Lists',
+          extensions: ['csv', 'xlsx'],
+        }],
+      },
+      (fileNames) => {
+        if (fileNames === undefined) return;
+
+        this.setState({
+          scan_lists: fileNames,
+        })
+      }
+    )
+  }
+
   changeMatPaths() {
     dialog.showOpenDialog(
       {
@@ -125,6 +149,10 @@ class ModalImportBox extends React.Component {
         })
       }
     )
+  }
+
+  changeCPUCount(e) {
+    this.setState({cpus: e.target.value})
   }
 
   closeCallback() {
@@ -153,8 +181,16 @@ class ModalImportBox extends React.Component {
       args = args.concat(["--raw-paths"]).concat(this.state.raw_paths)
     }
 
+    if (this.state.scan_lists.length > 0) {
+      args = args.concat(["--scans-path"]).concat(this.state.scan_lists)
+    }
+
     if (this.state.mat_paths.length > 0) {
       args = args.concat(["--mat-sessions"]).concat(this.state.mat_paths)
+    }
+
+    if (this.state.cpus != null) {
+      args = args.concat(["--cpus", this.state.cpus])
     }
 
     let out_path = this.state.search_path.replace(/\.[^/.]+$/, ".camv.db")
@@ -291,7 +327,7 @@ class ModalImportBox extends React.Component {
                   onClick={this.changeRawPaths.bind(this)}
                   disabled={this.state.radioChoice != "process" || this.state.processing}
                 >
-                  Raw Paths
+                  Raw Path(s)
                 </Button>
                 <div>
                   {
@@ -306,10 +342,28 @@ class ModalImportBox extends React.Component {
               >
                 <Button
                   id="fileSelect"
+                  onClick={this.changeScanLists.bind(this)}
+                  disabled={this.state.radioChoice != "process" || this.state.processing}
+                >
+                  Scan List(s)
+                </Button>
+                <div>
+                  {
+                    this.state.scan_lists.length > 0 ?
+                    this.state.scan_lists.join(', ') :
+                    ("No files selected.")
+                  }
+                </div>
+              </FormGroup>
+              <FormGroup
+                controlId="formControlsFile"
+              >
+                <Button
+                  id="fileSelect"
                   onClick={this.changeMatPaths.bind(this)}
                   disabled={this.state.radioChoice != "process" || this.state.processing}
                 >
-                  CAMV-Matlab Sessions
+                  CAMV-Matlab Session(s)
                 </Button>
                 <div>
                   {
@@ -318,6 +372,25 @@ class ModalImportBox extends React.Component {
                     ("No files selected.")
                   }
                 </div>
+              </FormGroup>
+              <FormGroup
+                controlId="formControlsSelect"
+              >
+                <ControlLabel>
+                  # of CPUs
+                </ControlLabel>
+                <FormControl
+                  componentClass="select"
+                  value={this.state.cpus}
+                  onChange={this.changeCPUCount.bind(this)}
+                >
+                  {
+                    os.cpus().map(
+                      (cpu, i) =>
+                      <option value={i + 1} key={i + 1}>{i + 1}</option>
+                    )
+                  }
+                </FormControl>
               </FormGroup>
             </Radio>
           </FormGroup>
