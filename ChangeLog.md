@@ -1,6 +1,12 @@
 # Change Log
 
-## 0.10.1 (2017-05-1)
+## 0.10.2 (2017-05-15)
+
+Features
+
+  - Improved path finding for processing scans.
+
+## 0.10.1 (2017-05-11)
 
 Bug fixes
 
