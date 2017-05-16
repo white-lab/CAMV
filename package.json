@@ -9,7 +9,7 @@
     "babel-plugin-transform-runtime": "^6.23.0",
     "babel-preset-es2017-node7": "^0.5.2",
     "babel-preset-react": "^6.24.1",
-    "d3": "^4.8.0",
+    "d3": "^4.9.1",
     "dom-to-image": "github:naderm/dom-to-image",
     "electron-compile": "^6.4.1",
     "electron-compilers": "^5.9.0",
