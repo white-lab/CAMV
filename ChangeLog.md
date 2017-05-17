@@ -1,5 +1,11 @@
 # Change Log
 
+## 0.11.1 (2017-05-17)
+
+Features
+
+  - Updated d3 and electron dependencies to newest versions.
+
 ## 0.11.0 (2017-05-15)
 
 Features
