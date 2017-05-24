@@ -166,7 +166,12 @@ class MassSpectrum {
           .attr('fill', '#3366cc')
           .on('click', d => this.clicked(d))
 
-      let scatterPoints = data.filter(i => i.visible)
+      let scatterPoints = data.filter(
+        i =>
+        (i.visible && i.into > Math.max.apply(null, y.domain()) / 11) ||
+        i.always_visible
+      )
+
       let shapes = {
         circle: d3.symbolCircle,
         star: d3.symbolStar,

@@ -81,26 +81,29 @@ class PrecursorSpectrumBox extends BaseSpectrum {
       let ionIndex = indices.indexOf(index)
       let found = (ionIndex != -1)
 
-      let contaminant = !found && this.props.isolationWindow != null && (
-        peak.mz >= precursorMz - this.props.isolationWindow[0] &&
-        peak.mz <= precursorMz + this.props.isolationWindow[1]
-      )
-
       let size = 5
       let color = '#5CB85C'
       let shape = 'circle'
-      let visible = true
+      let always_visible = true
 
-      if (contaminant) {
-        size = 3
-        color = 'red'
-      } else if (!found) {
-        visible = false
+      if (!found) {
+        let contaminant = this.props.isolationWindow != null && (
+          peak.mz >= precursorMz - this.props.isolationWindow[0] &&
+          peak.mz <= precursorMz + this.props.isolationWindow[1]
+        )
+
+        if (contaminant) {
+          size = 3
+          color = 'red'
+        } else {
+          always_visible = false
+        }
       }
 
       peak.size = size
       peak.color = color
-      peak.visible = visible
+      peak.visible = false
+      peak.always_visible = always_visible
       peak.shape = shape
       peak.peak_name = name
     })

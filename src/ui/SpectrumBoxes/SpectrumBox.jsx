@@ -56,6 +56,7 @@ class SpectrumBox extends BaseSpectrum {
       let size = 3
       let shape = 'circle'
       let visible = true
+      let always_visible = false
 
       if (mz > this.minMZ && mz < this.maxMZ) {
         if (!this.props.ptmSet) {
@@ -76,11 +77,15 @@ class SpectrumBox extends BaseSpectrum {
 
           if (peak.ppm != null && peak.ppm < ppm_cutoff) {
             if (isotope) {
+              // Yellow
               color = '#F0AD4E'
             } else {
+              // Green
               color = '#5CB85C'
+              always_visible = true
             }
           } else {
+            // Magenta
             size = 5
             color = '#FF00FF'
             shape = 'star'
@@ -93,6 +98,7 @@ class SpectrumBox extends BaseSpectrum {
         peak.shape = shape
         peak.color = color
         peak.visible = visible
+        peak.always_visible = always_visible
         peak.peak_name = name
       }
     })

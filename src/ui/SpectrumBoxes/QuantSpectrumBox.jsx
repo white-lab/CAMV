@@ -34,7 +34,7 @@ class QuantSpectrumBox extends BaseSpectrum {
     this.props.spectrumData.forEach(peak => {
       let name = ''
       let color = '#5CB85C'
-      let visible = true
+      let always_visible = true
       let shape = 'circle'
       let size = 5
 
@@ -46,12 +46,13 @@ class QuantSpectrumBox extends BaseSpectrum {
           color = '#FF00FF'
         }
       } else {
-        visible = false
+        always_visible = false
       }
 
       peak.size = size
       peak.color = color
-      peak.visible = visible
+      peak.always_visible = always_visible
+      peak.visible = false
       peak.shape = shape
       peak.peak_name = name
     })
