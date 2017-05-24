@@ -31,7 +31,7 @@
     "electron-prebuilt-compile": "1.7.1",
     "eslint": "^3.19.0",
     "eslint-formatter-pretty": "^1.1.0",
-    "eslint-plugin-import": "^2.2.0",
+    "eslint-plugin-import": "^2.3.0",
     "eslint-plugin-promise": "^3.5.0",
     "eslint-plugin-react": "^7.0.1"
   },
