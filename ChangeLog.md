@@ -1,5 +1,12 @@
 # Change Log
 
+## 0.13.0 (2017-05-24)
+
+Features
+
+  - Improved view of complex spectra by hiding peak colors for low intensity
+    ions.
+
 ## 0.12.0 (2017-05-23)
 
 Features
