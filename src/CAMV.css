@@ -5,10 +5,15 @@
   display: flex;
 }
 
+.importModal {
+  height: 60vh;
+  width: 75vw;
+}
+
 .console {
-  height: 500px;
+  height: 100%;
   width: 100%;
-  padding: 10px;
+  padding: 5px;
   border: 1px solid #e4e6e8;
   display: block;
   overflow: auto;

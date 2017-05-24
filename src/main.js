@@ -12,7 +12,7 @@ var mainWindow = null
 function createWindow() {
   mainWindow = new BrowserWindow({
     width: 1200,
-    height: 600,
+    height: 700,
     icon: __dirname + '../assets/CAMV.ico'
   })
 

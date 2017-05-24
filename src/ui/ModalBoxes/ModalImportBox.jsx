@@ -4,6 +4,7 @@ import { Modal, Button, FormGroup, FormControl, Radio, ControlLabel } from 'reac
 import { spawn } from 'child_process'
 import path from 'path'
 import os from 'os'
+import terminate from 'terminate'
 
 import { remote } from 'electron'
 const { dialog } = remote
@@ -14,7 +15,7 @@ class ModalImportBox extends React.Component {
   constructor(props) {
     super(props)
     this.state = {
-      processing: false,
+      child: null,
       camvFileName: null,
       pycamverterPath: path.resolve(
         __filename.replace(/[\/\\][^\/\\]+$/, ""),
@@ -160,7 +161,7 @@ class ModalImportBox extends React.Component {
 
   closeCallback() {
     if (
-      !this.state.processing &&
+      this.state.child != null &&
       this.props.closeCallback != null
     ) {
       this.props.closeCallback()
@@ -168,12 +169,6 @@ class ModalImportBox extends React.Component {
   }
 
   runProcess() {
-    this.setState({
-      processing: true,
-      stdout: [],
-      stderr: [],
-    })
-
     if (this.props.database != null) {
       this.props.database.close()
     }
@@ -201,9 +196,10 @@ class ModalImportBox extends React.Component {
 
     let out_path = this.state.search_path.replace(/\.[^/.]+$/, ".camv.db")
 
-    console.log(
-      this.state.pycamverterPath, args,
-    )
+    this.setState({
+      stdout: [`${this.state.pycamverterPath} ${args.join(' ')}`],
+      stderr: [],
+    })
 
     let win = remote.getCurrentWindow()
     win.setProgressBar(-1)
@@ -219,7 +215,7 @@ class ModalImportBox extends React.Component {
         win.setProgressBar(-1)
         console.error(err)
         this.setState({
-          processing: false,
+          child: null,
         })
       },
     )
@@ -231,14 +227,15 @@ class ModalImportBox extends React.Component {
 
         if (code != 0) {
           console.error(`child exited with code: ${code}`)
+
           this.setState({
-            processing: false,
+            child: null,
           })
           return
         }
 
         this.setState({
-          processing: false,
+          child: null,
           camvFileName: out_path,
         }, this.runImport.bind(this))
       }
@@ -253,7 +250,7 @@ class ModalImportBox extends React.Component {
 
         if (progress != null) {
           let win = remote.getCurrentWindow()
-          win.setProgressBar(progress[1] / progress[2])
+          win.setProgressBar((progress[1] - 1) / progress[2])
         }
 
         if (data.match('DEBUG')) {
@@ -276,11 +273,29 @@ class ModalImportBox extends React.Component {
         }))
       },
     )
+
+    this.setState({
+      child: child,
+    })
+  }
+
+  cancelProcess() {
+    this.state.child.removeListener('close')
+
+    terminate(this.state.child.pid, (err) => {
+      if (err) { console.error(err) }
+
+      win.setProgressBar(-1)
+
+      this.setState({
+        child: null,
+      })
+    })
   }
 
   runImport() {
     this.setState({
-      processing: true,
+      opening: true,
     })
 
     loadSQL(
@@ -289,7 +304,7 @@ class ModalImportBox extends React.Component {
         this.props.importCallback(data, this.state.camvFileName)
 
         this.setState({
-          processing: false,
+          opening: false,
         })
       }
     )
@@ -300,6 +315,7 @@ class ModalImportBox extends React.Component {
       <Modal
         onHide={this.closeCallback.bind(this)}
         show={this.props.showModal}
+        dialogClassName="importModal"
       >
         <Modal.Header>
           <Modal.Title>
@@ -309,177 +325,201 @@ class ModalImportBox extends React.Component {
           </Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <FormGroup
-            controlId="radioChoice"
-          >
-            <Radio
-              value="open"
-              checked={this.state.radioChoice == "open"}
-              onChange={this.radioChange.bind(this)}
+          {
+            this.state.child == null &&
+            <FormGroup
+              controlId="radioChoice"
             >
-              <FormGroup
-                controlId="formControlsFile"
+              <Radio
+                value="open"
+                checked={this.state.radioChoice == "open"}
+                onChange={this.radioChange.bind(this)}
               >
-                <Button
-                  id="fileSelect"
-                  onClick={this.changeCAMVPath.bind(this)}
-                  disabled={this.state.radioChoice != "open" || this.state.processing}
-                >
-                  CAMV Database
-                </Button>
-                <div>
-                  {
-                    this.state.camvFileName != null ?
-                    this.state.camvFileName :
-                    ("No file selected.")
-                  }
-                </div>
-              </FormGroup>
-            </Radio>
-            <Radio
-              value="process"
-              checked={this.state.radioChoice == "process"}
-              onChange={this.radioChange.bind(this)}
-            >
-              {
-                process.env.NODE_ENV === 'development' &&
                 <FormGroup
                   controlId="formControlsFile"
                 >
                   <Button
                     id="fileSelect"
-                    onClick={this.changePycamverterPath.bind(this)}
-                    disabled={this.state.radioChoice != "process" || this.state.processing}
+                    onClick={this.changeCAMVPath.bind(this)}
+                    disabled={
+                      this.state.radioChoice != "open" ||
+                      this.state.opening
+                    }
                   >
-                    PyCamverter Path
+                    CAMV Database
                   </Button>
                   <div>
                     {
-                      this.state.pycamverterPath != null ?
-                      this.state.pycamverterPath :
+                      this.state.camvFileName != null ?
+                      this.state.camvFileName :
                       ("No file selected.")
                     }
                   </div>
                 </FormGroup>
-              }
-              <FormGroup
-                controlId="formControlsFile"
+              </Radio>
+              <Radio
+                value="process"
+                checked={this.state.radioChoice == "process"}
+                onChange={this.radioChange.bind(this)}
               >
-                <Button
-                  id="fileSelect"
-                  onClick={this.changeSearchPath.bind(this)}
-                  disabled={this.state.radioChoice != "process" || this.state.processing}
+                {
+                  process.env.NODE_ENV === 'development' &&
+                  <FormGroup
+                    controlId="formControlsFile"
+                  >
+                    <Button
+                      id="fileSelect"
+                      onClick={this.changePycamverterPath.bind(this)}
+                      disabled={
+                        this.state.radioChoice != "process" ||
+                        this.state.opening
+                      }
+                    >
+                      PyCamverter Path
+                    </Button>
+                    <div>
+                      {
+                        this.state.pycamverterPath != null ?
+                        this.state.pycamverterPath :
+                        ("No file selected.")
+                      }
+                    </div>
+                  </FormGroup>
+                }
+                <FormGroup
+                  controlId="formControlsFile"
                 >
-                  Search Path
-                </Button>
-                <div>
-                  {
-                    this.state.search_path != null ?
-                    this.state.search_path :
-                    ("No file selected.")
-                  }
-                </div>
-              </FormGroup>
-              <FormGroup
-                controlId="formControlsFile"
-              >
-                <Button
-                  id="fileSelect"
-                  onClick={this.changeRawPaths.bind(this)}
-                  disabled={this.state.radioChoice != "process" || this.state.processing}
+                  <Button
+                    id="fileSelect"
+                    onClick={this.changeSearchPath.bind(this)}
+                    disabled={
+                      this.state.radioChoice != "process" ||
+                      this.state.opening
+                    }
+                  >
+                    Search Path
+                  </Button>
+                  <div>
+                    {
+                      this.state.search_path != null ?
+                      this.state.search_path :
+                      ("No file selected.")
+                    }
+                  </div>
+                </FormGroup>
+                <FormGroup
+                  controlId="formControlsFile"
                 >
-                  Raw Path(s)
-                </Button>
-                <div>
-                  {
-                    this.state.raw_paths.length > 0 ?
-                    this.state.raw_paths.join(', ') :
-                    ("No file selected.")
-                  }
-                </div>
-              </FormGroup>
-              <FormGroup
-                controlId="formControlsFile"
-              >
-                <Button
-                  id="fileSelect"
-                  onClick={this.changeScanLists.bind(this)}
-                  disabled={this.state.radioChoice != "process" || this.state.processing}
+                  <Button
+                    id="fileSelect"
+                    onClick={this.changeRawPaths.bind(this)}
+                    disabled={
+                      this.state.radioChoice != "process" ||
+                      this.state.opening
+                    }
+                  >
+                    Raw Path(s)
+                  </Button>
+                  <div>
+                    {
+                      this.state.raw_paths.length > 0 ?
+                      this.state.raw_paths.join(', ') :
+                      ("No file selected.")
+                    }
+                  </div>
+                </FormGroup>
+                <FormGroup
+                  controlId="formControlsFile"
                 >
-                  Scan List(s)
-                </Button>
-                <div>
-                  {
-                    this.state.scan_lists.length > 0 ?
-                    this.state.scan_lists.join(', ') :
-                    ("No files selected.")
-                  }
-                </div>
-              </FormGroup>
-              <FormGroup
-                controlId="formControlsFile"
-              >
-                <Button
-                  id="fileSelect"
-                  onClick={this.changeMatPaths.bind(this)}
-                  disabled={this.state.radioChoice != "process" || this.state.processing}
+                  <Button
+                    id="fileSelect"
+                    onClick={this.changeScanLists.bind(this)}
+                    disabled={
+                      this.state.radioChoice != "process" ||
+                      this.state.opening
+                    }
+                  >
+                    Scan List(s)
+                  </Button>
+                  <div>
+                    {
+                      this.state.scan_lists.length > 0 ?
+                      this.state.scan_lists.join(', ') :
+                      ("No files selected.")
+                    }
+                  </div>
+                </FormGroup>
+                <FormGroup
+                  controlId="formControlsFile"
                 >
-                  CAMV-Matlab Session(s)
-                </Button>
-                <div>
-                  {
-                    this.state.mat_paths.length > 0 ?
-                    this.state.mat_paths.join(', ') :
-                    ("No files selected.")
-                  }
-                </div>
-              </FormGroup>
-              <FormGroup
-                controlId="formControlsSelect"
-              >
-                <ControlLabel>
-                  # of CPUs
-                </ControlLabel>
-                <FormControl
-                  componentClass="select"
-                  value={this.state.cpus}
-                  onChange={this.changeCPUCount.bind(this)}
-                  disabled={this.state.radioChoice != "process" || this.state.processing}
+                  <Button
+                    id="fileSelect"
+                    onClick={this.changeMatPaths.bind(this)}
+                    disabled={
+                      this.state.radioChoice != "process" ||
+                      this.state.opening
+                    }
+                  >
+                    CAMV-Matlab Session(s)
+                  </Button>
+                  <div>
+                    {
+                      this.state.mat_paths.length > 0 ?
+                      this.state.mat_paths.join(', ') :
+                      ("No files selected.")
+                    }
+                  </div>
+                </FormGroup>
+                <FormGroup
+                  controlId="formControlsSelect"
                 >
-                  {
-                    os.cpus().map(
-                      (cpu, i) =>
-                      <option value={i + 1} key={i + 1}>{i + 1}</option>
-                    )
-                  }
-                </FormControl>
-              </FormGroup>
+                  <ControlLabel>
+                    # of CPUs
+                  </ControlLabel>
+                  <FormControl
+                    componentClass="select"
+                    value={this.state.cpus}
+                    onChange={this.changeCPUCount.bind(this)}
+                    disabled={
+                      this.state.radioChoice != "process" ||
+                      this.state.opening
+                    }
+                  >
+                    {
+                      os.cpus().map(
+                        (cpu, i) =>
+                        <option value={i + 1} key={i + 1}>{i + 1}</option>
+                      )
+                    }
+                  </FormControl>
+                </FormGroup>
 
+              </Radio>
+            </FormGroup>
+          }
+          {
+            this.state.child != null &&
+            <div className="console">
               {
-                this.state.processing &&
-                <div className="console">
-                  {
-                    this.state.stdout.map(
-                      (line, index) => (
-                        <p className="stdout" key={index}>
-                          {line}
-                        </p>
-                      )
-                    )
-                  }
-                  {
-                    this.state.stderr.map(
-                      (line, index) => (
-                        <p className="stderr" key={index}>
-                          {line}
-                        </p>
-                      )
-                    )
-                  }
-                </div>
+                this.state.stdout.map(
+                  (line, index) => (
+                    <p className="stdout" key={index}>
+                      {line}
+                    </p>
+                  )
+                )
               }
-            </Radio>
-          </FormGroup>
+              {
+                this.state.stderr.map(
+                  (line, index) => (
+                    <p className="stderr" key={index}>
+                      {line}
+                    </p>
+                  )
+                )
+              }
+            </div>
+          }
         </Modal.Body>
         <Modal.Footer>
           <Button
@@ -494,18 +534,24 @@ class ModalImportBox extends React.Component {
                   this.state.search_path == null
                 )
               ) ||
-              this.state.processing
+              this.state.opening
             }
             onClick={
               this.state.radioChoice == "open" ?
               this.runImport.bind(this) :
-              this.runProcess.bind(this)
+              (
+                this.state.child != null ?
+                this.cancelProcess.bind(this) :
+                this.runProcess.bind(this)
+              )
             }
           >
             {
-              this.state.processing ?
-              (this.state.radioChoice == "open" ? ("importing...") : ("processing...")) :
-              (this.state.radioChoice == "open" ? ("Open") : ("Process"))
+              this.state.opening ? ("importing...") : (
+                this.state.child != null ? ("Cancel") : (
+                  this.state.radioChoice == "open" ? ("Open") : ("Process")
+                )
+              )
             }
           </Button>
         </Modal.Footer>
