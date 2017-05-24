@@ -1,5 +1,11 @@
 # Change Log
 
+## 0.12.0 (2017-05-23)
+
+Features
+
+  - Show processing output and update window's progress bar.
+
 ## 0.11.1 (2017-05-17)
 
 Features

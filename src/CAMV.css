@@ -5,6 +5,24 @@
   display: flex;
 }
 
+.console {
+  height: 500px;
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #e4e6e8;
+  display: block;
+  overflow: auto;
+  background-color: #eff0f1;
+}
+
+.stdout {
+  color: #393318;
+}
+
+.stderr {
+  color: #E64320;
+}
+
 text.shadow {
   stroke: white;
   stroke-width: .05px;

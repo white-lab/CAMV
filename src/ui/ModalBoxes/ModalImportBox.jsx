@@ -1,11 +1,12 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { Modal, Button, FormGroup, FormControl, Radio, ControlLabel } from 'react-bootstrap'
-import { execFile } from 'child_process'
+import { spawn } from 'child_process'
 import path from 'path'
 import os from 'os'
 
-const { dialog } = require('electron').remote
+import { remote } from 'electron'
+const { dialog } = remote
 
 import { loadSQL } from '../../io/sql'
 
@@ -25,6 +26,8 @@ class ModalImportBox extends React.Component {
       search_path: null,
       radioChoice: 'open',
       cpus: os.cpus().length,
+      stdout: [],
+      stderr: [],
     }
   }
 
@@ -167,6 +170,8 @@ class ModalImportBox extends React.Component {
   runProcess() {
     this.setState({
       processing: true,
+      stdout: [],
+      stderr: [],
     })
 
     if (this.props.database != null) {
@@ -174,6 +179,7 @@ class ModalImportBox extends React.Component {
     }
 
     let args = [
+      "-vv",
       "--search-path", this.state.search_path,
     ]
 
@@ -199,24 +205,76 @@ class ModalImportBox extends React.Component {
       this.state.pycamverterPath, args,
     )
 
-    // XXX: Modal view?
+    let win = remote.getCurrentWindow()
+    win.setProgressBar(-1)
 
-    execFile(
+    const child = spawn(
       this.state.pycamverterPath,
       args,
-      (error, stdout, stderr) => {
-        if (error) {
-          console.error(error)
-        }
+    )
 
-        console.log(stdout)
-        console.log(stderr)
+    child.on(
+      'error',
+      (err) => {
+        win.setProgressBar(-1)
+        console.error(err)
+        this.setState({
+          processing: false,
+        })
+      },
+    )
+
+    child.on(
+      'close',
+      (code) => {
+        win.setProgressBar(-1)
+
+        if (code != 0) {
+          console.error(`child exited with code: ${code}`)
+          this.setState({
+            processing: false,
+          })
+          return
+        }
 
         this.setState({
           processing: false,
           camvFileName: out_path,
         }, this.runImport.bind(this))
       }
+    )
+
+    child.stdout.on(
+      'data',
+      (data) => {
+        data = data.toString()
+
+        let progress = data.match(/\((\d+)\s*\/\s*(\d+)\)/)
+
+        if (progress != null) {
+          let win = remote.getCurrentWindow()
+          win.setProgressBar(progress[1] / progress[2])
+        }
+
+        if (data.match('DEBUG')) {
+          return
+        }
+
+        this.setState((prevState) => ({
+          stdout: prevState.stdout.concat(data.split("\n")),
+        }))
+      },
+    )
+
+    child.stderr.on(
+      'data',
+      (data) => {
+        data = data.toString()
+
+        this.setState((prevState) => ({
+          stderr: prevState.stderr.concat(data.split("\n")),
+        }))
+      },
     )
   }
 
@@ -283,24 +341,27 @@ class ModalImportBox extends React.Component {
               checked={this.state.radioChoice == "process"}
               onChange={this.radioChange.bind(this)}
             >
-              <FormGroup
-                controlId="formControlsFile"
-              >
-                <Button
-                  id="fileSelect"
-                  onClick={this.changePycamverterPath.bind(this)}
-                  disabled={this.state.radioChoice != "process" || this.state.processing}
+              {
+                process.env.NODE_ENV === 'development' &&
+                <FormGroup
+                  controlId="formControlsFile"
                 >
-                  PyCamverter Path
-                </Button>
-                <div>
-                  {
-                    this.state.pycamverterPath != null ?
-                    this.state.pycamverterPath :
-                    ("No file selected.")
-                  }
-                </div>
-              </FormGroup>
+                  <Button
+                    id="fileSelect"
+                    onClick={this.changePycamverterPath.bind(this)}
+                    disabled={this.state.radioChoice != "process" || this.state.processing}
+                  >
+                    PyCamverter Path
+                  </Button>
+                  <div>
+                    {
+                      this.state.pycamverterPath != null ?
+                      this.state.pycamverterPath :
+                      ("No file selected.")
+                    }
+                  </div>
+                </FormGroup>
+              }
               <FormGroup
                 controlId="formControlsFile"
               >
@@ -393,6 +454,30 @@ class ModalImportBox extends React.Component {
                   }
                 </FormControl>
               </FormGroup>
+
+              {
+                this.state.processing &&
+                <div className="console">
+                  {
+                    this.state.stdout.map(
+                      (line, index) => (
+                        <p className="stdout" key={index}>
+                          {line}
+                        </p>
+                      )
+                    )
+                  }
+                  {
+                    this.state.stderr.map(
+                      (line, index) => (
+                        <p className="stderr" key={index}>
+                          {line}
+                        </p>
+                      )
+                    )
+                  }
+                </div>
+              }
             </Radio>
           </FormGroup>
         </Modal.Body>
