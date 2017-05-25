@@ -249,7 +249,6 @@ class ModalImportBox extends React.Component {
         let progress = data.match(/\((\d+)\s*\/\s*(\d+)\)/)
 
         if (progress != null) {
-          let win = remote.getCurrentWindow()
           win.setProgressBar((progress[1] - 1) / progress[2])
         }
 
@@ -280,12 +279,10 @@ class ModalImportBox extends React.Component {
   }
 
   cancelProcess() {
-    this.state.child.removeListener('close')
-
     terminate(this.state.child.pid, (err) => {
       if (err) { console.error(err) }
 
-      win.setProgressBar(-1)
+      remote.getCurrentWindow().setProgressBar(-1)
 
       this.setState({
         child: null,
