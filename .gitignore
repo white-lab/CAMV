@@ -16,3 +16,4 @@ CAMV-*-*/
 out/
 *.log
 *.exe
+package-lock.json
