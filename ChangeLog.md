@@ -1,5 +1,9 @@
 # Change Log
 
+## 0.13.1 (2017-06-01)
+
+Removed / updated various dependency packages.
+
 ## 0.13.0 (2017-05-24)
 
 Features
