@@ -1,5 +1,9 @@
 # Change Log
 
+## 0.13.2 (2017-06-02)
+
+Build CAMV with node v8.
+
 ## 0.13.1 (2017-06-01)
 
 Removed / updated various dependency packages.

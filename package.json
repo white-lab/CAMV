@@ -1,10 +1,9 @@
 {
   "name": "camv",
-  "version": "0.13.1",
+  "version": "0.13.2",
   "main": "src/main.js",
   "productName": "CAMV",
   "dependencies": {
-    "babel-plugin-syntax-async-functions": "^6.13.0",
     "babel-plugin-transform-react-jsx-source": "^6.22.0",
     "babel-plugin-transform-runtime": "^6.23.0",
     "babel-preset-es2017-node7": "^0.5.2",

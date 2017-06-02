@@ -2,7 +2,6 @@
   "presets": ["es2017-node7", "react"],
   "plugins": [
     "transform-react-jsx-source",
-    "syntax-async-functions",
     "transform-runtime"
   ],
   "sourceMaps": "inline"
