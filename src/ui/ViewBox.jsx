@@ -143,7 +143,11 @@ class ViewBox extends React.Component {
   }
 
   blob_to_peaks(blob) {
-    return new TextDecoder("utf-8").decode(blob).split(";").map(
+    let txt = new TextDecoder("utf-8").decode(blob)
+
+    if (txt.length < 1) { return [] }
+
+    return txt.split(";").map(
       (i, index) => {
         let [mz, intensity] = i.split(',')
         mz = parseFloat(mz)
