@@ -4,7 +4,7 @@ skip_non_tags: true
 
 environment:
     matrix:
-        - nodejs_version: "7"
+        - nodejs_version: "8"
           platform: x64
 
 install:
