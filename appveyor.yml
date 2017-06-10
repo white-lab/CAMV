@@ -8,7 +8,7 @@ environment:
           platform: x64
 
 install:
-    - ps: Update-NodeJsInstallation node $env:nodejs_version $env:platform
+    - ps: Update-NodeJsInstallation $env:nodejs_version $env:platform
     - "node --version"
     - "npm --version"
     - "npm install"
