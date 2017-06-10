@@ -12,9 +12,15 @@ install:
     - "npm install"
     - "npm install bower -g"
     - "bower install"
+    - "npm install archiver@1.3.0"
+    - "cat node_modules/archiver/package.json"
     - "cd node_modules/zip-folder/"
     - "npm install archiver@1.3.0"
-    - "cd ../../"
+    - "cat node_modules/archiver/package.json"
+    - "cd node_modules/archiver/"
+    - "npm install compress-commons@1.2.0"
+    - "cat node_modules/compress-commons/package.json"
+    - "cd ../../../../"
     - ps: $pycamverter_version = git ls-remote --tags git://github.com/white-lab/pycamverter.git | cut -f 2 | cut -d / -f 3 | cut -d ^ -f 1 | tail -n1
     - ps: Start-FileDownload https://github.com/white-lab/pycamverter/releases/download/${pycamverter_version}/PyCAMVerter.exe
 
