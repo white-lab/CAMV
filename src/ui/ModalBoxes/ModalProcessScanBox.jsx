@@ -5,6 +5,7 @@ import { execFile } from 'child_process'
 
  import fs from 'fs'
  import path from 'path'
+ import process from 'process'
 
 const { dialog } = require('electron').remote
 
@@ -178,8 +179,8 @@ class modalProcessScanBox extends React.Component {
       "-vv",
       "--reprocess",
       "--scans", this.props.scan.scanNumber,
-      "--search_path", this.state.search_path,
-      "--raw_paths", this.state.raw_path,
+      "--search-path", this.state.search_path,
+      "--raw-paths", this.state.raw_path,
     ]
 
     console.log(
@@ -280,6 +281,7 @@ class modalProcessScanBox extends React.Component {
         <Modal.Footer>
           <Button
             disabled={
+              process.platform != "win32" ||
               this.state.processing ||
               this.props.scan == null ||
               this.state.pycamverterPath == null ||
