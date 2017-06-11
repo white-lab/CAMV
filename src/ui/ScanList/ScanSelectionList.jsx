@@ -616,6 +616,14 @@ class ScanSelectionList extends React.Component {
       node.props.children.pop()
     }
 
+    node = this.findTreeNode(
+      key.slice(0, -2).map(i => i.join(",")).join("-")
+    )
+
+    while (node.props.children.length > 0) {
+      node.props.children.pop()
+    }
+
     await this.getIndices(key)
     node.forceUpdate()
   }
