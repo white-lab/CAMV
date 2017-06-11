@@ -1,5 +1,12 @@
 # Change Log
 
+## 0.13.3 (2017-06-10)
+
+Bug fixes
+
+  - Don't hide processing console immediately on pycamverter error.
+  - Fixed bugs in re-processing scans with a truncated PTM list.
+
 ## 0.13.2 (2017-06-02)
 
 Build CAMV with node v8.
