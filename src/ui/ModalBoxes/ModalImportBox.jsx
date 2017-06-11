@@ -29,6 +29,8 @@ class ModalImportBox extends React.Component {
       cpus: os.cpus().length,
       stdout: [],
       stderr: [],
+      opening: false,
+      running: false,
     }
   }
 
@@ -161,7 +163,7 @@ class ModalImportBox extends React.Component {
 
   closeCallback() {
     if (
-      this.state.child != null &&
+      !this.state.running &&
       this.props.closeCallback != null
     ) {
       this.props.closeCallback()
@@ -237,6 +239,7 @@ class ModalImportBox extends React.Component {
         this.setState({
           child: null,
           camvFileName: out_path,
+          running: false,
         }, this.runImport.bind(this))
       }
     )
@@ -275,10 +278,18 @@ class ModalImportBox extends React.Component {
 
     this.setState({
       child: child,
+      running: true,
     })
   }
 
   cancelProcess() {
+    if (this.state.child == null) {
+      this.setState({
+        running: false,
+      })
+      return
+    }
+
     terminate(this.state.child.pid, (err) => {
       if (err) { console.error(err) }
 
@@ -286,6 +297,7 @@ class ModalImportBox extends React.Component {
 
       this.setState({
         child: null,
+        running: false,
       })
     })
   }
@@ -323,7 +335,7 @@ class ModalImportBox extends React.Component {
         </Modal.Header>
         <Modal.Body>
           {
-            this.state.child == null &&
+            !this.state.running &&
             <FormGroup
               controlId="radioChoice"
             >
@@ -495,7 +507,7 @@ class ModalImportBox extends React.Component {
             </FormGroup>
           }
           {
-            this.state.child != null &&
+            this.state.running &&
             <div className="console">
               {
                 this.state.stdout.map(
@@ -537,7 +549,7 @@ class ModalImportBox extends React.Component {
               this.state.radioChoice == "open" ?
               this.runImport.bind(this) :
               (
-                this.state.child != null ?
+                this.state.running ?
                 this.cancelProcess.bind(this) :
                 this.runProcess.bind(this)
               )
@@ -545,7 +557,7 @@ class ModalImportBox extends React.Component {
           >
             {
               this.state.opening ? ("importing...") : (
-                this.state.child != null ? ("Cancel") : (
+                this.state.running ? ("Cancel") : (
                   this.state.radioChoice == "open" ? ("Open") : ("Process")
                 )
               )
