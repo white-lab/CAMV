@@ -98,8 +98,8 @@ class ScanSelectionList extends React.Component {
         selectedKeys: [key]
       })
 
-      let treeNode = this.findTreeNode(key.split("-")[0])
-      ReactDOM.findDOMNode(treeNode).scrollIntoView()
+      let treeNode = this.findTreeNode(key)
+      ReactDOM.findDOMNode(treeNode).scrollIntoViewIfNeeded()
     }
 
     this.setState({
@@ -607,25 +607,21 @@ class ScanSelectionList extends React.Component {
     )
   }
 
-  async refresh(key) {
-    let node = this.findTreeNode(
-      key.slice(0, -1).map(i => i.join(",")).join("-")
-    )
+  async refresh(key, depth) {
+    for (let i = -1; i >= -depth; i--) {
+      let node = this.findTreeNode(
+        key.slice(0, i).map(i => i.join(",")).join("-")
+      )
 
-    while (node.props.children.length > 0) {
-      node.props.children.pop()
-    }
-
-    node = this.findTreeNode(
-      key.slice(0, -2).map(i => i.join(",")).join("-")
-    )
-
-    while (node.props.children.length > 0) {
-      node.props.children.pop()
+      while (node.props.children.length > 0) {
+        node.props.children.pop()
+      }
     }
 
     await this.getIndices(key)
-    node.forceUpdate()
+    this.findTreeNode(
+      key.slice(0, -depth).map(i => i.join(",")).join("-")
+    ).forceUpdate()
   }
 
   buildNodeTree() {

@@ -1,5 +1,12 @@
 # Change Log
 
+## 0.13.4 (2017-06-12)
+
+Bug fixes
+
+  - Fixed exporting spectra one by one.
+  - Improved scrolling the scan list when using keyboard navigation.
+
 ## 0.13.3 (2017-06-10)
 
 Bug fixes

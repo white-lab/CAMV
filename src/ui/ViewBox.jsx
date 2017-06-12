@@ -454,7 +454,7 @@ class ViewBox extends React.Component {
 
 
     if (reprocessed) {
-      this.refs["scanSelectionList"].refresh(this.getSelectedNode())
+      this.refs["scanSelectionList"].refresh(this.getSelectedNode(), 2)
     }
   }
 
@@ -596,7 +596,7 @@ class ViewBox extends React.Component {
     if (export_spectras[1]) { params.push("maybe") }
     if (export_spectras[2]) { params.push("reject") }
 
-    this.state.db.each(
+    this.state.db.all(
       `SELECT \
       protein_sets.protein_set_id, protein_sets.protein_set_name, \
       protein_sets.protein_set_accession, \
@@ -631,38 +631,27 @@ class ViewBox extends React.Component {
       protein_sets.protein_set_name, peptides.peptide_seq, \
       mod_states.mod_desc, ptms.name`,
       params,
-      (err, row) => {
-        if (err != null || row == null) {
+      async function(err, rows) {
+        if (err != null || rows == null) {
           console.error(err)
           return
         }
 
-        let nodes = [
-          [row.protein_set_id],
-          [row.peptide_id, row.mod_state_id],
-          [row.scan_id],
-          [row.ptm_id],
-        ]
+        for (let row of rows) {
+          let nodes = [
+            [row.protein_set_id],
+            [row.peptide_id, row.mod_state_id],
+            [row.scan_id],
+            [row.ptm_id],
+          ]
 
-        promises.push(
-          new Promise(
-            (resolve) => cb(nodes, row, resolve)
-          )
-        )
-      },
-      async function(err, count) {
-        if (err != null) {
-          console.error(err)
-        }
-
-        for (let promise of promises) {
-          await promise
+          await new Promise(resolve => cb(nodes, row, resolve))
         }
 
         if (cb_done != null) {
           cb_done()
         }
-      }
+      },
     )
   }
 
@@ -832,7 +821,7 @@ class ViewBox extends React.Component {
         this.state.selectedPTM
       ],
     ).then(() => {
-      this.refs["scanSelectionList"].refresh(this.getSelectedNode())
+      this.refs["scanSelectionList"].refresh(this.getSelectedNode(), 1)
     })
   }
 
