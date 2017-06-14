@@ -52,17 +52,12 @@
     "bower.json",
     "node_modules/",
     ".babelrc",
-    ".bowerrc",
     "PyCamverter.exe",
-    "src/bower_components/",
-    "src/*.css",
-    "src/*.html",
-    "src/*.js",
-    "src/ui/*.jsx"
+    "src/"
   ],
   "devEngines": {
-    "node": ">=7.x",
-    "npm": ">=4.x"
+    "node": ">=8.x",
+    "yarn": ">=0.24"
   },
   "author": {
     "name": "Nader Morshed",

@@ -49,9 +49,7 @@ well as [git](https://git-scm.com/) (for `bower`).
 Once those are installed, run:
 
 ```
-npm install
-npm install bower -g
-bower install
+yarn install
 ```
 
 ### Usage
@@ -59,9 +57,9 @@ bower install
 From this directory, run:
 
 ```
-npm start
+yarn start
 # or
-npm run start-dev
+yarn run start-dev
 ```
 
 ### Deployment
@@ -69,7 +67,7 @@ npm run start-dev
 From this directory, run:
 
 ```
-npm run make
+yarn run make
 ```
 
 This will generate a zip using in `./out/make/` for your current platform.
