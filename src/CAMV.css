@@ -183,7 +183,7 @@ li[class=accept] > a {
 }
 
 li[class=maybe] > a {
-  color: yellow;
+  color: #FFA500;
 }
 
 li[class=reject] > a {
@@ -199,9 +199,11 @@ li[class=undecided] > a {
 }
 
 .rc-tree-node-selected {
-  background-color: #ffe6b0;
-  border: 1px #ffb951 solid;
+  background-color: #E0F0FF;
+  border: 1px #99D1FF solid;
   opacity: 0.8;
+  margin: 5px;
+  padding: 2px;
 }
 
 ul {
