@@ -42,8 +42,7 @@ Control-F: Search proteins / peptides / scans
 
 ### Dependencies
 
-You will first need to [install Node.js v8](https://nodejs.org/en/) as
-well as [git](https://git-scm.com/) (for `bower`).
+You will first need to [install Node.js v8](https://nodejs.org/en/).
 
 
 Once those are installed, run:
