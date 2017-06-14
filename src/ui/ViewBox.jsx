@@ -1304,7 +1304,7 @@ class ViewBox extends React.Component {
             >
               <div
                 id="fragmentSpectrumBox"
-                style={{height: this.state.exporting ? "100%" : "92.5%"}}
+                style={{height: this.state.exporting ? "100%" : "calc(100% - 40px)"}}
               >
                 <SpectrumBox
                   ref="fragmentSpectrum"
@@ -1334,7 +1334,7 @@ class ViewBox extends React.Component {
               <div
                 id="precursorSpectrumBox"
                 style={{
-                  height: this.state.exporting ? "50%" : "46.25%",
+                  height: this.state.exporting ? "50%" : "calc(50% - 20px)",
                 }}
               >
                 <PrecursorSpectrumBox
@@ -1364,7 +1364,7 @@ class ViewBox extends React.Component {
               <div
                 id="quantSpectrumBox"
                 style={{
-                  height: this.state.exporting ? "50%" : "46.25%",
+                  height: this.state.exporting ? "50%" : "calc(50% - 20px)",
                 }}
               >
                 <QuantSpectrumBox
