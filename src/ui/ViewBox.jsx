@@ -455,6 +455,7 @@ class ViewBox extends React.Component {
 
     if (reprocessed) {
       this.refs["scanSelectionList"].refresh(this.getSelectedNode(), 2)
+      this.updateScan()
     }
   }
 
