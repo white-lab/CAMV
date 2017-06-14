@@ -1,13 +1,13 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { Modal, Button, FormGroup, FormControl, Radio, ControlLabel } from 'react-bootstrap'
-import { spawn } from 'child_process'
-import path from 'path'
-import os from 'os'
-import terminate from 'terminate'
 
+import { spawn } from 'child_process'
 import { remote } from 'electron'
-const { dialog } = remote
+import os from 'os'
+import path from 'path'
+import process from 'process'
+import terminate from 'terminate'
 
 import { loadSQL } from '../../io/sql'
 
@@ -215,7 +215,13 @@ class ModalImportBox extends React.Component {
       'error',
       (err) => {
         win.setProgressBar(-1)
+
+        remote.dialog.showErrorBox(
+          "Processing Error",
+          err.message,
+        )
         console.error(err)
+
         this.setState({
           child: null,
         })
@@ -255,12 +261,19 @@ class ModalImportBox extends React.Component {
           win.setProgressBar((progress[1] - 1) / progress[2])
         }
 
-        if (data.match('DEBUG')) {
-          return
-        }
+        data = data.split("\n").filter(i => i && !i.match("DEBUG"))
+
+        let err = data.map(
+          i => Boolean(
+            i.match("pycamv.main - ERROR - PyCAMV Converter has crashed!")
+          )
+        ).lastIndexOf(true)
+        data = data.slice(0, (err >= 0) ? (err + 1) : data.length)
+
+        if (data.length < 1) { return }
 
         this.setState((prevState) => ({
-          stdout: prevState.stdout.concat(data.split("\n")),
+          stdout: prevState.stdout.concat(data.join("\n")),
         }))
       },
     )
@@ -271,7 +284,7 @@ class ModalImportBox extends React.Component {
         data = data.toString()
 
         this.setState((prevState) => ({
-          stderr: prevState.stderr.concat(data.split("\n")),
+          stderr: prevState.stderr.concat(data),
         }))
       },
     )
@@ -291,7 +304,13 @@ class ModalImportBox extends React.Component {
     }
 
     terminate(this.state.child.pid, (err) => {
-      if (err) { console.error(err) }
+      if (err) {
+        remote.dialog.showErrorBox(
+          "Database Error",
+          err.message,
+        )
+        console.error(err)
+      }
 
       remote.getCurrentWindow().setProgressBar(-1)
 
@@ -512,18 +531,18 @@ class ModalImportBox extends React.Component {
               {
                 this.state.stdout.map(
                   (line, index) => (
-                    <p className="stdout" key={index}>
+                    <pre className="stdout" key={index}>
                       {line}
-                    </p>
+                    </pre>
                   )
                 )
               }
               {
                 this.state.stderr.map(
                   (line, index) => (
-                    <p className="stderr" key={index}>
+                    <pre className="stderr" key={index}>
                       {line}
-                    </p>
+                    </pre>
                   )
                 )
               }
@@ -539,6 +558,7 @@ class ModalImportBox extends React.Component {
               ) || (
                 this.state.radioChoice == "process" &&
                 (
+                  process.platform != "win32" ||
                   this.state.pycamverterPath == null ||
                   this.state.search_path == null
                 )
