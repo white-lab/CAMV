@@ -1,5 +1,16 @@
 # Change Log
 
+## 0.14.0 (2017-06-13)
+
+Features
+
+  - Use new yarn / node / react to build / bundle / run CAMV.
+  - Improved color scheme of "maybe" items.
+
+Bug fixes
+
+  - Fixed minor bugs in interface updates after re-processing a scan.
+
 ## 0.13.4 (2017-06-12)
 
 Bug fixes
