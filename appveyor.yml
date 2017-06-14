@@ -8,7 +8,7 @@ environment:
           platform: x64
 
 install:
-    - Install-Product node $env:nodejs_version $env:platform
+    - ps: Install-Product node $env:nodejs_version $env:platform
     # - ps: Update-NodeJsInstallation $env:nodejs_version $env:platform
     - "node --version"
     - "yarn --version"
