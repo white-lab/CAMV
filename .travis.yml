@@ -34,12 +34,10 @@ before_install:
     fi;
 
 install:
-  - npm install
-  - npm install bower -g
-  - bower install
+  - yarn
 
 script:
-  - travis_wait 30 npm run make
+  - travis_wait 30 yarn run make
   - ls -lh out/make/
 
 deploy:
