@@ -7,7 +7,7 @@ import { execFile } from 'child_process'
  import path from 'path'
  import process from 'process'
 
-const { dialog } = require('electron').remote
+import { remote } from 'electron'
 
 class modalProcessScanBox extends React.Component {
   constructor(props) {
@@ -111,7 +111,7 @@ class modalProcessScanBox extends React.Component {
   }
 
   updatePycamverterPath() {
-    dialog.showOpenDialog(
+    remote.dialog.showOpenDialog(
       {
         filters: [{
           name: 'PyCamverter',
@@ -129,7 +129,7 @@ class modalProcessScanBox extends React.Component {
   }
 
   updateRawPath() {
-    dialog.showOpenDialog(
+    remote.dialog.showOpenDialog(
       {
         filters: [{
           name: 'RAW File',
@@ -147,7 +147,7 @@ class modalProcessScanBox extends React.Component {
   }
 
   updateSearchPath() {
-    dialog.showOpenDialog(
+    remote.dialog.showOpenDialog(
       {
         filters: [{
           name: 'Search File',

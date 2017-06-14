@@ -2,7 +2,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import { Modal, Checkbox, Button } from 'react-bootstrap'
 
-const { dialog } = require('electron').remote
+import { remote } from 'electron'
 
 class ModalExportBox extends React.Component {
   constructor(props) {
@@ -20,7 +20,7 @@ class ModalExportBox extends React.Component {
   updateDir() {
     var component = this;
 
-    dialog.showOpenDialog(
+    remote.dialog.showOpenDialog(
       {
         title: "Export Spectra",
         properties: ["createDirectory", "openDirectory"]

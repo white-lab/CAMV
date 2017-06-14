@@ -2,7 +2,7 @@
 import fs from 'fs'
 import path from 'path'
 
-const { dialog } = require('electron').remote
+import { remote } from 'electron'
 import sqlite3 from 'sqlite3'
 
 
@@ -11,7 +11,10 @@ exports.loadSQL = function(fileName, cb) {
     fileName, sqlite3.OPEN_READWRITE,
     (err) => {
       if (err != null) {
-        dialog.showErrorBox("File Save Error", err.message)
+        remote.dialog.showErrorBox(
+          "Database Error",
+          err.message,
+        )
       }
     },
   )

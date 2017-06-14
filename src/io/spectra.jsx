@@ -3,8 +3,7 @@ import fs from 'fs'
 import path from 'path'
 
 import domtoimage from 'dom-to-image'
-
-const remote = require('electron').remote
+import { remote } from 'electron'
 
 
 function decodeBase64Image(dataString) {

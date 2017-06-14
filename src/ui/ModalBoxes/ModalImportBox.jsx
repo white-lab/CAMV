@@ -41,7 +41,7 @@ class ModalImportBox extends React.Component {
   }
 
   changeCAMVPath() {
-    dialog.showOpenDialog(
+    remote.dialog.showOpenDialog(
       {
         filters: [{
           name: 'CAMV SQLite',
@@ -59,7 +59,7 @@ class ModalImportBox extends React.Component {
   }
 
   changePycamverterPath() {
-    dialog.showOpenDialog(
+    remote.dialog.showOpenDialog(
       {
         filters: [{
           name: 'PyCamverter Path',
@@ -77,7 +77,7 @@ class ModalImportBox extends React.Component {
   }
 
   changeSearchPath() {
-    dialog.showOpenDialog(
+    remote.dialog.showOpenDialog(
       {
         filters: [{
           name: 'Search Path',
@@ -95,7 +95,7 @@ class ModalImportBox extends React.Component {
   }
 
   changeRawPaths() {
-    dialog.showOpenDialog(
+    remote.dialog.showOpenDialog(
       {
         properties: [
           'multiSelections',
@@ -116,7 +116,7 @@ class ModalImportBox extends React.Component {
   }
 
   changeScanLists() {
-    dialog.showOpenDialog(
+    remote.dialog.showOpenDialog(
       {
         properties: [
           'multiSelections',
@@ -137,7 +137,7 @@ class ModalImportBox extends React.Component {
   }
 
   changeMatPaths() {
-    dialog.showOpenDialog(
+    remote.dialog.showOpenDialog(
       {
         properties: [
           'multiSelections',

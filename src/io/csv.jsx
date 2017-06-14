@@ -1,6 +1,8 @@
 
 import fs from 'fs'
 
+import { remote } from 'electron'
+
 exports.exportCSV = function(vb, path) {
   // Export spectra as csv file
   let stream = fs.createWriteStream(path)
@@ -16,7 +18,12 @@ exports.exportCSV = function(vb, path) {
       "Status",
     ].join(",") + "\n",
     (err) => {
-      if (err != null) { console.error(err) ; return }
+      if (err != null) {
+        remote.dialog.showErrorBox(
+          "CSV Export Error",
+          err.message,
+        )
+      }
 
       vb.iterate_spectra(
         [true, true, true, true],
@@ -32,7 +39,12 @@ exports.exportCSV = function(vb, path) {
               row.choice,
             ].join(",") + "\n",
             (err) => {
-              if (err != null) { console.error(err) }
+              if (err != null) {
+                remote.dialog.showErrorBox(
+                  "Spectra Export Error",
+                  err.message,
+                )
+              }
               resolve()
             }
           )
