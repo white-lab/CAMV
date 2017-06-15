@@ -16,9 +16,9 @@
     "jquery": "^3.2.1",
     "prop-types": "^15.5.10",
     "rc-tree": "github:naderm/tree#precompiled",
-    "react": "^15.6.0",
+    "react": "^15.6.1",
     "react-bootstrap": "^0.31.0",
-    "react-dom": "^15.6.0",
+    "react-dom": "^15.6.1",
     "react-hotkey": "^0.7.0",
     "react-native-fs": "^2.3.3",
     "sqlite3": "^3.1.8",
@@ -27,13 +27,13 @@
   "devDependencies": {
     "babel-eslint": "^7.2.3",
     "cross-env": "^5.0.1",
-    "electron-forge": "^3.0.3",
+    "electron-forge": "^3.0.4",
     "electron-prebuilt-compile": "1.7.1",
     "eslint": "^4.0.0",
     "eslint-formatter-pretty": "^1.1.0",
     "eslint-plugin-import": "^2.3.0",
     "eslint-plugin-promise": "^3.5.0",
-    "eslint-plugin-react": "^7.0.1",
+    "eslint-plugin-react": "^7.1.0",
     "react-hot-loader": "^3.0.0-beta.7"
   },
   "scripts": {
