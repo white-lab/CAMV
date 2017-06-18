@@ -1370,9 +1370,9 @@ crc32-stream@~0.3.1:
     buffer-crc32 "~0.2.1"
     readable-stream "~1.0.24"
 
-create-react-class@^15.5.2:
-  version "15.5.4"
-  resolved "https://registry.yarnpkg.com/create-react-class/-/create-react-class-15.5.4.tgz#188875cb15e2fbe4ca595b6f43eb0e4a1f00fe50"
+create-react-class@^15.6.0:
+  version "15.6.0"
+  resolved "https://registry.yarnpkg.com/create-react-class/-/create-react-class-15.6.0.tgz#ab448497c26566e1e29413e883207d57cfe7bed4"
   dependencies:
     fbjs "^0.8.9"
     loose-envify "^1.3.1"
@@ -1879,11 +1879,7 @@ dom-walk@^0.1.0:
   version "0.1.1"
   resolved "https://registry.yarnpkg.com/dom-walk/-/dom-walk-0.1.1.tgz#672226dc74c8f799ad35307df936aba11acd6018"
 
-domelementtype@1:
-  version "1.3.0"
-  resolved "https://registry.yarnpkg.com/domelementtype/-/domelementtype-1.3.0.tgz#b17aed82e8ab59e52dd9c19b1756e0fc187204c2"
-
-domelementtype@~1.1.1:
+domelementtype@1, domelementtype@~1.1.1:
   version "1.1.3"
   resolved "https://registry.yarnpkg.com/domelementtype/-/domelementtype-1.1.3.tgz#bd28773e2642881aec51544924299c5cd822185b"
 
@@ -2024,9 +2020,9 @@ electron-forge-template-vue@^1.0.2:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/electron-forge-template-vue/-/electron-forge-template-vue-1.0.2.tgz#c935f5aa96a2798c6ea9b834465e3212e4f71d33"
 
-electron-forge@^3.0.3:
-  version "3.0.3"
-  resolved "https://registry.yarnpkg.com/electron-forge/-/electron-forge-3.0.3.tgz#8e7009aa2deff05e23e5e44159bb6f9b41c55a81"
+electron-forge@^3.0.5:
+  version "3.0.5"
+  resolved "https://registry.yarnpkg.com/electron-forge/-/electron-forge-3.0.5.tgz#c8f54c99058014583dbee67584c29960cef56b74"
   dependencies:
     aws-sdk "^2.9.0"
     babel-register "^6.16.3"
@@ -2040,7 +2036,6 @@ electron-forge@^3.0.3:
     electron-forge-template-vue "^1.0.2"
     electron-packager "^8.5.2"
     electron-rebuild "^1.5.7"
-    electron-sudo malept/electron-sudo#fix-linux-sudo-detection
     form-data "^2.1.4"
     fs-extra "^3.0.0"
     github "^9.0.0"
@@ -2180,13 +2175,6 @@ electron-rebuild@^1.5.7:
     rimraf "^2.6.1"
     spawn-rx "^2.0.10"
     yargs "^7.0.2"
-
-"electron-sudo@github:malept/electron-sudo#fix-linux-sudo-detection":
-  version "4.0.12"
-  resolved "https://codeload.github.com/malept/electron-sudo/tar.gz/73d135de6f0da7abb7e2b3cee9aa3a1d3fd4e4db"
-  dependencies:
-    babel-runtime "^6.18.0"
-    bluebird "^3.4.6"
 
 electron-to-chromium@^1.2.7, electron-to-chromium@^1.3.14:
   version "1.3.14"
@@ -2341,7 +2329,7 @@ eslint-plugin-promise@^3.5.0:
   version "3.5.0"
   resolved "https://registry.yarnpkg.com/eslint-plugin-promise/-/eslint-plugin-promise-3.5.0.tgz#78fbb6ffe047201627569e85a6c5373af2a68fca"
 
-eslint-plugin-react@^7.0.1:
+eslint-plugin-react@^7.1.0:
   version "7.1.0"
   resolved "https://registry.yarnpkg.com/eslint-plugin-react/-/eslint-plugin-react-7.1.0.tgz#27770acf39f5fd49cd0af4083ce58104eb390d4c"
   dependencies:
@@ -2617,15 +2605,7 @@ forever-agent@~0.6.1:
   version "0.6.1"
   resolved "https://registry.yarnpkg.com/forever-agent/-/forever-agent-0.6.1.tgz#fbc71f0c41adeb37f96c577ad1ed42d8fdacca91"
 
-form-data@^2.1.4:
-  version "2.2.0"
-  resolved "https://registry.yarnpkg.com/form-data/-/form-data-2.2.0.tgz#9a5e3b9295f980b2623cf64fa238b14cebca707b"
-  dependencies:
-    asynckit "^0.4.0"
-    combined-stream "^1.0.5"
-    mime-types "^2.1.12"
-
-form-data@~2.1.1:
+form-data@^2.1.4, form-data@~2.1.1:
   version "2.1.4"
   resolved "https://registry.yarnpkg.com/form-data/-/form-data-2.1.4.tgz#33c183acf193276ecaa98143a69e94bfee1750d1"
   dependencies:
@@ -4454,7 +4434,7 @@ promise@~2.0:
   dependencies:
     is-promise "~1"
 
-prop-types@15.x, prop-types@^15.5.10, prop-types@^15.5.4, prop-types@^15.5.6, prop-types@^15.5.7, prop-types@^15.5.8, prop-types@~15.5.7:
+prop-types@15.x, prop-types@^15.5.10, prop-types@^15.5.4, prop-types@^15.5.6, prop-types@^15.5.8:
   version "15.5.10"
   resolved "https://registry.yarnpkg.com/prop-types/-/prop-types-15.5.10.tgz#2797dfc3126182e3a95e3dfbb2e893ddd7456154"
   dependencies:
@@ -4568,14 +4548,14 @@ react-deep-force-update@^2.0.1:
   version "2.0.1"
   resolved "https://registry.yarnpkg.com/react-deep-force-update/-/react-deep-force-update-2.0.1.tgz#4f7f6c12c3e7de42f345992a3c518236fa1ecad3"
 
-react-dom@^15.6.0:
-  version "15.6.0"
-  resolved "https://registry.yarnpkg.com/react-dom/-/react-dom-15.6.0.tgz#8bc23cb0c80e706355b76ca9f8ce47cf7bdfb6d1"
+react-dom@^15.6.1:
+  version "15.6.1"
+  resolved "https://registry.yarnpkg.com/react-dom/-/react-dom-15.6.1.tgz#2cb0ed4191038e53c209eb3a79a23e2a4cf99470"
   dependencies:
     fbjs "^0.8.9"
     loose-envify "^1.1.0"
     object-assign "^4.1.0"
-    prop-types "~15.5.7"
+    prop-types "^15.5.10"
 
 react-hot-loader@^3.0.0-beta.7:
   version "3.0.0-beta.7"
@@ -4623,15 +4603,15 @@ react-proxy@^3.0.0-alpha.0:
   dependencies:
     lodash "^4.6.1"
 
-react@^15.6.0:
-  version "15.6.0"
-  resolved "https://registry.yarnpkg.com/react/-/react-15.6.0.tgz#c23299b48e30ed302508ce89e1a02c919f826bce"
+react@^15.6.1:
+  version "15.6.1"
+  resolved "https://registry.yarnpkg.com/react/-/react-15.6.1.tgz#baa8434ec6780bde997cdc380b79cd33b96393df"
   dependencies:
-    create-react-class "^15.5.2"
+    create-react-class "^15.6.0"
     fbjs "^0.8.9"
     loose-envify "^1.1.0"
     object-assign "^4.1.0"
-    prop-types "^15.5.7"
+    prop-types "^15.5.10"
 
 read-pkg-up@^1.0.1:
   version "1.0.1"
