@@ -1,5 +1,11 @@
 # Change Log
 
+## 0.14.1 (2017-06-18)
+
+Bug fixes
+
+  - Fixed crash in exporting proteins with long names.
+
 ## 0.14.0 (2017-06-13)
 
 Features
