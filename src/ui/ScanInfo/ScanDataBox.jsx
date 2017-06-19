@@ -12,6 +12,12 @@ class ScanDataBox extends React.Component {
       this.props.proteins.proteinName : ''
     )
 
+    if (prot.length > 0) {
+      prot = Array.from(
+        new Set(prot.split(' / '))
+      ).sort().join(" / ")
+    }
+
     if (filename.length > 100) {
       filename = filename.substring(0, 100) + "..."
     }

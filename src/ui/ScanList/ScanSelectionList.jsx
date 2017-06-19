@@ -642,8 +642,12 @@ class ScanSelectionList extends React.Component {
         this.setState({
           tree: rows.map(
             row => {
+              let name = Array.from(
+                new Set(row.protein_set_name.split(' / '))
+              ).sort()
+
               return {
-                name: row.protein_set_name,
+                name: name,
                 nodeId: [row.protein_set_id]
               }
             }

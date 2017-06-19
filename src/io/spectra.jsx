@@ -39,7 +39,10 @@ exports.spectraToImage = async function(vb, dirName, export_spectras) {
   vb.iterate_spectra(
     export_spectras,
     async function(nodes, row, resolve) {
-      let out_name = `${row.protein_set_name.replace(/\//g, '_').slice(0, 150)} - ${row.name} - ${row.scan_num}`
+      let name = Array.from(
+        new Set(row.protein_set_name.split(' / '))
+      ).sort().join(' _ ').replace(/\//g, '_')
+      let out_name = `${name.slice(0, 150)} - ${row.name} - ${row.scan_num}`
 
       await vb.updateAll(nodes)
 
