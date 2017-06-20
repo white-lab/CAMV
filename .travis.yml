@@ -6,9 +6,9 @@ addons:
   apt:
     sources:
     - ubuntu-toolchain-r-test
-    - llvm-toolchain-precise-3.5
+    - llvm-toolchain-precise-4.0
     packages:
-     - clang-3.5
+     - clang-4.0
 
 matrix:
   include:
@@ -17,8 +17,8 @@ matrix:
       env:
       addons:
          apt:
-            sources: [ 'ubuntu-toolchain-r-test','llvm-toolchain-precise-3.5', 'gcc-multilib', 'g++-multilib', 'libsqlite3-dev:i386' ]
-            packages: [ 'clang-3.5' ]
+            sources: [ 'ubuntu-toolchain-r-test','llvm-toolchain-precise-4.0', 'gcc-multilib', 'g++-multilib', 'libsqlite3-dev' ]
+            packages: [ 'clang-4.0' ]
     - os: osx
       node_js: '8'
 
