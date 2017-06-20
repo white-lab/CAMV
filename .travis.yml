@@ -34,7 +34,7 @@ before_install:
     fi;
 
 install:
-  - yarn
+  - travis_wait 30 yarn
 
 script:
   - travis_wait 30 yarn run make
