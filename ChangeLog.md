@@ -1,5 +1,16 @@
 # Change Log
 
+## 0.14.2 (2017-06-18)
+
+Features
+
+  - Updated electron to 1.7.3.
+
+Bug fixes
+
+  - Fixed export of proteins with ':' in their name.
+  - Clean up redundant protein names ("Altered inheritance of mitochondria protein 44 / Altered inheritance of mitochondria protein 44 / Altered inheritance of mitochondria protein 44 / Altered inheritance of mitochondria protein 44" => "Altered inheritance of mitochondria protein 44").
+
 ## 0.14.1 (2017-06-18)
 
 Bug fixes
