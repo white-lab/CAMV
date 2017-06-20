@@ -5,9 +5,9 @@ cache: yarn
 addons:
   apt:
     sources:
-    - llvm-toolchain-precise-3.8
+    - llvm-toolchain-precise-3.5
     packages:
-     - clang-3.8
+     - clang-3.5
 
 matrix:
   include:
@@ -17,8 +17,8 @@ matrix:
       env:
       addons:
          apt:
-            sources: [ 'llvm-toolchain-precise-3.8', 'libsqlite3-dev' ]
-            packages: [ 'clang-3.8' ]
+            sources: [ 'llvm-toolchain-precise-3.5', 'libsqlite3-dev' ]
+            packages: [ 'clang-3.5' ]
     - os: osx
       node_js: '8'
 
