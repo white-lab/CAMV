@@ -134,11 +134,13 @@ class BaseSpectrum extends React.Component {
 BaseSpectrum.propTypes = {
   spectrumData: PropTypes.array,
   pointChosenCallback: PropTypes.func,
+  collisionType: PropTypes.string,
 }
 
 BaseSpectrum.defaultProps = {
   spectrumData: [],
   pointChosenCallback: null,
+  collisionType: null,
 }
 
 module.exports = BaseSpectrum

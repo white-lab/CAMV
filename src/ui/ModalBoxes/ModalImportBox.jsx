@@ -515,8 +515,14 @@ class ModalImportBox extends React.Component {
                   >
                     {
                       os.cpus().map(
-                        (cpu, i) =>
-                        <option value={i + 1} key={i + 1}>{i + 1}</option>
+                        (cpu, i) => (
+                          <option
+                            value={i + 1}
+                            key={i + 1}
+                          >
+                            {i + 1}
+                          </option>
+                        )
                       )
                     }
                   </FormControl>
@@ -531,7 +537,10 @@ class ModalImportBox extends React.Component {
               {
                 this.state.stdout.map(
                   (line, index) => (
-                    <pre className="stdout" key={index}>
+                    <pre
+                      className="stdout"
+                      key={index}
+                    >
                       {line}
                     </pre>
                   )
@@ -540,7 +549,10 @@ class ModalImportBox extends React.Component {
               {
                 this.state.stderr.map(
                   (line, index) => (
-                    <pre className="stderr" key={index}>
+                    <pre
+                      className="stderr"
+                      key={index}
+                    >
                       {line}
                     </pre>
                   )
@@ -590,10 +602,11 @@ class ModalImportBox extends React.Component {
 }
 
 ModalImportBox.propTypes = {
-  importCallback: PropTypes.func,
-  closeCallback: PropTypes.func,
   showModal: PropTypes.bool.isRequired,
   database: PropTypes.object,
+
+  importCallback: PropTypes.func,
+  closeCallback: PropTypes.func,
 }
 
 ModalImportBox.defaultProps = {

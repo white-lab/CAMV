@@ -211,6 +211,10 @@ class ModalFragmentBox extends React.Component {
 }
 
 ModalFragmentBox.propTypes = {
+  peak: PropTypes.object,
+  fragmentMatches: PropTypes.array,
+  showModal: PropTypes.bool.isRequired,
+
   updateCallback: PropTypes.func,
   newLabelCallback: PropTypes.func,
   noneCallback: PropTypes.func,
@@ -218,6 +222,9 @@ ModalFragmentBox.propTypes = {
 }
 
 ModalFragmentBox.defaultProps = {
+  peak: null,
+  fragmentMatches: [],
+
   updateCallback: null,
   newLabelCallback: null,
   noneCallback: null,

@@ -33,12 +33,13 @@ class ModalBYBox extends React.Component {
               <div id="modalBIons">
                 {
                   this.props.bIons.map(
-                    (peak, index) =>
-                    <p key={index}>
-                      <a onClick={this.onClick.bind(this, peak)}>
-                        {peak.name}
-                      </a>
-                    </p>
+                    (peak, index) => (
+                      <p key={index}>
+                        <a onClick={this.onClick.bind(this, peak)}>
+                          {peak.name}
+                        </a>
+                      </p>
+                    )
                   )
                 }
               </div>
@@ -50,12 +51,13 @@ class ModalBYBox extends React.Component {
               <div id="modalYIons">
                 {
                   this.props.yIons.map(
-                    (peak, index) =>
-                    <p key={index}>
-                      <a onClick={this.onClick.bind(this, peak)}>
-                        {peak.name}
-                      </a>
-                    </p>
+                    (peak, index) => (
+                      <p key={index}>
+                        <a onClick={this.onClick.bind(this, peak)}>
+                          {peak.name}
+                        </a>
+                      </p>
+                    )
                   )
                 }
               </div>
@@ -75,10 +77,13 @@ class ModalBYBox extends React.Component {
 }
 
 ModalBYBox.propTypes = {
-  clickCallback: PropTypes.func,
-  closeCallback: PropTypes.func,
+  showModal: PropTypes.bool.isRequired,
+
   bIons: PropTypes.array,
   yIons: PropTypes.array,
+
+  clickCallback: PropTypes.func,
+  closeCallback: PropTypes.func,
 }
 
 ModalBYBox.defaultProps = {

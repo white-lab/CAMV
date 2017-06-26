@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom'
 
 import ViewBox from './ui/ViewBox'
 
-var app = (<ViewBox/>)
+var app = (<ViewBox />)
 
 if (process.env.NODE_ENV === 'development') {
   const { AppContainer } = require('react-hot-loader')

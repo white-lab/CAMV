@@ -188,53 +188,60 @@ class ViewBox extends React.Component {
     if (this.state.selectedPTM == null) { return }
 
     /* Reset peak assignments */
-    this.state.scanData = this.state.scanData.map(
-      (peak) => { return {mz: peak.mz, into: peak.into, peak_id: peak.peak_id} }
-    )
-
-    return this.wrapSQLAll(
-      "SELECT fragments.fragment_id, fragments.peak_id, \
-      fragments.display_name, fragments.mz, \
-      fragments.ion_type, fragments.ion_pos, \
-      scan_ptms.scan_id, scan_ptms.ptm_id \
-      \
-      FROM fragments inner JOIN scan_ptms \
-      ON fragments.scan_ptm_id=scan_ptms.scan_ptm_id \
-      \
-      WHERE scan_ptms.scan_id=? AND scan_ptms.ptm_id=? AND fragments.best=1",
-      [
-        this.state.selectedScan,
-        this.state.selectedPTM,
-      ],
-      (resolve, reject, rows) => {
-        let data = this.state.scanData.slice()
-
-        rows.forEach((row) => {
-          if (
-            row.scan_id != this.state.selectedScan ||
-            row.ptm_id != this.state.selectedPTM
-          ) {
-            reject({errno: sqlite3.INTERRUPT})
-            return
+    return new Promise((resolve) => {
+      this.setState({
+        scanData: this.state.scanData.map(
+          (peak) => {
+            return {mz: peak.mz, into: peak.into, peak_id: peak.peak_id}
           }
+        ),
+      }, resolve)
+    }).then(() => {
+      /* Update peak assignments for the new PTM */
+      return this.wrapSQLAll(
+        "SELECT fragments.fragment_id, fragments.peak_id, \
+        fragments.display_name, fragments.mz, \
+        fragments.ion_type, fragments.ion_pos, \
+        scan_ptms.scan_id, scan_ptms.ptm_id \
+        \
+        FROM fragments inner JOIN scan_ptms \
+        ON fragments.scan_ptm_id=scan_ptms.scan_ptm_id \
+        \
+        WHERE scan_ptms.scan_id=? AND scan_ptms.ptm_id=? AND fragments.best=1",
+        [
+          this.state.selectedScan,
+          this.state.selectedPTM,
+        ],
+        (resolve, reject, rows) => {
+          let data = this.state.scanData.slice()
 
-          let peak = data[row.peak_id]
-          if (peak == null) { return }
+          rows.forEach((row) => {
+            if (
+              row.scan_id != this.state.selectedScan ||
+              row.ptm_id != this.state.selectedPTM
+            ) {
+              reject({errno: sqlite3.INTERRUPT})
+              return
+            }
 
-          peak.fragId = row.fragment_id
-          peak.name = row.display_name
-          peak.exp_mz = row.mz
-          peak.ionType = row.ion_type
-          peak.ionPos = row.ion_pos
-          peak.ppm = 1e6 * Math.abs(peak.mz - row.mz) / row.mz
-        })
+            let peak = data[row.peak_id]
+            if (peak == null) { return }
 
-        this.setState({
-          scanData: data,
-          ptmSet: true,
-        }, resolve)
-      },
-    )
+            peak.fragId = row.fragment_id
+            peak.name = row.display_name
+            peak.exp_mz = row.mz
+            peak.ionType = row.ion_type
+            peak.ionPos = row.ion_pos
+            peak.ppm = 1e6 * Math.abs(peak.mz - row.mz) / row.mz
+          })
+
+          this.setState({
+            scanData: data,
+            ptmSet: true,
+          }, resolve)
+        },
+      )
+    })
   }
 
   updateAll(nodes) {
@@ -1375,13 +1382,15 @@ class ViewBox extends React.Component {
                   pointChosenCallback={this.selectedQuantMz.bind(this)}
                 />
               </div>
-              <div id="exportSave">
+              <div
+                id="exportSave"
+                style={{display: this.state.exporting ? 'none' : null}}
+              >
                 {
                   this.state.scan != null && this.state.scan.truncated != 0 &&
                   <Button
                     id="openProcessScan"
                     onClick={this.openProcessScan.bind(this)}
-                    style={{display: this.state.exporting ? 'none' : null}}
                   >
                     Process
                   </Button>
@@ -1389,14 +1398,12 @@ class ViewBox extends React.Component {
                 <Button
                   id="openImport"
                   onClick={this.openImport.bind(this)}
-                  style={{display: this.state.exporting ? 'none' : null}}
                 >
                   Open
                 </Button>
                 <Button
                   id="openExport"
                   onClick={this.openExport.bind(this)}
-                  style={{display: this.state.exporting ? 'none' : null}}
                   disabled={!this.state.loaded}
                 >
                   Export

@@ -309,7 +309,6 @@ class modalProcessScanBox extends React.Component {
 }
 
 modalProcessScanBox.propTypes = {
-  importCallback: PropTypes.func,
   closeCallback: PropTypes.func,
 
   showModal: PropTypes.bool.isRequired,
@@ -319,7 +318,6 @@ modalProcessScanBox.propTypes = {
 }
 
 modalProcessScanBox.defaultProps = {
-  importCallback: null,
   closeCallback: null,
 
   scan: null,
