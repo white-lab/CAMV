@@ -105,9 +105,11 @@ class SequenceBox extends React.Component {
             <tbody>
               {
                 rows.map(
-                  (row, i) => {
-                    return <tr key={i}>{row}</tr>
-                  }
+                  (row, i) => (
+                    <tr key={i}>
+                      {row}
+                    </tr>
+                  )
                 )
               }
             </tbody>
