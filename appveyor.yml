@@ -12,7 +12,9 @@ install:
     - "node --version"
     - "npm --version"
     - "yarn --version"
+    - "npm cache clean"
     - "npm install"
+    - "npm install -g lodash"
     # - "yarn"
     # - yarn run electron-version
     # - npm install -g node-gyp node-pre-gyp
