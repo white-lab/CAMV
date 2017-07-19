@@ -50,11 +50,13 @@
   },
   "files": [
     ".babelrc",
-    "PyCamverter.exe"
+    "PyCamverter.exe",
+    "src/",
+    "node_modules/"
   ],
   "devEngines": {
     "node": ">=8.x",
-    "yarn": ">=0.27"
+    "npm": ">=5.x"
   },
   "author": {
     "name": "Nader Morshed",
