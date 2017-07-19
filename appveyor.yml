@@ -19,6 +19,7 @@ install:
 #     - yarn test
 
 build_script:
+    - $env:DEBUG='electron-forge:*'
     - yarn run make
     - "ls -lh out/make/"
 
