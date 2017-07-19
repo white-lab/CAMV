@@ -10,10 +10,8 @@ environment:
 install:
     - ps: Install-Product node $env:nodejs_version $env:platform
     - "node --version"
-    - "npm upgrade --global yarn"
     - "yarn --version"
     - "yarn"
-    - "yarn install"
     - ps: $pycamverter_version = git ls-remote --tags git://github.com/white-lab/pycamverter.git | cut -f 2 | cut -d / -f 3 | cut -d ^ -f 1 | tail -n1
     - ps: Start-FileDownload https://github.com/white-lab/pycamverter/releases/download/${pycamverter_version}/PyCAMVerter.exe
 
@@ -21,7 +19,6 @@ install:
 #     - yarn test
 
 build_script:
-    - ls node_modules/
     - yarn run make
     - "ls -lh out/make/"
 

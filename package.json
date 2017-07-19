@@ -48,11 +48,8 @@
     "make": "electron-forge make"
   },
   "files": [
-    "package.json",
-    "node_modules/",
     ".babelrc",
-    "PyCamverter.exe",
-    "src/"
+    "PyCamverter.exe"
   ],
   "devEngines": {
     "node": ">=8.x",
