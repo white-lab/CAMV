@@ -13,7 +13,7 @@ install:
     - "npm --version"
     - "yarn --version"
     - "npm install"
-    - "npm install -g lodash"
+    - "ls node_modules/"
     # - "yarn"
     # - yarn run electron-version
     # - npm install -g node-gyp node-pre-gyp
