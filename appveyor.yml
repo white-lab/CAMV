@@ -6,6 +6,7 @@ environment:
     matrix:
         - nodejs_version: "8"
           platform: x64
+          node_installer: yarn
 
 install:
     - ps: Install-Product node $env:nodejs_version $env:platform
