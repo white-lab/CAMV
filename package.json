@@ -42,6 +42,7 @@
     "start": "electron-forge start",
     "start-dev": "cross-env NODE_ENV=development electron-forge start",
     "package": "electron-forge package",
+    "electron-version": "electron-forge --version",
     "make-win": "electron-forge make --targets=win32",
     "make-linux": "electron-forge make --targets=linux",
     "make-osx": "electron-forge make --targets=darwin",
