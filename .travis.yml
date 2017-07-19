@@ -1,6 +1,9 @@
 language: node_js
 sudo: false
-cache: yarn
+cache:
+  yarn: true
+  directories:
+    - node_modules
 
 addons:
   apt:
@@ -36,10 +39,12 @@ before_install:
     fi;
 
 install:
-  - travis_wait 30 yarn
+  # - travis_wait 30 yarn
+  - travis_wait 30 npm install
 
 script:
-  - travis_wait 30 yarn run make
+  # - travis_wait 30 yarn run make
+  - travis_wait 30 npm run make
   - ls -lh out/make/
 
 deploy:
