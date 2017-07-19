@@ -12,7 +12,7 @@ install:
     - "node --version"
     - "npm --version"
     - "yarn --version"
-    - "npm install"
+    - "yarn"
     - "ls node_modules/"
     # - "yarn"
     # - yarn run electron-version
@@ -25,7 +25,7 @@ install:
 
 build_script:
     - ps: $env:DEBUG='electron-forge:*'
-    - npm run make
+    - yarn run make
     - "ls -lh out/make/"
 
 artifacts:
