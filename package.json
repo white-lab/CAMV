@@ -52,7 +52,8 @@
     ".babelrc",
     "PyCamverter.exe",
     "src/",
-    "node_modules/"
+    "node_modules/",
+    "package.json"
   ],
   "devEngines": {
     "node": ">=8.x",
