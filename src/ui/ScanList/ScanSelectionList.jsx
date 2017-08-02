@@ -644,7 +644,7 @@ class ScanSelectionList extends React.Component {
             row => {
               let name = Array.from(
                 new Set(row.protein_set_name.split(' / '))
-              ).sort()
+              ).sort().join(" / ")
 
               return {
                 name: name,
