@@ -44,7 +44,7 @@ before_install:
 
 install:
   # - travis_wait 30 yarn
-  - travis_wait 30 npm install
+  - travis_wait 30 npm install --no-shrinkwrap
 
 script:
   # - travis_wait 30 yarn run make
