@@ -17,10 +17,10 @@ function createWindow() {
 
   mainWindow.loadURL('file://' + __dirname + '/index.html')
 
-  if (process.env.NODE_ENV === 'development') {
+  // if (process.env.NODE_ENV === 'development') {
     mainWindow.webContents.openDevTools()
-  } else {
-    mainWindow.setMenu(null)
+  // } else {
+  //   mainWindow.setMenu(null)
   }
 
   mainWindow.on('closed', function() {
