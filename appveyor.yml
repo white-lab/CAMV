@@ -14,6 +14,7 @@ install:
     - "npm i -g yarn"
     - "npm --version"
     - "yarn --version"
+    - "npm cache clean -f"
     - "npm install"
     # - "yarn"
     # - "yarn run electron-version"

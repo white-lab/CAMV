@@ -6917,7 +6917,6 @@
       "version": "1.0.2",
       "dev": true
     },
-    "path-key": {},
     "path-parse": {
       "version": "1.0.5"
     },
