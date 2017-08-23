@@ -9,9 +9,9 @@ addons:
   apt:
     sources:
       - ubuntu-toolchain-r-test
-      - llvm-toolchain-precise-3.5
+      - llvm-toolchain-precise-3.8
     packages:
-      - clang-3.5
+      - clang-3.8
 
 matrix:
   include:
@@ -21,8 +21,8 @@ matrix:
       env:
       addons:
          apt:
-            sources: [ 'ubuntu-toolchain-r-test','llvm-toolchain-precise-3.5', 'gcc-multilib', 'g++-multilib', 'libsqlite3-dev' ]
-            packages: [ 'clang-3.5' ]
+            sources: [ 'ubuntu-toolchain-r-test','llvm-toolchain-precise-3.8', 'gcc-multilib', 'g++-multilib', 'libsqlite3-dev' ]
+            packages: [ 'clang-3.8' ]
     - os: osx
       node_js: '8'
 
@@ -37,8 +37,6 @@ before_install:
     elif [[ $(uname -s) == 'Darwin' ]] ; then
       export DEPLOY_FILE=out/make/CAMV-darwin-x64-${CAMV_VERSION}.zip;
     fi;
-
-before_install:
   - "npm i -g npm@^5.4.0"
   - "npm i -g yarn"
   - "npm --version"
