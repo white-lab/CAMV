@@ -7303,7 +7303,7 @@
       }
     },
     "rc-tree": {
-      "version": "1.7.1",
+      "version": "1.7.2",
       "requires": {
         "babel-runtime": "6.26.0",
         "classnames": "2.2.5",
