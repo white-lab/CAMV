@@ -21,7 +21,7 @@ function createWindow() {
     mainWindow.webContents.openDevTools()
   // } else {
   //   mainWindow.setMenu(null)
-  }
+  // }
 
   mainWindow.on('closed', function() {
     mainWindow = null
