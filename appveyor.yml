@@ -14,9 +14,9 @@ install:
     - "npm i -g yarn"
     - "npm --version"
     - "yarn --version"
-    - "npm install"
-    # - "yarn"
-    # - "yarn run electron-version"
+    # - "npm install"
+    - "yarn"
+    - "yarn run electron-version"
     - ps: $pycamverter_version = git ls-remote --tags git://github.com/white-lab/pycamverter.git | cut -f 2 | cut -d / -f 3 | cut -d ^ -f 1 | tail -n1
     - ps: Start-FileDownload https://github.com/white-lab/pycamverter/releases/download/${pycamverter_version}/PyCAMVerter.exe
 
@@ -25,8 +25,8 @@ install:
 
 build_script:
     - ps: $env:DEBUG='electron-forge:*'
-    - "npm run make"
-    # - "yarn run make"
+    # - "npm run make"
+    - "yarn run make"
     - "ls -lh out/make/"
 
 artifacts:
