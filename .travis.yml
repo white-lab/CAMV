@@ -38,6 +38,9 @@ before_install:
       export DEPLOY_FILE=out/make/CAMV-darwin-x64-${CAMV_VERSION}.zip;
     fi;
 
+before_install:
+  - "npm i -g npm@^5.4.0"
+
 install:
   # - travis_wait 30 yarn
   - travis_wait 30 npm install
