@@ -38,7 +38,7 @@ before_install:
       export DEPLOY_FILE=out/make/CAMV-darwin-x64-${CAMV_VERSION}.zip;
     fi;
   - "npm i -g npm@^5.4.0"
-  - "npm i -g yarn@0.24.6"
+  - "npm i -g yarn"
   - "npm --version"
   - "yarn --version"
 
