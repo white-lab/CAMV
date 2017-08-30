@@ -7390,14 +7390,13 @@
       }
     },
     "rc-tree": {
-      "version": "1.7.3",
       "requires": {
-        "babel-runtime": "6.26.0",
         "classnames": "2.2.5",
+        "deep-is": "0.1.3",
+        "object-assign": "4.1.1",
         "prop-types": "15.5.10",
         "rc-animate": "2.4.1",
-        "rc-util": "4.0.4",
-        "warning": "3.0.0"
+        "rc-util": "4.0.4"
       }
     },
     "rc-util": {
