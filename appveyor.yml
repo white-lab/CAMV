@@ -10,12 +10,12 @@ environment:
 install:
     - ps: Install-Product node $env:nodejs_version $env:platform
     - "node --version"
-    - "npm i -g npm@^5.4.0"
+    - "npm i -g npm@5.0.3"
     - "npm i -g yarn"
     - "npm --version"
     - "yarn --version"
-    # - "npm install --no-shrinkwrap"
-    - "yarn"
+    - "npm install"
+    # - "yarn"
     # - "npm install sqlite3 --build-from-source"
     - "yarn run electron-version"
     - ps: $pycamverter_version = git ls-remote --tags git://github.com/white-lab/pycamverter.git | cut -f 2 | cut -d / -f 3 | cut -d ^ -f 1 | tail -n1
@@ -26,8 +26,8 @@ install:
 
 build_script:
     # - ps: $env:DEBUG='electron-forge:*'
-    # - "npm run make"
-    - "yarn run make"
+    - "npm run make"
+    # - "yarn run make"
     - "ls -lh out/make/"
 
 artifacts:

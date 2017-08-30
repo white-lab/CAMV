@@ -15,7 +15,7 @@
     "electron-compilers": "^5.9.0",
     "jquery": "^3.2.1",
     "prop-types": "^15.5.10",
-    "rc-tree": "^1.7.2",
+    "rc-tree": "^1.7.3",
     "react": "15.6.1",
     "react-bootstrap": "^0.31.2",
     "react-dom": "15.6.1",
@@ -27,7 +27,7 @@
   "devDependencies": {
     "babel-eslint": "^7.2.3",
     "cross-env": "^5.0.5",
-    "electron-forge": "^3.2.0",
+    "electron-forge": "^4.0.0",
     "electron-prebuilt-compile": "1.7.6",
     "eslint": "^4.5.0",
     "eslint-formatter-pretty": "^1.1.0",
