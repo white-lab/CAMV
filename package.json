@@ -59,11 +59,7 @@
     "node": ">=8.x",
     "npm": ">=5.x"
   },
-  "author": {
-    "name": "Nader Morshed",
-    "email": "morshed@mit.edu",
-    "url": "https://github.com/naderm"
-  },
+  "author": "Nader Morshed <morshed@mit.edu> (https://github.com/naderm)",
   "license": "MIT",
   "repository": "https://github.com/white-lab/CAMV",
   "description": "Tool for validation proteomic mass spectrometry peptide assignments.",
