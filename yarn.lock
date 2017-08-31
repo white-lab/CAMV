@@ -4753,9 +4753,9 @@ rc-animate@2.x:
     css-animation "^1.3.2"
     prop-types "15.x"
 
-"rc-tree@github:naderm/tree":
+"rc-tree@github:naderm/tree#precompiled":
   version "1.4.8"
-  resolved "https://codeload.github.com/naderm/tree/tar.gz/41939a5ff7b4485b13890560a00d01d4749b2290"
+  resolved "https://codeload.github.com/naderm/tree/tar.gz/53751e2b6edb3acb600812e6b2c9ff931239b09c"
   dependencies:
     classnames "2.x"
     deep-is "^0.1.3"
