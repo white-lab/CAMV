@@ -28,7 +28,7 @@
     "babel-eslint": "^7.2.3",
     "cross-env": "^5.0.5",
     "electron-forge": "^4.0.0",
-    "electron-prebuilt-compile": "1.7.6",
+    "electron-prebuilt-compile": "1.7.7",
     "eslint": "^4.5.0",
     "eslint-formatter-pretty": "^1.1.0",
     "eslint-plugin-import": "^2.7.0",
