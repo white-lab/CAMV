@@ -27,10 +27,10 @@
   "devDependencies": {
     "babel-eslint": "^7.2.3",
     "cross-env": "^5.0.5",
-    "electron-forge": "^4.0.0",
+    "electron-forge": "^4.0.1",
     "electron-prebuilt-compile": "1.7.7",
     "eslint": "^4.6.1",
-    "eslint-formatter-pretty": "^1.1.0",
+    "eslint-formatter-pretty": "^1.2.0",
     "eslint-plugin-import": "^2.7.0",
     "eslint-plugin-promise": "^3.5.0",
     "eslint-plugin-react": "^7.3.0",
