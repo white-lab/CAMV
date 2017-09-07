@@ -37,7 +37,7 @@ class ModalBYBox extends React.Component {
                       <p key={index}>
                         <a onClick={this.onClick.bind(this, peak)}>
                           {peak.name}
-                        </a>
+                        </a> - {peak.mz.toFixed(3)} ({peak.ppm.toFixed(1)} ppm)
                       </p>
                     )
                   )
@@ -55,7 +55,7 @@ class ModalBYBox extends React.Component {
                       <p key={index}>
                         <a onClick={this.onClick.bind(this, peak)}>
                           {peak.name}
-                        </a>
+                        </a> - {peak.mz.toFixed(3)} ({peak.ppm.toFixed(1)} ppm)
                       </p>
                     )
                   )
