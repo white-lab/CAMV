@@ -1,5 +1,11 @@
 # Change Log
 
+## 0.15.1 (2017-09-07)
+
+Bug fixes
+
+  - Use latest pycamverter version.
+
 ## 0.15.0 (2017-09-07)
 
 Features

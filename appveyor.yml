@@ -18,7 +18,8 @@ install:
     # - "yarn"
     # - "npm install sqlite3 --build-from-source"
     # - "yarn run electron-version"
-    - ps: $pycamverter_version = git ls-remote --tags git://github.com/white-lab/pycamverter.git | cut -f 2 | cut -d / -f 3 | cut -d ^ -f 1 | tail -n1
+    - ps: $pycamverter_version = git ls-remote --tags git://github.com/white-lab/pycamverter.git | cut -f 2 | cut -d / -f 3 | cut -d ^ -f 1 | sort --version-sort | tail -n1
+    - ps: "echo ${pycamverter_version}"
     - ps: Start-FileDownload https://github.com/white-lab/pycamverter/releases/download/${pycamverter_version}/PyCAMVerter.exe
 
 # test_script:
