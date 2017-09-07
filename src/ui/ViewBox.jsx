@@ -6,7 +6,7 @@ import fs from 'fs'
 import path from 'path'
 import sqlite3 from 'sqlite3'
 
-import remote, { dialog } from 'electron'
+import { remote, dialog } from 'electron'
 
 import ModalExportBox from './ModalBoxes/ModalExportBox'
 import ModalImportBox from './ModalBoxes/ModalImportBox'
@@ -99,6 +99,9 @@ class ViewBox extends React.Component {
     switch (desc) {
       case 'Control o':
         this.setState({modalImportOpen: !this.state.modalImportOpen})
+        break
+      case 'Control i':
+        remote.getCurrentWindow().webContents.toggleDevTools()
         break
     }
 
