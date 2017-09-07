@@ -189,10 +189,15 @@ class ViewBox extends React.Component {
 
     /* Update peak assignments for the new PTM */
     return this.wrapSQLAll(
-      "SELECT fragments.fragment_id, fragments.peak_id, \
-      fragments.display_name, fragments.mz, \
-      fragments.ion_type, fragments.ion_pos, \
-      scan_ptms.scan_id, scan_ptms.ptm_id \
+      "SELECT \
+      fragments.fragment_id, \
+      fragments.peak_id, \
+      fragments.display_name, \
+      fragments.mz, \
+      fragments.ion_type, \
+      fragments.ion_pos, \
+      scan_ptms.scan_id, \
+      scan_ptms.ptm_id \
       \
       FROM fragments inner JOIN scan_ptms \
       ON fragments.scan_ptm_id=scan_ptms.scan_ptm_id \
@@ -514,14 +519,16 @@ class ViewBox extends React.Component {
               name, \
               display_name, \
               mz, \
+              intensity, \
               best \
-            ) VALUES (?, ?, ?, ?, ?, ?)",
+            ) VALUES (?, ?, ?, ?, ?, ?, ?)",
             [
               row.scan_ptm_id,
               peak.peak_id,
               label,
               label,
               peak.mz,
+              peak.into,
               1,
             ],
             (resolve_b, reject_b) => {
