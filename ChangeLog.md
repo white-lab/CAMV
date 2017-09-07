@@ -1,5 +1,12 @@
 # Change Log
 
+## 0.15.0 (2017-09-07)
+
+Features
+
+  - Export quantitation data.
+  - Add b/y masses and ppms to modal view.
+
 ## 0.14.4 (2017-08-22)
 
 Features
