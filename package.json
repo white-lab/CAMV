@@ -17,7 +17,7 @@
     "prop-types": "^15.5.10",
     "rc-tree": "github:naderm/tree#precompiled",
     "react": "15.6.1",
-    "react-bootstrap": "^0.31.2",
+    "react-bootstrap": "^0.31.3",
     "react-dom": "15.6.1",
     "react-hotkey": "^0.7.0",
     "react-native-fs": "^2.5.1",

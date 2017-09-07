@@ -63,7 +63,7 @@ class MassSpectrum {
     this.scaler = d3.zoom()
       .translateExtent([
         [this.x(this.options.xmin), this.y(this.options.ymin)],
-        [this.x(this.options.xmax), this.y(this.options.ymax)],
+        [this.x(this.options.xmax) + 100, this.y(this.options.ymax)],
       ])
       .scaleExtent([1, 100000])
       .on("zoom", this.zoomed())
@@ -240,8 +240,8 @@ class MassSpectrum {
 
       if (newx.domain()[1] > this.options.xmax) {
         newx = newx.domain([
-          newx.domain()[0] + newx.domain()[1] - this.options.xmax,
-          newx.domain()[1],
+          newx.domain()[0],
+          this.options.xmax,
         ])
       }
 
