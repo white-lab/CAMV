@@ -22,7 +22,7 @@ install:
     - ps: "echo ${pycamverter_version}"
     # - ps: $pycamverter_version = "v0.10.0"
     # - ps: "echo ${pycamverter_version}"
-    - ps: Start-FileDownload https://github.com/white-lab/pycamverter/releases/download/${pycamverter_version}/PyCAMVerter.exe
+    - ps: Start-FileDownload https://github.com/white-lab/pycamverter/releases/download/v${pycamverter_version}/PyCAMVerter.exe
 
 # test_script:
 #     - yarn test
