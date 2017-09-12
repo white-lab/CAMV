@@ -25,7 +25,7 @@
     "terminate": "^2.1.0"
   },
   "devDependencies": {
-    "babel-eslint": "^7.2.3",
+    "babel-eslint": "^8.0.0",
     "cross-env": "^5.0.5",
     "electron-forge": "^4.0.2",
     "electron-prebuilt-compile": "1.7.7",
