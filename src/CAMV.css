@@ -178,23 +178,23 @@ input:disabled {
   background-color: LightGray;
 }
 
-li[class=accept] > a {
+li[class=accept] > span {
   color: #5CB85C;
 }
 
-li[class=maybe] > a {
+li[class=maybe] > span {
   color: #FFA500;
 }
 
-li[class=reject] > a {
+li[class=reject] > span {
   color: red;
 }
 
-li[class=truncated] > a {
+li[class=truncated] > span {
   color: orange;
 }
 
-li[class=undecided] > a {
+li[class=undecided] > span {
   color: black;
 }
 
