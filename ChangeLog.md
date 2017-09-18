@@ -1,5 +1,11 @@
 # Change Log
 
+## 0.15.2 (2017-09-18)
+
+Features
+
+  - Updated several dependencies to their latest version.
+
 ## 0.15.1 (2017-09-07)
 
 Bug fixes
