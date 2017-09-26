@@ -20,14 +20,14 @@
     "react-bootstrap": "^0.31.3",
     "react-dom": "15.6.2",
     "react-hotkey": "^0.7.0",
-    "react-native-fs": "^2.5.1",
+    "react-native-fs": "^2.5.2",
     "sqlite3": "^3.1.12",
     "terminate": "^2.1.0"
   },
   "devDependencies": {
     "babel-eslint": "^8.0.0",
     "cross-env": "^5.0.5",
-    "electron-forge": "^4.0.2",
+    "electron-forge": "^4.1.0",
     "electron-prebuilt-compile": "1.7.8",
     "eslint": "^4.7.2",
     "eslint-formatter-pretty": "^1.2.0",
