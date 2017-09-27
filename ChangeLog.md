@@ -1,5 +1,11 @@
 # Change Log
 
+## 0.15.3 (2017-09-27)
+
+Bug fixes
+
+  - Fixed building CAMV on linux and OS X.
+
 ## 0.15.2 (2017-09-18)
 
 Features
