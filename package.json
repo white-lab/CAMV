@@ -21,7 +21,7 @@
     "react-dom": "15.6.2",
     "react-hotkey": "^0.7.0",
     "react-native-fs": "^2.5.2",
-    "sqlite3": "^3.1.12",
+    "sqlite3": "3.1.10",
     "terminate": "^2.1.0"
   },
   "devDependencies": {
