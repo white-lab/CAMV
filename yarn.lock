@@ -387,9 +387,9 @@ babel-core@^6.13.2, babel-core@^6.26.0:
     slash "^1.0.0"
     source-map "^0.5.6"
 
-babel-eslint@^8.0.0:
-  version "8.0.0"
-  resolved "https://registry.yarnpkg.com/babel-eslint/-/babel-eslint-8.0.0.tgz#ce06f385bdfb5b6d7e603f06222f891abd14c240"
+babel-eslint@^8.0.1:
+  version "8.0.1"
+  resolved "https://registry.yarnpkg.com/babel-eslint/-/babel-eslint-8.0.1.tgz#5d718be7a328625d006022eb293ed3008cbd6346"
   dependencies:
     babel-code-frame "7.0.0-beta.0"
     babel-traverse "7.0.0-beta.0"
@@ -1481,8 +1481,8 @@ crc32-stream@~0.3.1:
     readable-stream "~1.0.24"
 
 create-react-class@^15.6.0:
-  version "15.6.0"
-  resolved "https://registry.yarnpkg.com/create-react-class/-/create-react-class-15.6.0.tgz#ab448497c26566e1e29413e883207d57cfe7bed4"
+  version "15.6.2"
+  resolved "https://registry.yarnpkg.com/create-react-class/-/create-react-class-15.6.2.tgz#cf1ed15f12aad7f14ef5f2dfe05e6c42f91ef02a"
   dependencies:
     fbjs "^0.8.9"
     loose-envify "^1.3.1"
@@ -2172,9 +2172,9 @@ electron-forge-template-vue@^1.0.2:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/electron-forge-template-vue/-/electron-forge-template-vue-1.0.2.tgz#c935f5aa96a2798c6ea9b834465e3212e4f71d33"
 
-electron-forge@^4.1.0:
-  version "4.1.0"
-  resolved "https://registry.yarnpkg.com/electron-forge/-/electron-forge-4.1.0.tgz#5853c3dc6c9e42393dda89da758fecbf4dd8a50a"
+electron-forge@^4.1.1:
+  version "4.1.1"
+  resolved "https://registry.yarnpkg.com/electron-forge/-/electron-forge-4.1.1.tgz#98569b7ed35bb67bcaf635763cc0b359c2230e42"
   dependencies:
     aws-sdk "^2.9.0"
     babel-register "^6.16.3"
@@ -4890,9 +4890,9 @@ rc-animate@2.x:
     css-animation "^1.3.2"
     prop-types "15.x"
 
-rc-tree@^1.7.4:
-  version "1.7.4"
-  resolved "https://registry.yarnpkg.com/rc-tree/-/rc-tree-1.7.4.tgz#030cff0081b01aec8766c2cfe0a640c390ce6349"
+rc-tree@^1.7.7:
+  version "1.7.7"
+  resolved "https://registry.yarnpkg.com/rc-tree/-/rc-tree-1.7.7.tgz#834a9ffc2a13fb9d8d9f1c52b839d41738db82a5"
   dependencies:
     babel-runtime "^6.23.0"
     classnames "2.x"
