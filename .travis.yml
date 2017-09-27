@@ -37,7 +37,7 @@ before_install:
     elif [[ $(uname -s) == 'Darwin' ]] ; then
       export DEPLOY_FILE=out/make/CAMV-darwin-x64-${CAMV_VERSION}.zip;
     fi;
-  - "npm i -g npm@5.0.3"
+  - "npm i -g npm@5.4.2"
   - "npm i -g yarn"
   - "npm --version"
   - "yarn --version"
