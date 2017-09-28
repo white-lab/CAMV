@@ -14,12 +14,42 @@ class ScanSelectionList extends React.Component {
     }
   }
 
-  componentDidUpdate(prevProps, prevState) {
+  componentWillUpdate(nextProps, nextState) {
+    this.notReRender = nextState.tree == this.state.tree
+  }
+
+  async componentDidUpdate(prevProps, prevState) {
     if (
       prevProps.db != this.props.db &&
       this.props.db != null
     ) {
       this.buildNodeTree()
+    }
+
+    if (!cmp(prevProps.selectedNode, this.props.selectedNode)) {
+      if (!cmp(prevProps.selectedNode, this.state.selectedNode)) {
+        let tree = this.refs["tree"]
+
+        if (tree != null) {
+          // Add nodes to tree
+          let indices = await this.getIndices(this.props.selectedNode)
+
+          // Select and expand nodes
+          let key = this.props.selectedNode.map(i => i.join(",")).join("-")
+
+          tree.setState({
+            expandedKeys: this.toExpandKeys(this.props.selectedNode),
+            selectedKeys: [key],
+          })
+
+          // Scroll into view
+          this.findTreeDOMNode(indices).scrollIntoView()
+        }
+      }
+
+      this.setState({
+        selectedNode: this.props.selectedNode,
+      })
     }
   }
 
@@ -34,40 +64,6 @@ class ScanSelectionList extends React.Component {
     }
 
     return treeNode
-  }
-
-  async componentWillUpdate(nextProps, nextState) {
-    if (
-      nextState.tree == this.state.tree
-    ) {
-      this.notReRender = true
-    } else {
-      this.notReRender = false
-    }
-
-    if (!cmp(nextProps.selectedNode, this.props.selectedNode)) {
-      if (!cmp(nextProps.selectedNode, this.state.selectedNode)) {
-        let tree = this.refs["tree"]
-
-        if (tree != null) {
-          // Add nodes to tree
-          let indices = await this.getIndices(nextProps.selectedNode)
-
-          // Select and expand nodes
-          let key = nextProps.selectedNode.map(i => i.join(",")).join("-")
-
-          tree.setState({
-            expandedKeys: this.toExpandKeys(nextProps.selectedNode),
-            selectedKeys: [key],
-          })
-
-          // Scroll into view
-          this.findTreeDOMNode(indices).scrollIntoView()
-        }
-      }
-
-      this.setState({selectedNode: nextProps.selectedNode})
-    }
   }
 
   toExpandKeys(nodes) {
