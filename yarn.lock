@@ -2172,9 +2172,9 @@ electron-forge-template-vue@^1.0.2:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/electron-forge-template-vue/-/electron-forge-template-vue-1.0.2.tgz#c935f5aa96a2798c6ea9b834465e3212e4f71d33"
 
-electron-forge@^4.1.1:
-  version "4.1.1"
-  resolved "https://registry.yarnpkg.com/electron-forge/-/electron-forge-4.1.1.tgz#98569b7ed35bb67bcaf635763cc0b359c2230e42"
+electron-forge@^4.1.2:
+  version "4.1.2"
+  resolved "https://registry.yarnpkg.com/electron-forge/-/electron-forge-4.1.2.tgz#05777d99b1b0d9995505d523868bd62c043a820b"
   dependencies:
     aws-sdk "^2.9.0"
     babel-register "^6.16.3"
@@ -4176,7 +4176,7 @@ node-gyp@^3.4.0, node-gyp@^3.6.0:
     tar "^2.0.0"
     which "1"
 
-node-pre-gyp@~0.6.37:
+node-pre-gyp@~0.6.38:
   version "0.6.38"
   resolved "https://registry.yarnpkg.com/node-pre-gyp/-/node-pre-gyp-0.6.38.tgz#e92a20f83416415bb4086f6d1fb78b3da73d113d"
   dependencies:
@@ -5519,12 +5519,12 @@ sprintf-js@~1.0.2:
   version "1.0.3"
   resolved "https://registry.yarnpkg.com/sprintf-js/-/sprintf-js-1.0.3.tgz#04e6926f662895354f3dd015203633b857297e2c"
 
-sqlite3@3.1.10:
-  version "3.1.10"
-  resolved "https://registry.yarnpkg.com/sqlite3/-/sqlite3-3.1.10.tgz#b1f10dfc5d487b079fda2f34fbf60cbaf6d92ad3"
+sqlite3@^3.1.13:
+  version "3.1.13"
+  resolved "https://registry.yarnpkg.com/sqlite3/-/sqlite3-3.1.13.tgz#d990a05627392768de6278bafd1a31fdfe907dd9"
   dependencies:
     nan "~2.7.0"
-    node-pre-gyp "~0.6.37"
+    node-pre-gyp "~0.6.38"
 
 sshpk@^1.7.0:
   version "1.13.1"

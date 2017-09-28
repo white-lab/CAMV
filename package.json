@@ -21,13 +21,13 @@
     "react-dom": "15.6.2",
     "react-hotkey": "^0.7.0",
     "react-native-fs": "^2.5.2",
-    "sqlite3": "3.1.10",
+    "sqlite3": "^3.1.13",
     "terminate": "^2.1.0"
   },
   "devDependencies": {
     "babel-eslint": "^8.0.1",
     "cross-env": "^5.0.5",
-    "electron-forge": "^4.1.1",
+    "electron-forge": "^4.1.2",
     "electron-prebuilt-compile": "1.7.8",
     "eslint": "^4.7.2",
     "eslint-formatter-pretty": "^1.2.0",
