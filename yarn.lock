@@ -4176,7 +4176,7 @@ node-gyp@^3.4.0, node-gyp@^3.6.0:
     tar "^2.0.0"
     which "1"
 
-node-pre-gyp@~0.6.38:
+node-pre-gyp@~0.6.37:
   version "0.6.38"
   resolved "https://registry.yarnpkg.com/node-pre-gyp/-/node-pre-gyp-0.6.38.tgz#e92a20f83416415bb4086f6d1fb78b3da73d113d"
   dependencies:
@@ -5519,12 +5519,12 @@ sprintf-js@~1.0.2:
   version "1.0.3"
   resolved "https://registry.yarnpkg.com/sprintf-js/-/sprintf-js-1.0.3.tgz#04e6926f662895354f3dd015203633b857297e2c"
 
-sqlite3@^3.1.12:
-  version "3.1.12"
-  resolved "https://registry.yarnpkg.com/sqlite3/-/sqlite3-3.1.12.tgz#2b3a14b17162e39e8aa6e1e2487a41d0795396d8"
+sqlite3@3.1.10:
+  version "3.1.10"
+  resolved "https://registry.yarnpkg.com/sqlite3/-/sqlite3-3.1.10.tgz#b1f10dfc5d487b079fda2f34fbf60cbaf6d92ad3"
   dependencies:
     nan "~2.7.0"
-    node-pre-gyp "~0.6.38"
+    node-pre-gyp "~0.6.37"
 
 sshpk@^1.7.0:
   version "1.13.1"

@@ -10,7 +10,7 @@ environment:
 install:
     - ps: Install-Product node $env:nodejs_version $env:platform
     - "node --version"
-    - "npm i -g npm@5.0.3"
+    - "npm i -g npm@5.2.0"
     - "npm i -g yarn"
     - "npm --version"
     - "yarn --version"
