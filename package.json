@@ -9,7 +9,7 @@
     "babel-preset-es2017-node7": "^0.5.2",
     "babel-preset-react": "^6.24.1",
     "bootstrap": "3.3.7",
-    "d3": "^4.10.2",
+    "d3": "^4.11.0",
     "dom-to-image": "github:naderm/dom-to-image",
     "electron-compile": "^6.4.2",
     "electron-compilers": "^5.9.0",
