@@ -1492,9 +1492,9 @@ create-react-class@^15.6.0:
     loose-envify "^1.3.1"
     object-assign "^4.1.1"
 
-cross-env@^5.1.0:
-  version "5.1.0"
-  resolved "https://registry.yarnpkg.com/cross-env/-/cross-env-5.1.0.tgz#1f12d6b3777d5847dcf9cf39fbee3c6a76dd5058"
+cross-env@^5.1.1:
+  version "5.1.1"
+  resolved "https://registry.yarnpkg.com/cross-env/-/cross-env-5.1.1.tgz#b6d8ab97f304c0f71dae7277b75fe424c08dfa74"
   dependencies:
     cross-spawn "^5.1.0"
     is-windows "^1.0.0"
@@ -2011,7 +2011,7 @@ doctrine@^2.0.0:
     esutils "^2.0.2"
     isarray "^1.0.0"
 
-dom-helpers@^3.2.0:
+dom-helpers@^3.2.0, dom-helpers@^3.2.1:
   version "3.2.1"
   resolved "https://registry.yarnpkg.com/dom-helpers/-/dom-helpers-3.2.1.tgz#3203e07fed217bd1f424b019735582fc37b2825a"
 
@@ -2498,9 +2498,9 @@ eslint-module-utils@^2.1.1:
     debug "^2.6.8"
     pkg-dir "^1.0.0"
 
-eslint-plugin-import@^2.7.0:
-  version "2.7.0"
-  resolved "https://registry.yarnpkg.com/eslint-plugin-import/-/eslint-plugin-import-2.7.0.tgz#21de33380b9efb55f5ef6d2e210ec0e07e7fa69f"
+eslint-plugin-import@^2.8.0:
+  version "2.8.0"
+  resolved "https://registry.yarnpkg.com/eslint-plugin-import/-/eslint-plugin-import-2.8.0.tgz#fa1b6ef31fcb3c501c09859c1b86f1fc5b986894"
   dependencies:
     builtin-modules "^1.1.1"
     contains-path "^0.1.0"
@@ -2533,9 +2533,9 @@ eslint-scope@^3.7.1:
     esrecurse "^4.1.0"
     estraverse "^4.1.1"
 
-eslint@^4.9.0:
-  version "4.9.0"
-  resolved "https://registry.yarnpkg.com/eslint/-/eslint-4.9.0.tgz#76879d274068261b191fe0f2f56c74c2f4208e8b"
+eslint@^4.10.0:
+  version "4.10.0"
+  resolved "https://registry.yarnpkg.com/eslint/-/eslint-4.10.0.tgz#f25d0d7955c81968c2309aa5c9a229e045176bb7"
   dependencies:
     ajv "^5.2.0"
     babel-code-frame "^6.22.0"
@@ -4937,9 +4937,9 @@ rcedit@^0.9.0:
   version "0.9.0"
   resolved "https://registry.yarnpkg.com/rcedit/-/rcedit-0.9.0.tgz#3910df57345399e2b0325f4a519007f89e55ef1c"
 
-react-bootstrap@^0.31.3:
-  version "0.31.3"
-  resolved "https://registry.yarnpkg.com/react-bootstrap/-/react-bootstrap-0.31.3.tgz#db2b7d45b00b5dac1ab8b6de3dd97feb3091b849"
+react-bootstrap@^0.31.5:
+  version "0.31.5"
+  resolved "https://registry.yarnpkg.com/react-bootstrap/-/react-bootstrap-0.31.5.tgz#57040fa8b1274e1e074803c21a1b895fdabea05a"
   dependencies:
     babel-runtime "^6.11.6"
     classnames "^2.2.5"
@@ -4948,8 +4948,7 @@ react-bootstrap@^0.31.3:
     keycode "^2.1.2"
     prop-types "^15.5.10"
     prop-types-extra "^1.0.1"
-    react-overlays "^0.7.0"
-    react-prop-types "^0.4.0"
+    react-overlays "^0.7.4"
     uncontrollable "^4.1.0"
     warning "^3.0.0"
 
@@ -4989,20 +4988,14 @@ react-native-fs@^2.8.1:
     base-64 "^0.1.0"
     utf8 "^2.1.1"
 
-react-overlays@^0.7.0:
-  version "0.7.0"
-  resolved "https://registry.yarnpkg.com/react-overlays/-/react-overlays-0.7.0.tgz#531898ff566c7e5c7226ead2863b8cf9fbb5a981"
+react-overlays@^0.7.4:
+  version "0.7.4"
+  resolved "https://registry.yarnpkg.com/react-overlays/-/react-overlays-0.7.4.tgz#ef2ec652c3444ab8aa014262b18f662068e56d5c"
   dependencies:
     classnames "^2.2.5"
-    dom-helpers "^3.2.0"
-    prop-types "^15.5.8"
-    react-prop-types "^0.4.0"
-    warning "^3.0.0"
-
-react-prop-types@^0.4.0:
-  version "0.4.0"
-  resolved "https://registry.yarnpkg.com/react-prop-types/-/react-prop-types-0.4.0.tgz#f99b0bfb4006929c9af2051e7c1414a5c75b93d0"
-  dependencies:
+    dom-helpers "^3.2.1"
+    prop-types "^15.5.10"
+    prop-types-extra "^1.0.1"
     warning "^3.0.0"
 
 react-proxy@^3.0.0-alpha.0:
