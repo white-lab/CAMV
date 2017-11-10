@@ -1,5 +1,11 @@
 # Change Log
 
+## 0.16.0 (2017-11-10)
+
+Features
+
+  - Added more information to exported output tables.
+
 ## 0.15.3 (2017-09-27)
 
 Bug fixes

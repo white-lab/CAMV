@@ -1,6 +1,6 @@
 {
   "name": "camv",
-  "version": "0.15.3",
+  "version": "0.16.0",
   "main": "src/main.js",
   "productName": "CAMV",
   "dependencies": {

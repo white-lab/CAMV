@@ -104,18 +104,20 @@ exports.exportCSV = async function(vb, path) {
       let rel_pos = row.name.split("")
         .map((i, ind) => [i, ind + 1])
         .filter(i => i[0] == i[0].toLowerCase())
+        .filter(i => i[0] != "k" && i[0] != "c")
         .map(i => (i[0] == "m" ? "ox" : "p") + i[0].toUpperCase() + i[1])
         .join(", ")
 
       let abs_pos = row.name.split("")
         .map((i, ind) => [i, ind + 1])
         .filter(i => i[0] == i[0].toLowerCase())
+        .filter(i => i[0] != "k" && i[0] != "c")
         .map(
           i =>
           row.protein_set_offsets.map(
             j => (i[0] == "m" ? "ox" : "p") +
             i[0].toUpperCase() +
-            j + i[1]
+            (j + i[1])
           ).join(" / ")
         ).join(", ")
 
@@ -127,8 +129,8 @@ exports.exportCSV = async function(vb, path) {
           row.protein_set_uniprot,
           row.name,
           new_name,
-          rel_pos,
-          abs_pos,
+          `"${rel_pos.replace("\"", "\"\"")}"`,
+          `"${abs_pos.replace("\"", "\"\"")}"`,
           row.mod_desc,
           row.mascot_score,
           row.choice,
