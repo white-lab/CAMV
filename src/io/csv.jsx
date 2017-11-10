@@ -11,7 +11,11 @@ exports.exportCSV = async function(vb, path) {
     "Scan",
     "Protein",
     "Accession",
+    "Uniprot Accession",
     "Sequence",
+    "Sequence (Mods)",
+    "Relative Positions",
+    "Absolute Positions",
     "Modifications",
     "Score",
     "Status",
@@ -90,12 +94,41 @@ exports.exportCSV = async function(vb, path) {
         }
       )
 
+      let new_name = row.name.replace("y", "[pY]") \
+        .replace("t", "[pT]")
+        .replace("s", "[pS]")
+        .replace("m", "[oxM]")
+        .replace("k", "K")
+        .replace("c", "C")
+
+        let rel_pos = row.name.split("") \
+          .map((i, ind) => [i, ind + 1]) \
+          .filter(i => i[0] == i[0].toLowerCase()) \
+          .map(i => (i[0] == "m" ? "ox" : "p") + i[0].toUpperCase() + i[1])
+          .join(", ")
+
+        let abs_pos = row.name.split("") \
+          .map((i, ind) => [i, ind + 1]) \
+          .filter(i => i[0] == i[0].toLowerCase()) \
+          .map(
+            i =>
+            row.peptide_offsets.map(
+              j => (i[0] == "m" ? "ox" : "p") +
+              i[0].toUpperCase() +
+              j + i[1]
+            ).join(" / ")
+          ).join(", ")
+
       stream.write(
         [
           row.scan_num,
           `"${row.protein_set_name.replace("\"", "\"\"")}"`,
           row.protein_set_accession,
+          row.protein_set_uniprot,
           row.name,
+          new_name,
+          rel_pos,
+          abs_pos,
           row.mod_desc,
           row.mascot_score,
           row.choice,
