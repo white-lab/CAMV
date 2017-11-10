@@ -95,11 +95,11 @@ exports.exportCSV = async function(vb, path) {
       )
 
       let new_name = row.name.replace("y", "[pY]")
-        .replace("t", "[pT]")
-        .replace("s", "[pS]")
-        .replace("m", "[oxM]")
-        .replace("k", "K")
-        .replace("c", "C")
+        .replace(/t/g, "[pT]")
+        .replace(/s/g, "[pS]")
+        .replace(/m/g, "[oxM]")
+        .replace(/k/g, "K")
+        .replace(/c/g, "C")
 
       let rel_pos = row.name.split("")
         .map((i, ind) => [i, ind + 1])
@@ -124,13 +124,13 @@ exports.exportCSV = async function(vb, path) {
       stream.write(
         [
           row.scan_num,
-          `"${row.protein_set_name.replace("\"", "\"\"")}"`,
+          `"${row.protein_set_name.replace(/\"/g, "\"\"")}"`,
           row.protein_set_accession,
           row.protein_set_uniprot,
           row.name,
           new_name,
-          `"${rel_pos.replace("\"", "\"\"")}"`,
-          `"${abs_pos.replace("\"", "\"\"")}"`,
+          `"${rel_pos.replace(/\"/g, "\"\"")}"`,
+          `"${abs_pos.replace(/\"/g, "\"\"")}"`,
           row.mod_desc,
           row.mascot_score,
           row.choice,
