@@ -94,7 +94,7 @@ exports.exportCSV = async function(vb, path) {
         }
       )
 
-      let new_name = row.name.replace("y", "[pY]") \
+      let new_name = row.name.replace("y", "[pY]")
         .replace("t", "[pT]")
         .replace("s", "[pS]")
         .replace("m", "[oxM]")
