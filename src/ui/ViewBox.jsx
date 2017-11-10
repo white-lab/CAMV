@@ -661,7 +661,7 @@ class ViewBox extends React.Component {
             [row.ptm_id],
           ]
 
-          row.protein_set_offsets = row.protein_set_offsets.split(";") \
+          row.protein_set_offsets = row.protein_set_offsets.split(";")
             .map(i => parseInt(i))
 
           await new Promise(resolve => cb(nodes, row, resolve))
