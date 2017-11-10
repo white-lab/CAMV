@@ -615,8 +615,8 @@ class ViewBox extends React.Component {
       `SELECT \
       protein_sets.protein_set_id, protein_sets.protein_set_name, \
       protein_sets.protein_set_accession, protein_sets.protein_set_uniprot, \
-      protein_sets.peptide_offsets, \
       peptides.peptide_id, peptides.peptide_seq, \
+      peptides.protein_set_offsets, \
       mod_states.mod_state_id, mod_states.mod_desc, \
       scans.scan_id, scans.scan_num, \
       scan_ptms.ptm_id, scan_ptms.choice, scan_ptms.mascot_score, \
@@ -661,7 +661,7 @@ class ViewBox extends React.Component {
             [row.ptm_id],
           ]
 
-          row.peptide_offsets = row.peptide_offsets.split(";") \
+          row.protein_set_offsets = row.protein_set_offsets.split(";") \
             .map(i => parseInt(i))
 
           await new Promise(resolve => cb(nodes, row, resolve))
