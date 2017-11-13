@@ -14,7 +14,7 @@ install:
     - "npm i -g yarn"
     - "npm --version"
     - "yarn --version"
-    - "npm install"
+    - "npm install --force"
     # - "yarn"
     # - "npm install sqlite3 --build-from-source"
     # - "yarn run electron-version"
