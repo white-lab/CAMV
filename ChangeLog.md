@@ -1,5 +1,11 @@
 # Change Log
 
+## 0.16.1 (2017-11-13)
+
+Features
+
+  - Block interface during CSV export.
+
 ## 0.16.0 (2017-11-10)
 
 Features

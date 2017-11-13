@@ -1,8 +1,13 @@
+import fs from 'fs'
+import path from 'path'
+
 import React from 'react'
 import PropTypes from 'prop-types'
 import { Modal, Checkbox, Button } from 'react-bootstrap'
 
 import { remote } from 'electron'
+
+import { exportCSV } from '../../io/csv.jsx'
 
 class ModalExportBox extends React.Component {
   constructor(props) {
@@ -14,6 +19,8 @@ class ModalExportBox extends React.Component {
       exportMaybeSpectra: false,
       exportRejectSpectra: false,
       exportTables: true,
+
+      processing: false,
     }
   }
 
@@ -31,7 +38,7 @@ class ModalExportBox extends React.Component {
 
         component.setState({
           dirChosen: true,
-          exportDirectory: dirName[0]
+          exportDirectory: dirName[0],
         })
       }
     )
@@ -42,16 +49,46 @@ class ModalExportBox extends React.Component {
   }
 
   export() {
-    this.props.exportCallback(
-      this.state.exportDirectory,
-      [
-        this.state.exportAcceptSpectra,
-        this.state.exportMaybeSpectra,
-        this.state.exportRejectSpectra
-      ],
-      this.state.exportTables
-    );
-    this.close();
+    this.setState(
+      {
+        processing: true,
+      },
+      () => {
+        fs.mkdir(
+          this.state.exportDirectory,
+          async function() {
+            if (this.state.exportTables) {
+              await exportCSV(
+                this.props.viewbox,
+                path.join(
+                  this.state.exportDirectory,
+                  this.props.viewbox.state.basename + ".csv",
+                )
+              )
+            }
+
+            this.setState(
+              {
+                processing: false,
+              },
+              () => {
+                this.props.exportCallback(
+                  this.state.exportDirectory,
+                  [
+                    this.state.exportAcceptSpectra,
+                    this.state.exportMaybeSpectra,
+                    this.state.exportRejectSpectra
+                  ],
+                  this.state.exportTables,
+                );
+
+                this.close();
+              }
+            )
+          }.bind(this)
+        )
+      }
+    )
   }
 
   render() {
@@ -125,13 +162,14 @@ class ModalExportBox extends React.Component {
         </Modal.Body>
         <Modal.Footer>
           <Button
-            disabled={!this.state.dirChosen}
+            disabled={!this.state.dirChosen || this.state.processing}
             onClick={this.export.bind(this)}
           >
             Export
           </Button>
           <Button
             onClick={this.close.bind(this)}
+            disabled={this.state.processing}
           >
             Cancel
           </Button>
@@ -145,6 +183,7 @@ ModalExportBox.propTypes = {
   exportCallback: PropTypes.func.isRequired,
   closeCallback: PropTypes.func.isRequired,
   showModal: PropTypes.bool.isRequired,
+  viewbox: PropTypes.object.isRequired,
 }
 
 module.exports = ModalExportBox

@@ -36,7 +36,7 @@ exports.spectraToImage = async function(vb, dirName, export_spectras) {
 
   let current_node = vb.getSelectedNode()
 
-  vb.iterate_spectra(
+  await vb.iterate_spectra(
     export_spectras,
     async function(nodes, row, resolve) {
       let name = Array.from(
@@ -68,17 +68,16 @@ exports.spectraToImage = async function(vb, dirName, export_spectras) {
         }
       )
     },
-    () => {
-      vb.setState({exporting: false})
-      win.setResizable(true)
-
-      if (maximized) {
-        win.maximize()
-      } else {
-        win.setSize(sizes.width, sizes.height)
-      }
-
-      vb.updateAll(current_node)
-    },
   )
+
+  vb.setState({exporting: false})
+  win.setResizable(true)
+
+  if (maximized) {
+    win.maximize()
+  } else {
+    win.setSize(sizes.width, sizes.height)
+  }
+
+  vb.updateAll(current_node)
 }

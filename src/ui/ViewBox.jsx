@@ -594,7 +594,7 @@ class ViewBox extends React.Component {
     })
   }
 
-  async iterate_spectra(export_spectras, cb, cb_done) {
+  async iterate_spectra(export_spectras, cb) {
     while (export_spectras.length < 4) {
       export_spectras.push(false)
     }
@@ -611,65 +611,68 @@ class ViewBox extends React.Component {
     if (export_spectras[1]) { params.push("maybe") }
     if (export_spectras[2]) { params.push("reject") }
 
-    this.state.db.all(
-      `SELECT \
-      protein_sets.protein_set_id, protein_sets.protein_set_name, \
-      protein_sets.protein_set_accession, protein_sets.protein_set_uniprot, \
-      peptides.peptide_id, peptides.peptide_seq, \
-      peptides.protein_set_offsets, \
-      mod_states.mod_state_id, mod_states.mod_desc, \
-      scans.scan_id, scans.scan_num, \
-      scan_ptms.ptm_id, scan_ptms.choice, scan_ptms.mascot_score, \
-      ptms.name \
-      \
-      FROM scan_ptms \
-      \
-      INNER JOIN scans \
-      ON scan_ptms.scan_id=scans.scan_id \
-      \
-      JOIN ptms \
-      ON scan_ptms.ptm_id=ptms.ptm_id \
-      \
-      JOIN mod_states \
-      ON ptms.mod_state_id=mod_states.mod_state_id \
-      \
-      JOIN peptides \
-      ON mod_states.peptide_id=peptides.peptide_id \
-      \
-      INNER JOIN protein_sets \
-      ON protein_sets.protein_set_id=peptides.protein_set_id \
-      \
-      WHERE \
-      scan_ptms.choice IN (${params.map(i => '?').join(', ')}) \
-      ${export_spectras[3] ? 'OR scan_ptms.choice IS NULL': ''} \
-      \
-      ORDER BY \
-      protein_sets.protein_set_name, peptides.peptide_seq, \
-      mod_states.mod_desc, ptms.name`,
-      params,
-      async function(err, rows) {
-        if (err != null || rows == null) {
-          console.error(err)
-          return
-        }
+    return new Promise(
+      (final_resolve, final_reject) => {
+        this.state.db.all(
+          `SELECT \
+          protein_sets.protein_set_id, protein_sets.protein_set_name, \
+          protein_sets.protein_set_accession, protein_sets.protein_set_uniprot, \
+          peptides.peptide_id, peptides.peptide_seq, \
+          peptides.protein_set_offsets, \
+          mod_states.mod_state_id, mod_states.mod_desc, \
+          scans.scan_id, scans.scan_num, \
+          scan_ptms.ptm_id, scan_ptms.choice, scan_ptms.mascot_score, \
+          ptms.name \
+          \
+          FROM scan_ptms \
+          \
+          INNER JOIN scans \
+          ON scan_ptms.scan_id=scans.scan_id \
+          \
+          JOIN ptms \
+          ON scan_ptms.ptm_id=ptms.ptm_id \
+          \
+          JOIN mod_states \
+          ON ptms.mod_state_id=mod_states.mod_state_id \
+          \
+          JOIN peptides \
+          ON mod_states.peptide_id=peptides.peptide_id \
+          \
+          INNER JOIN protein_sets \
+          ON protein_sets.protein_set_id=peptides.protein_set_id \
+          \
+          WHERE \
+          scan_ptms.choice IN (${params.map(i => '?').join(', ')}) \
+          ${export_spectras[3] ? 'OR scan_ptms.choice IS NULL': ''} \
+          \
+          ORDER BY \
+          protein_sets.protein_set_name, peptides.peptide_seq, \
+          mod_states.mod_desc, ptms.name`,
+          params,
+          async function(err, rows) {
+            if (err != null || rows == null) {
+              console.error(err)
+              final_reject()
+              return
+            }
 
-        for (let row of rows) {
-          let nodes = [
-            [row.protein_set_id],
-            [row.peptide_id, row.mod_state_id],
-            [row.scan_id],
-            [row.ptm_id],
-          ]
+            for (let row of rows) {
+              let nodes = [
+                [row.protein_set_id],
+                [row.peptide_id, row.mod_state_id],
+                [row.scan_id],
+                [row.ptm_id],
+              ]
 
-          row.protein_set_offsets = row.protein_set_offsets.split(";")
-            .map(i => parseInt(i))
+              row.protein_set_offsets = row.protein_set_offsets.split(";")
+                .map(i => parseInt(i))
 
-          await new Promise(resolve => cb(nodes, row, resolve))
-        }
+              await new Promise(resolve => cb(nodes, row, resolve))
+            }
 
-        if (cb_done != null) {
-          cb_done()
-        }
+            final_resolve()
+          },
+        )
       },
     )
   }
@@ -679,25 +682,11 @@ class ViewBox extends React.Component {
       modalExportOpen: false,
     })
 
-    if (exportTables || export_spectras.some(i => i)) {
-      fs.mkdir(
-        dirName,
-        () => {
-          if (exportTables) {
-            exportCSV(
-              this,
-              path.join(dirName, this.state.basename + ".csv")
-            )
-          }
-
-          if (!export_spectras.some(i => i)) {
-            return
-          }
-
-          spectraToImage(this, dirName, export_spectras)
-        }
-      )
+    if (!export_spectras.some(i => i)) {
+      return
     }
+
+    spectraToImage(this, dirName, export_spectras)
   }
 
   async getBase(node) {
@@ -1235,6 +1224,7 @@ class ViewBox extends React.Component {
           showModal={this.state.modalExportOpen}
           closeCallback={this.closeExportModal.bind(this)}
           exportCallback={this.runExport.bind(this)}
+          viewbox={this}
         />
         <ModalSearchBox
           ref="modalSearchBox"
