@@ -5,6 +5,10 @@
   display: flex;
 }
 
+div[tabindex="-1"]:focus {
+    outline: 0;
+}
+
 .importModal {
   height: 60vh;
   width: 75vw;

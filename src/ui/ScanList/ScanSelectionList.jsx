@@ -594,9 +594,7 @@ class ScanSelectionList extends React.Component {
     }
 
     await this.getIndices(key)
-    // this.findTreeNode(
-    //   key.slice(0, -depth).map(i => i.join(",")).join("-")
-    // ).forceUpdate()
+    this.refs["tree"].forceUpdate()
   }
 
   buildNodeTree() {
