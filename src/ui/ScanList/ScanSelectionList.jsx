@@ -43,7 +43,7 @@ class ScanSelectionList extends React.Component {
           })
 
           // Scroll into view
-          this.findTreeDOMNode(indices).scrollIntoView()
+          this.findTreeDOMNode(indices).scrollIntoViewIfNeeded()
         }
       }
 
