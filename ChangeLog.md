@@ -1,5 +1,13 @@
 # Change Log
 
+## 0.16.2 (2017-11-20)
+
+Features
+
+  - Updated React to latest version (16).
+  - Fixed search auto focus.
+  - Use a new library for handling hotkeys.
+
 ## 0.16.1 (2017-11-13)
 
 Features
