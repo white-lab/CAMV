@@ -325,50 +325,23 @@ class ScanSelectionList extends React.Component {
     return nodes
   }
 
-  async handleHotkey(e) {
-    let desc = []
-
-    for (let mod of ["Shift", "Meta", "Alt", "Control"]) {
-      if (e.getModifierState(mod)) {
-        desc.push(mod)
-      }
-    }
-
-    desc.push(e.key)
-    desc = desc.join(" ")
-
+  async handleSelect(desc) {
     let indices = await this.getIndices(this.state.selectedNode)
 
     if (indices.length < 1) {
       indices = [0]
     }
 
-    switch (desc) {
-      case 'ArrowLeft':
-        indices = await this.selectLeft(indices)
-        break
-      case 'ArrowRight':
-        indices = await this.selectRight(indices)
-        break
-      case 'k':
-      case 'ArrowUp':
-        indices = await this.selectUp(indices)
-        break
-      case 'j':
-      case 'ArrowDown':
-        indices = await this.selectDown(indices)
-        break
-      case 'n':
-        indices = await this.selectNext(indices)
-        break
-      case 'm':
-      case 'p':
-        indices = await this.selectPrevious(indices)
-        break
-      default:
-        return
+    let mapping = {
+      'left': this.selectLeft.bind(this),
+      'right': this.selectRight.bind(this),
+      'up': this.selectUp.bind(this),
+      'down': this.selectDown.bind(this),
+      'next': this.selectNext.bind(this),
+      'previous': this.selectPrevious.bind(this),
     }
 
+    indices = await mapping[desc](indices)
     let node = await this.getNode(indices)
     this.selectNode(node)
   }

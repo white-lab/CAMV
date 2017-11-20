@@ -15,11 +15,11 @@
     "electron-compilers": "^5.9.0",
     "jquery": "^3.2.1",
     "prop-types": "^15.6.0",
-    "rc-tree": "^1.7.8",
-    "react": "15.6.2",
+    "rc-tree": "^1.7.9",
+    "react": "16.1.1",
     "react-bootstrap": "^0.31.5",
-    "react-dom": "15.6.2",
-    "react-hotkey": "^0.7.0",
+    "react-dom": "16.1.0",
+    "react-hotkeys": "^0.10.0",
     "react-native-fs": "^2.8.5",
     "sqlite3": "^3.1.13",
     "terminate": "^2.1.0"
@@ -33,8 +33,8 @@
     "eslint-formatter-pretty": "^1.2.0",
     "eslint-plugin-import": "^2.8.0",
     "eslint-plugin-promise": "^3.6.0",
-    "eslint-plugin-react": "^7.4.0",
-    "react-hot-loader": "^3.1.2"
+    "eslint-plugin-react": "^7.5.1",
+    "react-hot-loader": "^3.1.3"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",

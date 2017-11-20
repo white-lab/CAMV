@@ -16,7 +16,7 @@ addons:
 matrix:
   include:
     - os: linux
-      node_js: '8'
+      node_js: '9'
       compiler: clang
       env:
       addons:
@@ -24,7 +24,7 @@ matrix:
             sources: [ 'ubuntu-toolchain-r-test','llvm-toolchain-precise-3.8', 'gcc-multilib', 'g++-multilib', 'libsqlite3-dev' ]
             packages: [ 'clang-3.8' ]
     - os: osx
-      node_js: '8'
+      node_js: '9'
 
 before_install:
   - export CAMV_VERSION=$(node -e "console.log(require('./package.json').version);")

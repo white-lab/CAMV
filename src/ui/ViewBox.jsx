@@ -1,5 +1,6 @@
 import React from 'react'
-import hotkey from 'react-hotkey'
+import { findDOMNode } from 'react-dom'
+import { HotKeys } from 'react-hotkeys'
 import { Button } from 'react-bootstrap'
 
 import fs from 'fs'
@@ -29,7 +30,25 @@ import { exportCSV } from '../io/csv.jsx'
 import { spectraToImage } from '../io/spectra.jsx'
 
 
-hotkey.activate()
+const autofocus = el => el && findDOMNode(el).focus();
+
+const map = {
+  'Open': 'ctrl+o',
+  'Find': 'ctrl+f',
+  'DevTools': 'ctrl+i',
+  'Export': 'ctrl+e',
+  "Accept": "a",
+  "Maybe": "s",
+  "Reject": "d",
+  "runSearch": "enter",
+  "selectLeft": 'left',
+  "selectRight": 'right',
+  "selectUp": ['up', 'k'],
+  "selectDown": ['down', 'j'],
+  "selectNext": ['n'],
+  "selectPrevious": ['m', 'p'],
+}
+
 
 
 class ViewBox extends React.Component {
@@ -74,64 +93,84 @@ class ViewBox extends React.Component {
       db: null,
       basename: null,
     }
-  }
 
-  componentDidMount() {
-    hotkey.addHandler(this.handleHotkey.bind(this))
-  }
-
-  componentWillUnmount() {
-    hotkey.removeHandler(this.handleHotkey.bind(this))
-  }
-
-  handleHotkey(e) {
-    let desc = []
-
-    for (let mod of ["Shift", "Meta", "Alt", "Control"]) {
-      if (e.getModifierState(mod)) {
-        desc.push(mod)
-      }
+    this.handlers = {
+      "Find": this.toggleFinder.bind(this),
+      "Open": this.toggleOpener.bind(this),
+      "DevTools": this.toggleDevTools.bind(this),
+      "Export": this.toggleExport.bind(this),
+      "Accept": this.runAccept.bind(this),
+      "Maybe": this.runMaybe.bind(this),
+      "Reject": this.runReject.bind(this),
+      "selectLeft": this.selectLeft.bind(this),
+      "selectRight": this.selectRight.bind(this),
+      "selectUp": this.selectUp.bind(this),
+      "selectDown": this.selectDown.bind(this),
+      "selectNext": this.selectNext.bind(this),
+      "selectPrevious": this.selectPrevious.bind(this),
     }
+  }
 
-    desc.push(e.key)
-    desc = desc.join(" ")
-
-    switch (desc) {
-      case 'Control o':
-        this.setState({modalImportOpen: !this.state.modalImportOpen})
-        break
-      case 'Control i':
-        remote.getCurrentWindow().webContents.toggleDevTools()
-        break
-    }
-
+  toggleFinder() {
     if (this.state.loaded) {
-      switch (desc) {
-        case 'Control f':
-          this.setState({modalSearchOpen: !this.state.modalSearchOpen})
-          break
-        case 'Control e':
-          this.setState({modalExportOpen: !this.state.modalExportOpen})
-          break
-      }
-
-      if (!this.anyModalOpen()) {
-        switch (desc) {
-          case 'a':
-            this.setChoice('accept')
-            break
-          case 's':
-            this.setChoice('maybe')
-            break
-          case 'd':
-            this.setChoice('reject')
-            break
-          default:
-            this.refs["scanSelectionList"].handleHotkey(e)
-            break
-        }
-      }
+      this.setState({modalSearchOpen: !this.state.modalSearchOpen})
     }
+  }
+
+  toggleOpener() {
+    this.setState({modalImportOpen: !this.state.modalImportOpen})
+  }
+
+  toggleDevTools() {
+    remote.getCurrentWindow().webContents.toggleDevTools()
+  }
+
+  toggleExport() {
+    if (this.state.loaded) {
+      this.setState({modalExportOpen: !this.state.modalExportOpen})
+    }
+  }
+
+  runAccept() {
+    if (this.state.loaded && !this.anyModalOpen()) {
+      this.setChoice('accept')
+    }
+  }
+
+  runMaybe() {
+    if (this.state.loaded && !this.anyModalOpen()) {
+      this.setChoice('maybe')
+    }
+  }
+
+  runReject() {
+    if (this.state.loaded && !this.anyModalOpen()) {
+      this.setChoice('reject')
+    }
+  }
+
+  selectLeft() {
+    this.refs["scanSelectionList"].handleSelect('left')
+  }
+
+  selectRight() {
+    this.refs["scanSelectionList"].handleSelect('right')
+  }
+
+  selectUp() {
+    this.refs["scanSelectionList"].handleSelect('up')
+  }
+
+  selectDown() {
+    this.refs["scanSelectionList"].handleSelect('down')
+  }
+
+  selectNext() {
+    this.refs["scanSelectionList"].handleSelect('next')
+  }
+
+  selectPrevious() {
+    this.refs["scanSelectionList"].handleSelect('previous')
   }
 
   anyModalOpen() {
@@ -1203,217 +1242,219 @@ class ViewBox extends React.Component {
 
   render() {
     return (
-      <div
-        className="panel panel-default"
-        id="viewBox"
-        style={{
-          margin: this.state.exporting ? '0px' : '10px',
-          height: this.state.exporting ? "calc(100% - 4px)" : "calc(100% - 30px)",
-          width: this.state.exporting ? "calc(100% - 4px)" : "calc(100% - 20px)",
-        }}
-      >
-        <ModalImportBox
-          ref="modalImportBox"
-          showModal={this.state.modalImportOpen}
-          importCallback={this.runImport.bind(this)}
-          closeCallback={this.closeImportModal.bind(this)}
-          database={this.state.db}
-        />
-        <ModalExportBox
-          ref="modalExportBox"
-          showModal={this.state.modalExportOpen}
-          closeCallback={this.closeExportModal.bind(this)}
-          exportCallback={this.runExport.bind(this)}
-          viewbox={this}
-        />
-        <ModalSearchBox
-          ref="modalSearchBox"
-          showModal={this.state.modalSearchOpen}
-          closeCallback={this.closeSearchModal.bind(this)}
-          searchCallback={this.runSearch.bind(this)}
-        />
-        <ModalFragmentBox
-          ref="modalFragmentBox"
-          showModal={this.state.modalFragmentSelectionOpen}
-          peak={this.state.selectedPeak}
-          fragmentMatches={this.state.fragmentMatches}
-          updateCallback={this.updateSelectedFragment.bind(this)}
-          newLabelCallback={this.newFragmentLabel.bind(this)}
-          noneCallback={this.unsetFragmentLabel.bind(this)}
-          closeCallback={this.closeFragmentSelectionModal.bind(this)}
-        />
-        <ModalBYBox
-          ref="modalBYBox"
-          showModal={this.state.modalBYOpen}
-          clickCallback={this.openBYModal.bind(this)}
-          closeCallback={this.closeBYModal.bind(this)}
-          bIons={this.state.bIons}
-          yIons={this.state.yIons}
-        />
-        <ModalProcessScanBox
-          ref="modalProcessScanBox"
-          showModal={this.state.modalProcessScan}
-          clickCallback={this.openProcessScan.bind(this)}
-          closeCallback={this.closeProcessScan.bind(this)}
-          scan={this.state.scan}
-          db={this.state.db}
-        />
+      <HotKeys keyMap={map} handlers={this.handlers} ref={autofocus}>
         <div
           className="panel panel-default"
-          id="scanSelectionList"
-          style={{display: this.state.exporting ? 'none' : null}}
+          id="viewBox"
+          style={{
+            margin: this.state.exporting ? '0px' : '10px',
+            height: this.state.exporting ? "calc(100% - 4px)" : "calc(100% - 30px)",
+            width: this.state.exporting ? "calc(100% - 4px)" : "calc(100% - 20px)",
+          }}
         >
-          <ScanSelectionList
-            ref="scanSelectionList"
-            db={this.state.db}
-
-            updateAllCallback={this.updateAll.bind(this)}
-
-            selectedNode={this.getSelectedNode()}
+          <ModalImportBox
+            ref="modalImportBox"
+            showModal={this.state.modalImportOpen}
+            importCallback={this.runImport.bind(this)}
+            closeCallback={this.closeImportModal.bind(this)}
+            database={this.state.db}
           />
-        </div>
-        <div
-          id="sequenceSpectraContainer"
-        >
+          <ModalExportBox
+            ref="modalExportBox"
+            showModal={this.state.modalExportOpen}
+            closeCallback={this.closeExportModal.bind(this)}
+            exportCallback={this.runExport.bind(this)}
+            viewbox={this}
+          />
+          <ModalSearchBox
+            ref="modalSearchBox"
+            showModal={this.state.modalSearchOpen}
+            closeCallback={this.closeSearchModal.bind(this)}
+            searchCallback={this.runSearch.bind(this)}
+          />
+          <ModalFragmentBox
+            ref="modalFragmentBox"
+            showModal={this.state.modalFragmentSelectionOpen}
+            peak={this.state.selectedPeak}
+            fragmentMatches={this.state.fragmentMatches}
+            updateCallback={this.updateSelectedFragment.bind(this)}
+            newLabelCallback={this.newFragmentLabel.bind(this)}
+            noneCallback={this.unsetFragmentLabel.bind(this)}
+            closeCallback={this.closeFragmentSelectionModal.bind(this)}
+          />
+          <ModalBYBox
+            ref="modalBYBox"
+            showModal={this.state.modalBYOpen}
+            clickCallback={this.openBYModal.bind(this)}
+            closeCallback={this.closeBYModal.bind(this)}
+            bIons={this.state.bIons}
+            yIons={this.state.yIons}
+          />
+          <ModalProcessScanBox
+            ref="modalProcessScanBox"
+            showModal={this.state.modalProcessScan}
+            clickCallback={this.openProcessScan.bind(this)}
+            closeCallback={this.closeProcessScan.bind(this)}
+            scan={this.state.scan}
+            db={this.state.db}
+          />
           <div
             className="panel panel-default"
-            id="sequenceBox"
+            id="scanSelectionList"
+            style={{display: this.state.exporting ? 'none' : null}}
           >
-            {
-              (this.state.scan != null && this.state.proteins != null) &&
-              <div
-                id="scanDataContainer"
-              >
-                <ScanDataBox
-                  proteins={this.state.proteins}
-                  scan={this.state.scan}
-                />
-              </div>
-            }
-            {
-              (this.state.scan != null && this.state.ptm != null) &&
-              <div
-                id="sequenceContainer"
-              >
-                <SequenceBox
-                  ptm={this.state.ptm}
-                  spectrumData={this.state.scanData}
-                  clickCallback={this.handleBYClick.bind(this)}
-                />
-              </div>
-            }
+            <ScanSelectionList
+              ref="scanSelectionList"
+              db={this.state.db}
+
+              updateAllCallback={this.updateAll.bind(this)}
+
+              selectedNode={this.getSelectedNode()}
+            />
           </div>
           <div
-            className="panel panel-default"
-            id="spectra"
+            id="sequenceSpectraContainer"
           >
             <div
-              id="spectrumUpdateBox"
+              className="panel panel-default"
+              id="sequenceBox"
             >
-              <div
-                id="fragmentSpectrumBox"
-                style={{height: this.state.exporting ? "100%" : "calc(100% - 40px)"}}
-              >
-                <SpectrumBox
-                  ref="fragmentSpectrum"
-                  spectrumData={this.state.scanData}
-                  collisionType={
-                    this.state.scan != null ?
-                    this.state.scan.collisionType : null
-                  }
-                  ptmSet={this.state.ptmSet}
-
-                  pointChosenCallback={this.updatePeak.bind(this)}
-                />
-              </div>
-              <div
-                id="updateBox"
-                style={{display: this.state.exporting ? 'none' : null}}
-              >
-                <ChoiceBox
-                  inputDisabled={this.state.ptm == null}
-                  updateChoice={this.setChoice.bind(this)}
-                />
-              </div>
+              {
+                (this.state.scan != null && this.state.proteins != null) &&
+                <div
+                  id="scanDataContainer"
+                >
+                  <ScanDataBox
+                    proteins={this.state.proteins}
+                    scan={this.state.scan}
+                  />
+                </div>
+              }
+              {
+                (this.state.scan != null && this.state.ptm != null) &&
+                <div
+                  id="sequenceContainer"
+                >
+                  <SequenceBox
+                    ptm={this.state.ptm}
+                    spectrumData={this.state.scanData}
+                    clickCallback={this.handleBYClick.bind(this)}
+                  />
+                </div>
+              }
             </div>
             <div
-              id="precursorQuantContainer"
+              className="panel panel-default"
+              id="spectra"
             >
               <div
-                id="precursorSpectrumBox"
-                style={{
-                  height: this.state.exporting ? "50%" : "calc(50% - 20px)",
-                }}
+                id="spectrumUpdateBox"
               >
-                <PrecursorSpectrumBox
-                  ref="precursorSpectrum"
-                  spectrumData={this.state.precursorData}
-                  precursorMz={
-                    this.state.scan != null ?
-                    this.state.scan.precursorMz : null
-                  }
-                  isolationWindow={
-                    this.state.scan != null ?
-                    this.state.scan.precursorIsolationWindow : null
-                  }
-                  c13Num={
-                    this.state.scan != null ?
-                    this.state.scan.c13Num : 0
-                  }
-                  chargeState={
-                    this.state.scan != null ?
-                    this.state.scan.chargeState : null
-                  }
-                  ppm={50}
+                <div
+                  id="fragmentSpectrumBox"
+                  style={{height: this.state.exporting ? "100%" : "calc(100% - 40px)"}}
+                >
+                  <SpectrumBox
+                    ref="fragmentSpectrum"
+                    spectrumData={this.state.scanData}
+                    collisionType={
+                      this.state.scan != null ?
+                      this.state.scan.collisionType : null
+                    }
+                    ptmSet={this.state.ptmSet}
 
-                  pointChosenCallback={this.selectedPrecursorMz.bind(this)}
-                />
+                    pointChosenCallback={this.updatePeak.bind(this)}
+                  />
+                </div>
+                <div
+                  id="updateBox"
+                  style={{display: this.state.exporting ? 'none' : null}}
+                >
+                  <ChoiceBox
+                    inputDisabled={this.state.ptm == null}
+                    updateChoice={this.setChoice.bind(this)}
+                  />
+                </div>
               </div>
               <div
-                id="quantSpectrumBox"
-                style={{
-                  height: this.state.exporting ? "50%" : "calc(50% - 20px)",
-                }}
+                id="precursorQuantContainer"
               >
-                <QuantSpectrumBox
-                  ref="quantSpectrum"
-                  spectrumData={this.state.quantData}
-                  ppm={50}
+                <div
+                  id="precursorSpectrumBox"
+                  style={{
+                    height: this.state.exporting ? "50%" : "calc(50% - 20px)",
+                  }}
+                >
+                  <PrecursorSpectrumBox
+                    ref="precursorSpectrum"
+                    spectrumData={this.state.precursorData}
+                    precursorMz={
+                      this.state.scan != null ?
+                      this.state.scan.precursorMz : null
+                    }
+                    isolationWindow={
+                      this.state.scan != null ?
+                      this.state.scan.precursorIsolationWindow : null
+                    }
+                    c13Num={
+                      this.state.scan != null ?
+                      this.state.scan.c13Num : 0
+                    }
+                    chargeState={
+                      this.state.scan != null ?
+                      this.state.scan.chargeState : null
+                    }
+                    ppm={50}
 
-                  pointChosenCallback={this.selectedQuantMz.bind(this)}
-                />
-              </div>
-              <div
-                id="exportSave"
-                style={{display: this.state.exporting ? 'none' : null}}
-              >
-                {
-                  this.state.scan != null && this.state.scan.truncated != 0 &&
+                    pointChosenCallback={this.selectedPrecursorMz.bind(this)}
+                  />
+                </div>
+                <div
+                  id="quantSpectrumBox"
+                  style={{
+                    height: this.state.exporting ? "50%" : "calc(50% - 20px)",
+                  }}
+                >
+                  <QuantSpectrumBox
+                    ref="quantSpectrum"
+                    spectrumData={this.state.quantData}
+                    ppm={50}
+
+                    pointChosenCallback={this.selectedQuantMz.bind(this)}
+                  />
+                </div>
+                <div
+                  id="exportSave"
+                  style={{display: this.state.exporting ? 'none' : null}}
+                >
+                  {
+                    this.state.scan != null && this.state.scan.truncated != 0 &&
+                    <Button
+                      id="openProcessScan"
+                      onClick={this.openProcessScan.bind(this)}
+                    >
+                      Process
+                    </Button>
+                  }
                   <Button
-                    id="openProcessScan"
-                    onClick={this.openProcessScan.bind(this)}
+                    id="openImport"
+                    onClick={this.openImport.bind(this)}
                   >
-                    Process
+                    Open
                   </Button>
-                }
-                <Button
-                  id="openImport"
-                  onClick={this.openImport.bind(this)}
-                >
-                  Open
-                </Button>
-                <Button
-                  id="openExport"
-                  onClick={this.openExport.bind(this)}
-                  disabled={!this.state.loaded}
-                >
-                  Export
-                </Button>
+                  <Button
+                    id="openExport"
+                    onClick={this.openExport.bind(this)}
+                    disabled={!this.state.loaded}
+                  >
+                    Export
+                  </Button>
+                </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
+      </HotKeys>
     )
   }
 }
