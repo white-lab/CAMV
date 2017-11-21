@@ -85,9 +85,9 @@
   version "7.0.42"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-7.0.42.tgz#051ff1cdbd1e1b7523ba425bc388147483344dbf"
 
-"@types/node@^7.0.18":
-  version "7.0.46"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-7.0.46.tgz#c3dedd25558c676b3d6303e51799abb9c3f8f314"
+"@types/node@^8.0.24":
+  version "8.0.53"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-8.0.53.tgz#396b35af826fa66aad472c8cb7b8d5e277f4e6d8"
 
 abab@^1.0.0:
   version "1.0.3"
@@ -2182,9 +2182,9 @@ electron-forge-template-vue@^1.0.2:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/electron-forge-template-vue/-/electron-forge-template-vue-1.0.2.tgz#c935f5aa96a2798c6ea9b834465e3212e4f71d33"
 
-electron-forge@^4.1.3:
-  version "4.1.3"
-  resolved "https://registry.yarnpkg.com/electron-forge/-/electron-forge-4.1.3.tgz#1cc7a16714cfac8aedabfe1390fcefb672bbf1b2"
+electron-forge@^4.1.4:
+  version "4.1.4"
+  resolved "https://registry.yarnpkg.com/electron-forge/-/electron-forge-4.1.4.tgz#278669cf8671ad796aa4d23b5fa85c73507ad37b"
   dependencies:
     aws-sdk "^2.9.0"
     babel-register "^6.16.3"
@@ -2315,15 +2315,15 @@ electron-packager@^9.1.0:
     sanitize-filename "^1.6.0"
     semver "^5.3.0"
 
-electron-prebuilt-compile@1.7.8:
-  version "1.7.8"
-  resolved "https://registry.yarnpkg.com/electron-prebuilt-compile/-/electron-prebuilt-compile-1.7.8.tgz#f3a1ac4c56e98d4706ed4c7fd8ff551b1be000b4"
+electron-prebuilt-compile@1.8.2-beta.2:
+  version "1.8.2-beta.2"
+  resolved "https://registry.yarnpkg.com/electron-prebuilt-compile/-/electron-prebuilt-compile-1.8.2-beta.2.tgz#27ddcb764d732f57347de552b70e599eae1b5220"
   dependencies:
     babel-plugin-array-includes "^2.0.3"
     babel-plugin-transform-async-to-generator "^6.8.0"
     babel-preset-es2016-node5 "^1.1.2"
     babel-preset-react "^6.11.1"
-    electron "1.7.8"
+    electron "1.8.2-beta.2"
     electron-compile "*"
     electron-compilers "*"
     yargs "^6.6.0"
@@ -2372,11 +2372,11 @@ electron-winstaller@^2.5.0:
     lodash.template "^4.2.2"
     temp "^0.8.3"
 
-electron@1.7.8:
-  version "1.7.8"
-  resolved "https://registry.yarnpkg.com/electron/-/electron-1.7.8.tgz#27b791a6895171a7d52991b99442cdbd10a3539d"
+electron@1.8.2-beta.2:
+  version "1.8.2-beta.2"
+  resolved "https://registry.yarnpkg.com/electron/-/electron-1.8.2-beta.2.tgz#b532c71050ddd2d4b00e2e0d355de4e75bc1e5fd"
   dependencies:
-    "@types/node" "^7.0.18"
+    "@types/node" "^8.0.24"
     electron-download "^3.0.1"
     extract-zip "^1.0.3"
 
@@ -4165,9 +4165,11 @@ nib@^1.1.2:
   dependencies:
     stylus "0.54.5"
 
-node-abi@^2.0.0:
-  version "2.1.0"
-  resolved "https://registry.yarnpkg.com/node-abi/-/node-abi-2.1.0.tgz#50ad834affcf17440e12bfc5f9ba0946f572d10c"
+node-abi@^2.0.0, node-abi@^2.1.2:
+  version "2.1.2"
+  resolved "https://registry.yarnpkg.com/node-abi/-/node-abi-2.1.2.tgz#4da6caceb6685fcd31e7dd1994ef6bb7d0a9c0b2"
+  dependencies:
+    semver "^5.4.1"
 
 node-fetch@^1.0.1, node-fetch@^1.6.3:
   version "1.7.2"
@@ -5361,7 +5363,7 @@ sax@1.2.1, sax@>=0.6.0, sax@^1.1.4, sax@~1.2.1:
   version "1.2.1"
   resolved "https://registry.yarnpkg.com/sax/-/sax-1.2.1.tgz#7b8e656190b228e81a66aea748480d828cd2d37a"
 
-"semver@2 || 3 || 4 || 5", semver@^5.3.0:
+"semver@2 || 3 || 4 || 5", semver@^5.3.0, semver@^5.4.1:
   version "5.4.1"
   resolved "https://registry.yarnpkg.com/semver/-/semver-5.4.1.tgz#e059c09d8571f0540823733433505d3a2f00b18e"
 
