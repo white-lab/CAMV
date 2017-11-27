@@ -1,5 +1,14 @@
 
-import * as d3 from "d3"
+// import * as d3 from "d3"
+var d3 = Object.assign(
+  {},
+  require("d3-axis"),
+  require("d3-format"),
+  require("d3-scale"),
+  require("d3-shape"),
+  require("d3-zoom"),
+  require("d3-selection"),
+)
 
 class MassSpectrum {
   constructor(elemid, data, options) {
@@ -229,7 +238,8 @@ class MassSpectrum {
 
   zoomed() {
     return () => {
-      let newx = d3.event.transform.rescaleX(this.x)
+      let event = require("d3-selection").event
+      let newx = event.transform.rescaleX(this.x)
 
       if (newx.domain()[0] < this.options.xmin) {
         newx = newx.domain([
