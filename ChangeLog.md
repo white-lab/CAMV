@@ -1,5 +1,12 @@
 # Change Log
 
+## 0.16.3 (2017-11-27)
+
+Bug fixes
+
+  - Updated insecure dependencies.
+  - Fixed scrolling bug.
+
 ## 0.16.2 (2017-11-20)
 
 Features
