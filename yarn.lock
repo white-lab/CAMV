@@ -2243,7 +2243,7 @@ electron-forge-template-vue@^1.0.2:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/electron-forge-template-vue/-/electron-forge-template-vue-1.0.2.tgz#c935f5aa96a2798c6ea9b834465e3212e4f71d33"
 
-electron-forge@^4.1.5:
+electron-forge@^4.1.6:
   version "4.1.6"
   resolved "https://registry.yarnpkg.com/electron-forge/-/electron-forge-4.1.6.tgz#99003d54e07816278ebc48b43bc785e3ff19fbbe"
   dependencies:
