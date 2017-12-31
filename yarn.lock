@@ -1766,9 +1766,9 @@ d3-format@1.2.1:
   version "1.2.1"
   resolved "https://registry.yarnpkg.com/d3-format/-/d3-format-1.2.1.tgz#4e19ecdb081a341dafaf5f555ee956bcfdbf167f"
 
-d3-geo@1.9.0:
-  version "1.9.0"
-  resolved "https://registry.yarnpkg.com/d3-geo/-/d3-geo-1.9.0.tgz#15c7d7a8ea9346e59ed150dc7b1f7f95479056e9"
+d3-geo@1.9.1:
+  version "1.9.1"
+  resolved "https://registry.yarnpkg.com/d3-geo/-/d3-geo-1.9.1.tgz#157e3b0f917379d0f73bebfff3be537f49fa7356"
   dependencies:
     d3-array "1"
 
@@ -1903,9 +1903,9 @@ d3-zoom@1.7.1:
     d3-selection "1"
     d3-transition "1"
 
-d3@^4.12.0:
-  version "4.12.0"
-  resolved "https://registry.yarnpkg.com/d3/-/d3-4.12.0.tgz#75eccb39ea40f6018de8cfa2752905bee7daa46f"
+d3@^4.12.2:
+  version "4.12.2"
+  resolved "https://registry.yarnpkg.com/d3/-/d3-4.12.2.tgz#12f775564c6a9de229f63db03446e2cb7bb56c8f"
   dependencies:
     d3-array "1.2.1"
     d3-axis "1.0.8"
@@ -1919,7 +1919,7 @@ d3@^4.12.0:
     d3-ease "1.0.3"
     d3-force "1.1.0"
     d3-format "1.2.1"
-    d3-geo "1.9.0"
+    d3-geo "1.9.1"
     d3-hierarchy "1.1.5"
     d3-interpolate "1.1.6"
     d3-path "1.0.5"
@@ -2243,9 +2243,9 @@ electron-forge-template-vue@^1.0.2:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/electron-forge-template-vue/-/electron-forge-template-vue-1.0.2.tgz#c935f5aa96a2798c6ea9b834465e3212e4f71d33"
 
-electron-forge@^4.1.6:
-  version "4.1.6"
-  resolved "https://registry.yarnpkg.com/electron-forge/-/electron-forge-4.1.6.tgz#99003d54e07816278ebc48b43bc785e3ff19fbbe"
+electron-forge@^4.1.7:
+  version "4.1.7"
+  resolved "https://registry.yarnpkg.com/electron-forge/-/electron-forge-4.1.7.tgz#b06526dca8848af72f9493e46357753a15006238"
   dependencies:
     aws-sdk "^2.9.0"
     babel-register "^6.16.3"
@@ -2592,21 +2592,25 @@ eslint-scope@^3.7.1:
     esrecurse "^4.1.0"
     estraverse "^4.1.1"
 
-eslint@^4.13.1:
-  version "4.13.1"
-  resolved "https://registry.yarnpkg.com/eslint/-/eslint-4.13.1.tgz#0055e0014464c7eb7878caf549ef2941992b444f"
+eslint-visitor-keys@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/eslint-visitor-keys/-/eslint-visitor-keys-1.0.0.tgz#3f3180fb2e291017716acb4c9d6d5b5c34a6a81d"
+
+eslint@^4.14.0:
+  version "4.14.0"
+  resolved "https://registry.yarnpkg.com/eslint/-/eslint-4.14.0.tgz#96609768d1dd23304faba2d94b7fefe5a5447a82"
   dependencies:
     ajv "^5.3.0"
     babel-code-frame "^6.22.0"
     chalk "^2.1.0"
     concat-stream "^1.6.0"
     cross-spawn "^5.1.0"
-    debug "^3.0.1"
+    debug "^3.1.0"
     doctrine "^2.0.2"
     eslint-scope "^3.7.1"
+    eslint-visitor-keys "^1.0.0"
     espree "^3.5.2"
     esquery "^1.0.0"
-    estraverse "^4.2.0"
     esutils "^2.0.2"
     file-entry-cache "^2.0.0"
     functional-red-black-tree "^1.0.1"
@@ -2666,7 +2670,7 @@ estraverse@^1.9.1:
   version "1.9.3"
   resolved "https://registry.yarnpkg.com/estraverse/-/estraverse-1.9.3.tgz#af67f2dc922582415950926091a4005d29c9bb44"
 
-estraverse@^4.0.0, estraverse@^4.1.0, estraverse@^4.1.1, estraverse@^4.2.0:
+estraverse@^4.0.0, estraverse@^4.1.0, estraverse@^4.1.1:
   version "4.2.0"
   resolved "https://registry.yarnpkg.com/estraverse/-/estraverse-4.2.0.tgz#0dee3fed31fcd469618ce7342099fc1afa0bdb13"
 
