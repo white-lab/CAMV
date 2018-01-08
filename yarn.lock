@@ -2249,9 +2249,9 @@ electron-forge-template-vue@^1.0.2:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/electron-forge-template-vue/-/electron-forge-template-vue-1.0.2.tgz#c935f5aa96a2798c6ea9b834465e3212e4f71d33"
 
-electron-forge@^4.1.7:
-  version "4.1.7"
-  resolved "https://registry.yarnpkg.com/electron-forge/-/electron-forge-4.1.7.tgz#b06526dca8848af72f9493e46357753a15006238"
+electron-forge@^4.2.0:
+  version "4.2.0"
+  resolved "https://registry.yarnpkg.com/electron-forge/-/electron-forge-4.2.0.tgz#1286c93ba24198b64dadb7c334ad09c55f4606e3"
   dependencies:
     aws-sdk "^2.9.0"
     babel-register "^6.16.3"
@@ -2292,7 +2292,7 @@ electron-forge@^4.1.7:
   optionalDependencies:
     electron-installer-debian "^0.7.1"
     electron-installer-dmg "^0.2.0"
-    electron-installer-flatpak "^0.6.0"
+    electron-installer-flatpak "^0.8.0"
     electron-installer-redhat "^0.5.0"
     electron-windows-store "^0.12.0"
     electron-winstaller "^2.5.0"
@@ -2323,9 +2323,9 @@ electron-installer-dmg@^0.2.0:
   optionalDependencies:
     appdmg "^0.4.5"
 
-electron-installer-flatpak@^0.6.0:
-  version "0.6.0"
-  resolved "https://registry.yarnpkg.com/electron-installer-flatpak/-/electron-installer-flatpak-0.6.0.tgz#dae659345c8affd74188d7c6236efda2484f2657"
+electron-installer-flatpak@^0.8.0:
+  version "0.8.0"
+  resolved "https://registry.yarnpkg.com/electron-installer-flatpak/-/electron-installer-flatpak-0.8.0.tgz#8edd178e0e04ec2da0fa40e777b67c9ccb78775f"
   dependencies:
     asar "^0.12.0"
     async "^2.0.0"
@@ -2602,9 +2602,9 @@ eslint-visitor-keys@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/eslint-visitor-keys/-/eslint-visitor-keys-1.0.0.tgz#3f3180fb2e291017716acb4c9d6d5b5c34a6a81d"
 
-eslint@^4.14.0:
-  version "4.14.0"
-  resolved "https://registry.yarnpkg.com/eslint/-/eslint-4.14.0.tgz#96609768d1dd23304faba2d94b7fefe5a5447a82"
+eslint@^4.15.0:
+  version "4.15.0"
+  resolved "https://registry.yarnpkg.com/eslint/-/eslint-4.15.0.tgz#89ab38c12713eec3d13afac14e4a89e75ef08145"
   dependencies:
     ajv "^5.3.0"
     babel-code-frame "^6.22.0"
