@@ -13,6 +13,8 @@ install:
     - "npm i -g npm@5.5.1"
     - "npm i -g yarn"
     - "npm i -g electron-forge"
+    - "npm i -g node-pre-gyp"
+    # - "npm i -g node-gyp"
     - "npm --version"
     - "yarn --version"
     # - "npm install --force"
