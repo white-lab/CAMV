@@ -12,6 +12,7 @@ install:
     - "node --version"
     - "npm i -g npm@5.5.1"
     - "npm i -g yarn"
+    - "npm i -g electron-forge"
     - "npm --version"
     - "yarn --version"
     # - "npm install --force"
@@ -26,7 +27,7 @@ install:
 #     - yarn test
 
 build_script:
-    # - ps: $env:DEBUG='electron-forge:*'
+    - ps: $env:DEBUG='electron-forge:*'
     # - "npm run make"
     # - "yarn run make"
     - "electron-forge make"
