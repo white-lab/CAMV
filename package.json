@@ -25,7 +25,7 @@
     "terminate": "^2.1.0"
   },
   "devDependencies": {
-    "babel-eslint": "^8.2.1",
+    "babel-eslint": "^8.2.2",
     "cross-env": "^5.1.4",
     "electron-forge": "^5.1.1",
     "electron-prebuilt-compile": "1.8.2",
@@ -38,12 +38,12 @@
   },
   "resolutions": {
     "electron-forge/electron-rebuild/node-abi": "^2.1.2",
-    "**/uglify-js": "^2.4.24",
-    "**/tough-cookie": "^2.3.3",
-    "**/semver": "^5.4.1",
-    "**/minimatch": "^3.0.4",
+    "**/debug": "^3.1.0",
     "**/mime": "^2.0.3",
-    "**/debug": "^3.1.0"
+    "**/minimatch": "^3.0.4",
+    "**/semver": "^5.4.1",
+    "**/tough-cookie": "^2.3.3",
+    "**/uglify-js": "^2.4.24"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
