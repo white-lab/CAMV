@@ -28,7 +28,8 @@ install:
 build_script:
     # - ps: $env:DEBUG='electron-forge:*'
     # - "npm run make"
-    - "yarn run make"
+    # - "yarn run make"
+    - "electron-forge make"
     - "ls -lh out/make/"
 
 artifacts:

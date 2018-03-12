@@ -90,7 +90,8 @@
         ]
       },
       "electronPackagerConfig": {
-        "icon": "assets/CAMV.ico"
+        "icon": "assets/CAMV.ico",
+        "packageManager": "yarn"
       },
       "electronWinstallerConfig": {
         "name": "CAMV"
