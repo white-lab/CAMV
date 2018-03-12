@@ -39,16 +39,19 @@ before_install:
     fi;
   - "npm i -g npm@5.5.1"
   - "npm i -g yarn"
+  - "npm i -g electron-forge"
+  - "npm i -g node-pre-gyp"
   - "npm --version"
   - "yarn --version"
 
 install:
-  # - travis_wait 30 yarn
-  - travis_wait 30 npm install
+  - travis_wait 30 yarn
+  # - travis_wait 30 npm install
 
 script:
   # - travis_wait 30 yarn run make
-  - travis_wait 30 npm run make
+  # - travis_wait 30 npm run make
+  - travis_wait 30 electron-forge make
   - ls -lh out/make/
 
 deploy:
