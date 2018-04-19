@@ -5202,9 +5202,9 @@ rc-animate@2.x:
     css-animation "^1.3.2"
     prop-types "15.x"
 
-rc-tree@^1.10.0:
-  version "1.10.0"
-  resolved "https://registry.yarnpkg.com/rc-tree/-/rc-tree-1.10.0.tgz#27c0b9651a8caca17a8df3b84a851137b0acd309"
+rc-tree@^1.10.1:
+  version "1.10.1"
+  resolved "https://registry.yarnpkg.com/rc-tree/-/rc-tree-1.10.1.tgz#3be1e606bb1e9d4e472bef53a060c4ac4a7e1106"
   dependencies:
     babel-runtime "^6.23.0"
     classnames "2.x"
@@ -5271,9 +5271,9 @@ react-hot-loader@^4.1.0:
     react-lifecycles-compat "^2.0.0"
     shallowequal "^1.0.2"
 
-react-hotkeys@^1.1.3:
-  version "1.1.3"
-  resolved "https://registry.yarnpkg.com/react-hotkeys/-/react-hotkeys-1.1.3.tgz#d6db35c19863c067af3b90099e039618300e6faa"
+react-hotkeys@^1.1.4:
+  version "1.1.4"
+  resolved "https://registry.yarnpkg.com/react-hotkeys/-/react-hotkeys-1.1.4.tgz#a0712aa2e0c03a759fd7885808598497a4dace72"
   dependencies:
     lodash.isboolean "^3.0.3"
     lodash.isequal "^4.5.0"
