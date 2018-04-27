@@ -5202,9 +5202,9 @@ rc-animate@2.x:
     css-animation "^1.3.2"
     prop-types "15.x"
 
-rc-tree@^1.10.1:
-  version "1.10.1"
-  resolved "https://registry.yarnpkg.com/rc-tree/-/rc-tree-1.10.1.tgz#3be1e606bb1e9d4e472bef53a060c4ac4a7e1106"
+rc-tree@^1.11.0:
+  version "1.11.0"
+  resolved "https://registry.yarnpkg.com/rc-tree/-/rc-tree-1.11.0.tgz#6e780d54eeb435641d389b01c9127a16ab05e6ae"
   dependencies:
     babel-runtime "^6.23.0"
     classnames "2.x"
@@ -5260,15 +5260,15 @@ react-dom@^16.3.2:
     object-assign "^4.1.1"
     prop-types "^15.6.0"
 
-react-hot-loader@^4.1.0:
-  version "4.1.0"
-  resolved "https://registry.yarnpkg.com/react-hot-loader/-/react-hot-loader-4.1.0.tgz#ae47224af27981c02d4b8c61d498e89d6d207096"
+react-hot-loader@^4.1.2:
+  version "4.1.2"
+  resolved "https://registry.yarnpkg.com/react-hot-loader/-/react-hot-loader-4.1.2.tgz#5e8025f5bc5605506586b46eb2c6cc4006fd54d7"
   dependencies:
     fast-levenshtein "^2.0.6"
     global "^4.3.0"
     hoist-non-react-statics "^2.5.0"
     prop-types "^15.6.1"
-    react-lifecycles-compat "^2.0.0"
+    react-lifecycles-compat "^3.0.2"
     shallowequal "^1.0.2"
 
 react-hotkeys@^1.1.4:
@@ -5281,9 +5281,9 @@ react-hotkeys@^1.1.4:
     mousetrap "^1.5.2"
     prop-types "^15.6.0"
 
-react-lifecycles-compat@^2.0.0:
-  version "2.0.2"
-  resolved "https://registry.yarnpkg.com/react-lifecycles-compat/-/react-lifecycles-compat-2.0.2.tgz#00a23160eec17a43b94dd74f95d44a1a2c3c5ec1"
+react-lifecycles-compat@^3.0.2:
+  version "3.0.2"
+  resolved "https://registry.yarnpkg.com/react-lifecycles-compat/-/react-lifecycles-compat-3.0.2.tgz#7279047275bd727a912e25f734c0559527e84eff"
 
 react-native-fs@^2.9.12:
   version "2.9.12"
