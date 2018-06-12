@@ -15,12 +15,12 @@
     "electron-compilers": "^5.9.0",
     "jquery": "^3.3.1",
     "prop-types": "^15.6.1",
-    "rc-tree": "^1.11.5",
+    "rc-tree": "^1.12.0",
     "react": "^16.4.0",
     "react-bootstrap": "^0.32.1",
     "react-dom": "^16.4.0",
     "react-hotkeys": "^1.1.4",
-    "react-native-fs": "^2.9.12",
+    "react-native-fs": "^2.10.14",
     "sqlite3": "^4.0.0",
     "terminate": "^2.1.0"
   },
@@ -33,8 +33,8 @@
     "eslint-formatter-pretty": "^1.3.0",
     "eslint-plugin-import": "^2.12.0",
     "eslint-plugin-promise": "^3.8.0",
-    "eslint-plugin-react": "^7.9.0",
-    "react-hot-loader": "^4.2.0"
+    "eslint-plugin-react": "^7.9.1",
+    "react-hot-loader": "^4.3.1"
   },
   "resolutions": {
     "electron-forge/electron-rebuild/node-abi": "^2.4.0",
