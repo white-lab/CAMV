@@ -116,6 +116,7 @@ class ModalExportBox extends React.Component {
             {this.state.exportDirectory}
             <Form.Check
               type="checkbox"
+              label="Export Accepted Spectra"
               checked={this.state.exportAcceptSpectra}
               onChange={
                 () => {
@@ -123,11 +124,10 @@ class ModalExportBox extends React.Component {
                     exportAcceptSpectra: !this.state.exportAcceptSpectra
                   })
                 }}
-            >
-              Export Accepted Spectra
-            </Form.Check>
+            />
             <Form.Check
               type="checkbox"
+              label="Export Maybed Spectra"
               checked={this.state.exportMaybeSpectra}
               onChange={
                 () => {
@@ -135,11 +135,10 @@ class ModalExportBox extends React.Component {
                     exportMaybeSpectra: !this.state.exportMaybeSpectra
                   })
                 }}
-            >
-              Export Maybed Spectra
-            </Form.Check>
+            />
             <Form.Check
               type="checkbox"
+              label="Export Rejected Spectra"
               checked={this.state.exportRejectSpectra}
               onChange={
                 () => {
@@ -147,9 +146,7 @@ class ModalExportBox extends React.Component {
                     exportRejectSpectra: !this.state.exportRejectSpectra
                   })
                 }}
-            >
-              Export Rejected Spectra
-            </Form.Check>
+            />
             <Form.Check
               type="checkbox"
               checked={this.state.exportTables}
@@ -159,9 +156,8 @@ class ModalExportBox extends React.Component {
                     exportTables: !this.state.exportTables
                   })
                 }}
-            >
-              Export CSV Table
-            </Form.Check>
+              label="Export CSV Table"
+            />
           </div>
         </Modal.Body>
         <Modal.Footer>
