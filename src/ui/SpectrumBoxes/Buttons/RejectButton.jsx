@@ -11,7 +11,7 @@ class RejectButton extends React.Component {
     return (
       <Button
         id="rejectButton"
-        bsStyle="danger"
+        variant="danger"
         className="choiceButton"
         value="Reject"
         disabled={this.props.disabled}

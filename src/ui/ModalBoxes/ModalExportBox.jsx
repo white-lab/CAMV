@@ -3,7 +3,7 @@ import path from 'path'
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import { Modal, Checkbox, Button } from 'react-bootstrap'
+import { Modal, Form, Button } from 'react-bootstrap'
 
 import { remote } from 'electron'
 
@@ -114,7 +114,8 @@ class ModalExportBox extends React.Component {
               Choose Directory
             </button>
             {this.state.exportDirectory}
-            <Checkbox
+            <Form.Check
+              type="checkbox"
               checked={this.state.exportAcceptSpectra}
               onChange={
                 () => {
@@ -124,8 +125,9 @@ class ModalExportBox extends React.Component {
                 }}
             >
               Export Accepted Spectra
-            </Checkbox>
-            <Checkbox
+            </Form.Check>
+            <Form.Check
+              type="checkbox"
               checked={this.state.exportMaybeSpectra}
               onChange={
                 () => {
@@ -135,8 +137,9 @@ class ModalExportBox extends React.Component {
                 }}
             >
               Export Maybed Spectra
-            </Checkbox>
-            <Checkbox
+            </Form.Check>
+            <Form.Check
+              type="checkbox"
               checked={this.state.exportRejectSpectra}
               onChange={
                 () => {
@@ -146,8 +149,9 @@ class ModalExportBox extends React.Component {
                 }}
             >
               Export Rejected Spectra
-            </Checkbox>
-            <Checkbox
+            </Form.Check>
+            <Form.Check
+              type="checkbox"
               checked={this.state.exportTables}
               onChange={
                 () => {
@@ -157,7 +161,7 @@ class ModalExportBox extends React.Component {
                 }}
             >
               Export CSV Table
-            </Checkbox>
+            </Form.Check>
           </div>
         </Modal.Body>
         <Modal.Footer>

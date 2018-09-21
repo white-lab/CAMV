@@ -1,7 +1,7 @@
 import React from 'react'
 import { findDOMNode } from 'react-dom'
 import PropTypes from 'prop-types'
-import { Modal, Button, FormGroup, ControlLabel, FormControl, HelpBlock } from 'react-bootstrap'
+import { Modal, Button, Form, HelpBlock } from 'react-bootstrap'
 import { HotKeys } from 'react-hotkeys'
 
 
@@ -72,41 +72,41 @@ class ModalSearchBox extends React.Component {
             </Modal.Title>
           </Modal.Header>
           <Modal.Body>
-            <FormGroup>
-              <ControlLabel>
+            <Form.Group>
+              <Form.Label>
                 Protein Name
-              </ControlLabel>
-              <FormControl
+              </Form.Label>
+              <Form.Control
                 type="text"
                 value={this.state.proteinMatch}
                 placeholder="Protein Name (i.e. EGFR)"
                 onChange={this.updateProtein.bind(this)}
                 autoFocus
               />
-            </FormGroup>
-            <FormGroup>
-              <ControlLabel>
+            </Form.Group>
+            <Form.Group>
+              <Form.Label>
                 Peptide Sequence
-              </ControlLabel>
-              <FormControl
+              </Form.Label>
+              <Form.Control
                 type="text"
                 value={this.state.peptideMatch}
                 placeholder="Peptide Sequence (i.e. QyQ)"
                 onChange={this.updatePeptide.bind(this)}
               />
-            </FormGroup>
+            </Form.Group>
 
-            <FormGroup>
-              <ControlLabel>
+            <Form.Group>
+              <Form.Label>
                 Scan Number
-              </ControlLabel>
-              <FormControl
+              </Form.Label>
+              <Form.Control
                 type="text"
                 value={this.state.scanNumber}
                 placeholder="Scan Number (i.e. 24117)"
                 onChange={this.updateScan.bind(this)}
               />
-            </FormGroup>
+            </Form.Group>
 
           </Modal.Body>
           <Modal.Footer>

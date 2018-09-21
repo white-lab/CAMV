@@ -1,6 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import { Modal, Button, Radio, FormGroup, FormControl, ControlLabel } from 'react-bootstrap'
+import { Modal, Button, Radio, Form } from 'react-bootstrap'
 
 class ModalFragmentBox extends React.Component {
   constructor(props) {
@@ -117,24 +117,25 @@ class ModalFragmentBox extends React.Component {
         </Modal.Header>
 
         <Modal.Body>
-          <FormGroup
+          <Form.Group
             controlId="radioChoice"
           >
-            <Radio
+            <Form.Check
+              type="radio"
               value="change"
               disabled={this.props.fragmentMatches.length <= 0}
               checked={this.state.radioChoice == "change"}
               onChange={this.radioChange.bind(this)}
             >
-              <FormGroup
+              <Form.Group
                 controlId="fragmentSelect"
               >
-                <ControlLabel>
+                <Form.Label>
                   Change Label
-                </ControlLabel>
+                </Form.Label>
 
-                <FormControl
-                  componentClass="select"
+                <Form.Control
+                  as="select"
                   placeholder="select"
                   disabled={this.props.fragmentMatches.length <= 0}
                   value={this.state.selectedFragment}
@@ -158,39 +159,41 @@ class ModalFragmentBox extends React.Component {
                       }
                     )
                   }
-                </FormControl>
-              </FormGroup>
-            </Radio>
+                </Form.Control>
+              </Form.Group>
+            </Form.Check>
 
-            <Radio
+            <Form.Check
+              type="radio"
               value="new"
               checked={this.state.radioChoice == "new"}
               onChange={this.radioChange.bind(this)}
             >
-              <FormGroup
+              <Form.Group
                 controlId="newLabelText"
               >
-                <ControlLabel>
+                <Form.Label>
                   New Label
-                </ControlLabel>
+                </Form.Label>
 
-                <FormControl
+                <Form.Control
                   type="text"
                   placeholder="Enter text"
                   value={this.state.newLabelText}
                   onChange={this.newLabelChange.bind(this)}
                 />
-              </FormGroup>
-            </Radio>
+              </Form.Group>
+            </Form.Check>
 
-            <Radio
+            <Form.Check
+              type="radio"
               value="none"
               checked={this.state.radioChoice == "none"}
               onChange={this.radioChange.bind(this)}
             >
               None
-            </Radio>
-          </FormGroup>
+            </Form.Check>
+          </Form.Group>
         </Modal.Body>
 
         <Modal.Footer>

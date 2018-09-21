@@ -8,17 +8,17 @@
     "babel-plugin-transform-runtime": "^6.23.0",
     "babel-preset-es2017-node7": "^0.5.2",
     "babel-preset-react": "^6.24.1",
-    "bootstrap": "3.3.7",
+    "bootstrap": "^4.1.3",
     "d3": "^5.7.0",
     "dom-to-image": "github:naderm/dom-to-image",
     "electron-compile": "^6.4.3",
     "electron-compilers": "^5.9.0",
     "jquery": "^3.3.1",
     "prop-types": "^15.6.2",
-    "rc-tree": "^1.14.6",
-    "react": "^16.5.1",
-    "react-bootstrap": "^0.32.4",
-    "react-dom": "^16.5.1",
+    "rc-tree": "1.7.9",
+    "react": "^16.5.2",
+    "react-bootstrap": "^v1.0.0-beta.1",
+    "react-dom": "^16.5.2",
     "react-hotkeys": "^1.1.4",
     "react-native-fs": "^2.11.15",
     "sqlite3": "^4.0.2",
@@ -34,7 +34,7 @@
     "eslint-plugin-import": "^2.14.0",
     "eslint-plugin-promise": "^4.0.1",
     "eslint-plugin-react": "^7.11.1",
-    "react-hot-loader": "^4.3.8"
+    "react-hot-loader": "^4.3.11"
   },
   "resolutions": {
     "electron-forge/electron-rebuild/node-abi": "^2.4.0",
@@ -79,7 +79,8 @@
     "forge": {
       "make_targets": {
         "win32": [
-          "zip"
+          "zip",
+          "squirrel"
         ],
         "darwin": [
           "zip"
@@ -93,7 +94,8 @@
         "packageManager": "yarn"
       },
       "electronWinstallerConfig": {
-        "name": "CAMV"
+        "name": "CAMV",
+        "setupIcon": "assets/CAMV.ico"
       },
       "electronInstallerDebian": {},
       "electronInstallerRedhat": {},

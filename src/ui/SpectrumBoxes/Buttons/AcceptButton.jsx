@@ -11,7 +11,7 @@ class AcceptButton extends React.Component {
     return (
       <Button
         className="choiceButton"
-        bsStyle="success"
+        variant="success"
         disabled={this.props.disabled}
         id="acceptButton"
         onClick={this.onChange.bind(this)}

@@ -11,7 +11,7 @@ class MaybeButton extends React.Component {
     return (
       <Button
         className="choiceButton"
-        bsStyle="warning"
+        variant="warning"
         disabled={this.props.disabled}
         id="maybeButton"
         onClick={this.onChange.bind(this)}

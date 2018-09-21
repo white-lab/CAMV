@@ -1,6 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import { Modal, Button, FormGroup, FormControl, Radio, ControlLabel } from 'react-bootstrap'
+import { Form, Modal, Button } from 'react-bootstrap'
 
 import { spawn } from 'child_process'
 import { remote } from 'electron'
@@ -16,7 +16,6 @@ class ModalImportBox extends React.Component {
     super(props)
     this.state = {
       child: null,
-      camvFileName: null,
       pycamverterPath: path.resolve(
         __filename.replace(/[\/\\][^\/\\]+$/, ""),
         "..\\..\\..\\PyCamverter.exe"
@@ -25,19 +24,12 @@ class ModalImportBox extends React.Component {
       scan_lists: [],
       mat_paths: [],
       search_path: null,
-      radioChoice: 'open',
       cpus: os.cpus().length,
       stdout: [],
       stderr: [],
       opening: false,
       running: false,
     }
-  }
-
-  radioChange(e) {
-    this.setState({
-      radioChoice: e.target.value,
-    })
   }
 
   changeCAMVPath() {
@@ -51,9 +43,7 @@ class ModalImportBox extends React.Component {
       (fileNames) => {
         if (fileNames === undefined) return;
 
-        this.setState({
-          camvFileName: fileNames[0],
-        })
+        this.runImport(fileNames[0])
       }
     )
   }
@@ -321,15 +311,15 @@ class ModalImportBox extends React.Component {
     })
   }
 
-  runImport() {
+  runImport(camvFileName) {
     this.setState({
       opening: true,
     })
 
     loadSQL(
-      this.state.camvFileName,
+      camvFileName,
       (data) => {
-        this.props.importCallback(data, this.state.camvFileName)
+        this.props.importCallback(data, camvFileName)
 
         this.setState({
           opening: false,
@@ -355,181 +345,155 @@ class ModalImportBox extends React.Component {
         <Modal.Body>
           {
             !this.state.running &&
-            <FormGroup
+            <Form.Group
               controlId="radioChoice"
             >
-              <Radio
-                value="open"
-                checked={this.state.radioChoice == "open"}
-                onChange={this.radioChange.bind(this)}
+              <Form.Group
+                controlId="formControlsFile"
               >
-                <FormGroup
-                  controlId="formControlsFile"
+                <Button
+                  id="fileSelect"
+                  onClick={this.changeCAMVPath.bind(this)}
+                  disabled={
+                    this.state.opening
+                  }
                 >
-                  <Button
-                    id="fileSelect"
-                    onClick={this.changeCAMVPath.bind(this)}
-                    disabled={
-                      this.state.radioChoice != "open" ||
-                      this.state.opening
-                    }
-                  >
-                    CAMV Database
-                  </Button>
-                  <div>
-                    {
-                      this.state.camvFileName != null ?
-                      this.state.camvFileName :
-                      ("No file selected.")
-                    }
-                  </div>
-                </FormGroup>
-              </Radio>
-              <Radio
-                value="process"
-                checked={this.state.radioChoice == "process"}
-                onChange={this.radioChange.bind(this)}
+                  Open CAMV Database (.camv.db)
+                </Button>
+              </Form.Group>
+              <hr/>
+              <Form.Group
+                controlId="formControlsFile"
               >
-                {
-                  process.env.NODE_ENV === 'development' &&
-                  <FormGroup
-                    controlId="formControlsFile"
-                  >
-                    <Button
-                      id="fileSelect"
-                      onClick={this.changePycamverterPath.bind(this)}
-                      disabled={
-                        this.state.radioChoice != "process" ||
-                        this.state.opening
-                      }
-                    >
-                      PyCamverter Path
-                    </Button>
-                    <div>
-                      {
-                        this.state.pycamverterPath != null ?
-                        this.state.pycamverterPath :
-                        ("No file selected.")
-                      }
-                    </div>
-                  </FormGroup>
-                }
-                <FormGroup
+                <Button
+                  id="fileSelect"
+                  onClick={this.changeSearchPath.bind(this)}
+                  disabled={
+                    this.state.opening
+                  }
+                >
+                  Search Path (.msf)
+                </Button>
+                <div>
+                  {
+                    this.state.search_path != null ?
+                    this.state.search_path :
+                    ("No file selected.")
+                  }
+                </div>
+              </Form.Group>
+              <Form.Group
+                controlId="formControlsFile"
+              >
+                <Button
+                  id="fileSelect"
+                  onClick={this.changeRawPaths.bind(this)}
+                  disabled={
+                    this.state.opening
+                  }
+                >
+                  Raw Files (.raw, .d, .wiff, .mgf)
+                </Button>
+                <div>
+                  {
+                    this.state.raw_paths.length > 0 ?
+                    this.state.raw_paths.join(', ') :
+                    ("No file selected.")
+                  }
+                </div>
+              </Form.Group>
+              <Form.Group
+                controlId="formControlsFile"
+              >
+                <Button
+                  id="fileSelect"
+                  onClick={this.changeScanLists.bind(this)}
+                  disabled={
+                    this.state.opening
+                  }
+                >
+                  Scan Lists (.csv, .xlsx)
+                </Button>
+                <div>
+                  {
+                    this.state.scan_lists.length > 0 ?
+                    this.state.scan_lists.join(', ') :
+                    ("No files selected.")
+                  }
+                </div>
+              </Form.Group>
+              <Form.Group
+                controlId="formControlsFile"
+              >
+                <Button
+                  id="fileSelect"
+                  onClick={this.changeMatPaths.bind(this)}
+                  disabled={
+                    this.state.opening
+                  }
+                >
+                  CAMV-Matlab Session(s) (.mat)
+                </Button>
+                <div>
+                  {
+                    this.state.mat_paths.length > 0 ?
+                    this.state.mat_paths.join(', ') :
+                    ("No files selected.")
+                  }
+                </div>
+              </Form.Group>
+              {
+                process.env.NODE_ENV === 'development' &&
+                <Form.Group
                   controlId="formControlsFile"
                 >
                   <Button
                     id="fileSelect"
-                    onClick={this.changeSearchPath.bind(this)}
+                    onClick={this.changePycamverterPath.bind(this)}
                     disabled={
-                      this.state.radioChoice != "process" ||
                       this.state.opening
                     }
                   >
-                    Search Path
+                    PyCamverter Path (.exe)
                   </Button>
                   <div>
                     {
-                      this.state.search_path != null ?
-                      this.state.search_path :
+                      this.state.pycamverterPath != null ?
+                      this.state.pycamverterPath :
                       ("No file selected.")
                     }
                   </div>
-                </FormGroup>
-                <FormGroup
-                  controlId="formControlsFile"
+                </Form.Group>
+              }
+              <Form.Group
+                controlId="formControlsSelect"
+              >
+                <Form.Label>
+                  # of CPUs
+                </Form.Label>
+                <Form.Control
+                  as="select"
+                  value={this.state.cpus.toString()}
+                  onChange={this.changeCPUCount.bind(this)}
+                  disabled={
+                    this.state.opening
+                  }
                 >
-                  <Button
-                    id="fileSelect"
-                    onClick={this.changeRawPaths.bind(this)}
-                    disabled={
-                      this.state.radioChoice != "process" ||
-                      this.state.opening
-                    }
-                  >
-                    Raw Path(s)
-                  </Button>
-                  <div>
-                    {
-                      this.state.raw_paths.length > 0 ?
-                      this.state.raw_paths.join(', ') :
-                      ("No file selected.")
-                    }
-                  </div>
-                </FormGroup>
-                <FormGroup
-                  controlId="formControlsFile"
-                >
-                  <Button
-                    id="fileSelect"
-                    onClick={this.changeScanLists.bind(this)}
-                    disabled={
-                      this.state.radioChoice != "process" ||
-                      this.state.opening
-                    }
-                  >
-                    Scan List(s)
-                  </Button>
-                  <div>
-                    {
-                      this.state.scan_lists.length > 0 ?
-                      this.state.scan_lists.join(', ') :
-                      ("No files selected.")
-                    }
-                  </div>
-                </FormGroup>
-                <FormGroup
-                  controlId="formControlsFile"
-                >
-                  <Button
-                    id="fileSelect"
-                    onClick={this.changeMatPaths.bind(this)}
-                    disabled={
-                      this.state.radioChoice != "process" ||
-                      this.state.opening
-                    }
-                  >
-                    CAMV-Matlab Session(s)
-                  </Button>
-                  <div>
-                    {
-                      this.state.mat_paths.length > 0 ?
-                      this.state.mat_paths.join(', ') :
-                      ("No files selected.")
-                    }
-                  </div>
-                </FormGroup>
-                <FormGroup
-                  controlId="formControlsSelect"
-                >
-                  <ControlLabel>
-                    # of CPUs
-                  </ControlLabel>
-                  <FormControl
-                    componentClass="select"
-                    value={this.state.cpus}
-                    onChange={this.changeCPUCount.bind(this)}
-                    disabled={
-                      this.state.radioChoice != "process" ||
-                      this.state.opening
-                    }
-                  >
-                    {
-                      os.cpus().map(
-                        (cpu, i) => (
-                          <option
-                            value={i + 1}
-                            key={i + 1}
-                          >
-                            {i + 1}
-                          </option>
-                        )
+                  {
+                    os.cpus().map(
+                      (cpu, i) => (
+                        <option
+                          value={i + 1}
+                          key={i + 1}
+                        >
+                          {i + 1}
+                        </option>
                       )
-                    }
-                  </FormControl>
-                </FormGroup>
-
-              </Radio>
-            </FormGroup>
+                    )
+                  }
+                </Form.Control>
+              </Form.Group>
+            </Form.Group>
           }
           {
             this.state.running &&
@@ -565,32 +529,22 @@ class ModalImportBox extends React.Component {
           <Button
             disabled={
               (
-                this.state.radioChoice == "open" &&
-                this.state.camvFileName == null
-              ) || (
-                this.state.radioChoice == "process" &&
-                (
-                  process.platform != "win32" ||
-                  this.state.pycamverterPath == null ||
-                  this.state.search_path == null
-                )
+                process.platform != "win32" ||
+                this.state.pycamverterPath == null ||
+                this.state.search_path == null
               ) ||
               this.state.opening
             }
             onClick={
-              this.state.radioChoice == "open" ?
-              this.runImport.bind(this) :
-              (
-                this.state.running ?
-                this.cancelProcess.bind(this) :
-                this.runProcess.bind(this)
-              )
+              this.state.running ?
+              this.cancelProcess.bind(this) :
+              this.runProcess.bind(this)
             }
           >
             {
               this.state.opening ? ("importing...") : (
                 this.state.running ? ("Cancel") : (
-                  this.state.radioChoice == "open" ? ("Open") : ("Process")
+                  ("Process")
                 )
               )
             }
