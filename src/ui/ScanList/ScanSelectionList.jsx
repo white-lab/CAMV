@@ -600,11 +600,11 @@ class ScanSelectionList extends React.Component {
   buildNodeTree() {
     return this.props.db.all(
       "SELECT \
-      protein_sets.protein_set_id, protein_sets.protein_set_name \
+      protein_sets.protein_set_id, protein_sets.protein_set_accession \
       \
       FROM protein_sets \
       \
-      ORDER BY protein_sets.protein_set_name",
+      ORDER BY protein_sets.protein_set_accession",
       [],
       (err, rows) => {
         if (err != null || rows == null) {
@@ -616,7 +616,7 @@ class ScanSelectionList extends React.Component {
           tree: rows.map(
             row => {
               let name = Array.from(
-                new Set(row.protein_set_name.split(' / '))
+                new Set(row.protein_set_accession.split(' / ').map(i => i.split("_")[0]))
               ).sort().join(" / ")
 
               return {
