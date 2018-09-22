@@ -1,6 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import { Modal, Button, Radio, Form } from 'react-bootstrap'
+import { Modal, Button, Form, InputGroup } from 'react-bootstrap'
 
 class ModalFragmentBox extends React.Component {
   constructor(props) {
@@ -36,12 +36,14 @@ class ModalFragmentBox extends React.Component {
   newLabelChange(e) {
     this.setState({
       newLabelText: e.target.value,
+      radioChoice: "new",
     })
   }
 
   selectedFragmentChange(e) {
     this.setState({
       selectedFragment: e.target.value,
+      radioChoice: "change",
     })
   }
 
@@ -117,83 +119,74 @@ class ModalFragmentBox extends React.Component {
         </Modal.Header>
 
         <Modal.Body>
-          <Form.Group
-            controlId="radioChoice"
-          >
-            <Form.Check
-              type="radio"
-              value="change"
+          <InputGroup>
+            <InputGroup.Prepend>
+              <InputGroup.Checkbox
+                type="radio"
+                label="Change Label"
+                value="change"
+                disabled={this.props.fragmentMatches.length <= 0}
+                checked={this.state.radioChoice == "change"}
+                onChange={this.radioChange.bind(this)}
+              />
+            </InputGroup.Prepend>
+            <Form.Control
+              as="select"
+              placeholder="select"
               disabled={this.props.fragmentMatches.length <= 0}
-              checked={this.state.radioChoice == "change"}
-              onChange={this.radioChange.bind(this)}
+              value={this.state.selectedFragment.toString()}
+              onChange={this.selectedFragmentChange.bind(this)}
             >
-              <Form.Group
-                controlId="fragmentSelect"
-              >
-                <Form.Label>
-                  Change Label
-                </Form.Label>
-
-                <Form.Control
-                  as="select"
-                  placeholder="select"
-                  disabled={this.props.fragmentMatches.length <= 0}
-                  value={this.state.selectedFragment}
-                  onChange={this.selectedFragmentChange.bind(this)}
-                >
-                  {
-                    this.props.fragmentMatches.map(
-                      (object, i) => {
-                        return (
-                          <option
-                            key={i}
-                            value={object.fragment_id}
-                          >
-                            {
-                              object.name +
-                              ' - ' + object.mz.toFixed(5) +
-                              ' (' + object.ppm.toFixed(1) + ' ppm)'
-                            }
-                          </option>
-                        )
-                      }
+              {
+                this.props.fragmentMatches.map(
+                  (object, i) => {
+                    return (
+                      <option
+                        key={i}
+                        value={object.fragment_id}
+                      >
+                        {
+                          object.name +
+                          ' - ' + object.mz.toFixed(5) +
+                          ' (' + object.ppm.toFixed(1) + ' ppm)'
+                        }
+                      </option>
                     )
                   }
-                </Form.Control>
-              </Form.Group>
-            </Form.Check>
+                )
+              }
+            </Form.Control>
+          </InputGroup>
 
-            <Form.Check
+          <InputGroup>
+            <InputGroup.Prepend>
+              <InputGroup.Checkbox
+                type="radio"
+                label="New Label"
+                value="new"
+                checked={this.state.radioChoice == "new"}
+                onChange={this.radioChange.bind(this)}
+              />
+            </InputGroup.Prepend>
+            <Form.Control
+              type="text"
+              placeholder="New Label"
+              value={this.state.newLabelText}
+              onChange={this.newLabelChange.bind(this)}
+            />
+          </InputGroup>
+          <InputGroup>
+            <InputGroup.Checkbox
               type="radio"
-              value="new"
-              checked={this.state.radioChoice == "new"}
-              onChange={this.radioChange.bind(this)}
-            >
-              <Form.Group
-                controlId="newLabelText"
-              >
-                <Form.Label>
-                  New Label
-                </Form.Label>
-
-                <Form.Control
-                  type="text"
-                  placeholder="Enter text"
-                  value={this.state.newLabelText}
-                  onChange={this.newLabelChange.bind(this)}
-                />
-              </Form.Group>
-            </Form.Check>
-
-            <Form.Check
-              type="radio"
+              label="None"
               value="none"
               checked={this.state.radioChoice == "none"}
               onChange={this.radioChange.bind(this)}
-            >
+            />
+            <InputGroup.Text>
               None
-            </Form.Check>
-          </Form.Group>
+            </InputGroup.Text>
+          </InputGroup>
         </Modal.Body>
 
         <Modal.Footer>
