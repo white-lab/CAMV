@@ -10,13 +10,11 @@ environment:
 install:
     - ps: Install-Product node $env:nodejs_version $env:platform
     - "node --version"
-    - "npm i -g npm@5.5.1"
     - "npm i -g yarn"
     - "npm i -g electron-forge"
     - "npm i -g node-pre-gyp"
     - "npm --version"
     - "yarn --version"
-    # - "npm install --force"
     - "yarn"
     # - "npm install sqlite3 --build-from-source"
     # - "yarn run electron-version"
@@ -29,8 +27,6 @@ install:
 
 build_script:
     - ps: $env:DEBUG='electron-forge:*'
-    # - "npm run make"
-    # - "yarn run make"
     - "electron-forge make"
     - "ls -lh out/make/"
 
