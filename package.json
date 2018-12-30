@@ -4,6 +4,7 @@
   "main": "src/main.js",
   "productName": "CAMV",
   "dependencies": {
+    "@electron-forge/cli": "^6.0.0-beta.30",
     "babel-plugin-transform-react-jsx-source": "^6.22.0",
     "babel-plugin-transform-runtime": "^6.23.0",
     "babel-preset-es2017-node7": "^0.5.2",
@@ -37,8 +38,6 @@
     "react-hot-loader": "^4.6.3"
   },
   "resolutions": {
-    "electron-forge/electron-rebuild/node-abi": "^2.5.1",
-    "**/electron-packager": "^13.0.0",
     "**/debug": "^3.2.6",
     "**/mime": "^2.4.0",
     "**/semver": "^5.6.0",
@@ -65,8 +64,8 @@
     "package.json"
   ],
   "devEngines": {
-    "node": ">=8.x",
-    "npm": ">=5.x"
+    "node": ">=10.x",
+    "npm": ">=6.x"
   },
   "author": {
     "name": "Nader Morshed",

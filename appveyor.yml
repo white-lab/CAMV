@@ -11,7 +11,7 @@ install:
     - ps: Install-Product node $env:nodejs_version $env:platform
     - "node --version"
     - "npm i -g yarn"
-    - "npm i -g electron-forge"
+    - "npm i -g @electron-forge/cli@beta"
     - "npm i -g node-pre-gyp"
     - "npm --version"
     - "yarn --version"
