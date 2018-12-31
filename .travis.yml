@@ -28,6 +28,7 @@ matrix:
 
 before_install:
   - export CAMV_VERSION=$(node -e "console.log(require('./package.json').version);")
+  - export DEBUG=electron-packager
   - uname -s
   - echo '${CXX} ${CC}'
   - if [[ $(uname -s) == 'Linux' ]]; then
