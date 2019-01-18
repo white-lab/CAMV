@@ -39,7 +39,7 @@ before_install:
       export DEPLOY_FILE=out/make/CAMV-darwin-x64-${CAMV_VERSION}.zip;
     fi;
   - "npm i -g yarn"
-  - "npm i -g @electron-forge/cli@beta"
+  - "npm i -g electron-forge"
   - "npm i -g node-pre-gyp"
   - "npm --version"
   - "yarn --version"
