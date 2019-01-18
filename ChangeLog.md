@@ -1,5 +1,11 @@
 # Change Log
 
+## 0.16.4 (2019-01-18)
+
+Bug fixes
+
+  - Updated dependencies to latest versions, fixing conversion / browsing issues.
+
 ## 0.16.3 (2017-11-27)
 
 Bug fixes
