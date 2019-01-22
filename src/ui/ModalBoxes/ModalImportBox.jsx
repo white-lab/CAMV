@@ -232,11 +232,18 @@ class ModalImportBox extends React.Component {
           return
         }
 
-        this.setState({
-          child: null,
-          camvFileName: out_path,
-          running: false,
-        }, this.runImport.bind(this))
+        console.log(out_path)
+
+        this.setState(
+          {
+            child: null,
+            camvFileName: out_path,
+            running: false,
+          },
+          () => {
+            this.runImport(out_path)
+          }
+        )
       }
     )
 
