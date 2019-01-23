@@ -17,7 +17,7 @@
     "prop-types": "^15.6.2",
     "rc-tree": "1.7.9",
     "react": "^16.7.0",
-    "react-bootstrap": "^1.0.0-beta.3",
+    "react-bootstrap": "^1.0.0-beta.4",
     "react-dom": "^16.7.0",
     "react-hotkeys": "^1.1.4",
     "react-native-fs": "^2.13.3",
@@ -29,9 +29,9 @@
     "cross-env": "^5.2.0",
     "electron-forge": "^5.2.4",
     "electron-prebuilt-compile": "3.0.6",
-    "eslint": "^5.12.0",
-    "eslint-formatter-pretty": "^2.1.0",
-    "eslint-plugin-import": "^2.14.0",
+    "eslint": "^5.12.1",
+    "eslint-formatter-pretty": "^2.1.1",
+    "eslint-plugin-import": "^2.15.0",
     "eslint-plugin-promise": "^4.0.1",
     "eslint-plugin-react": "^7.12.4",
     "react-hot-loader": "^4.6.3"
@@ -89,8 +89,7 @@
         ]
       },
       "electronPackagerConfig": {
-        "icon": "assets/CAMV.ico",
-        "packageManager": "yarn"
+        "icon": "assets/CAMV.ico"
       },
       "electronWinstallerConfig": {
         "name": "CAMV",

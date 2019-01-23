@@ -47,7 +47,7 @@ You will first need to [install Node.js v8](https://nodejs.org/en/).
 Once those are installed, run:
 
 ```
-yarn install
+npm install
 ```
 
 ### Usage
@@ -55,9 +55,9 @@ yarn install
 From this directory, run:
 
 ```
-yarn start
+npm start
 # or
-yarn run start-dev
+npm run start-dev
 ```
 
 ### Deployment
@@ -65,7 +65,7 @@ yarn run start-dev
 From this directory, run:
 
 ```
-yarn run make
+npm run make
 ```
 
 This will generate a zip using in `./out/make/` for your current platform.

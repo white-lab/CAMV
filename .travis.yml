@@ -38,14 +38,15 @@ before_install:
     elif [[ $(uname -s) == 'Darwin' ]] ; then
       export DEPLOY_FILE=out/make/CAMV-darwin-x64-${CAMV_VERSION}.zip;
     fi;
-  - "npm i -g yarn"
+  # - "npm i -g yarn"
   - "npm i -g electron-forge"
   - "npm i -g node-pre-gyp"
   - "npm --version"
-  - "yarn --version"
+  # - "yarn --version"
 
 install:
-  - travis_wait 30 yarn
+  # - travis_wait 30 yarn
+  - travis_wait 30 npm install
 
 script:
   - travis_wait 30 electron-forge make
