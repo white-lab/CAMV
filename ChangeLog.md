@@ -1,5 +1,11 @@
 # Change Log
 
+## 0.16.5 (2019-01-23)
+
+Bug fixes
+
+  - Fixed opening of CAMV database after processing a search file.
+
 ## 0.16.4 (2019-01-18)
 
 Bug fixes
