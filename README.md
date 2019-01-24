@@ -43,10 +43,11 @@ Control-F: Search proteins / peptides / scans
 
 You will first need to [install Node.js v8](https://nodejs.org/en/).
 
-
-Once those are installed, run:
+Once that is installed, run:
 
 ```
+git clone git@github.com:white-lab/CAMV.git
+cd CAMV/
 npm install
 ```
 
