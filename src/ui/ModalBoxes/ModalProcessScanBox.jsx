@@ -30,9 +30,9 @@ class modalProcessScanBox extends React.Component {
 
   refreshSearchPath() {
     this.props.db.all(
-      "SELECT * \
-      FROM camv_meta \
-      WHERE key=?",
+      `SELECT *
+      FROM camv_meta
+      WHERE key=?`,
       [
         "search_path",
       ],
@@ -62,9 +62,9 @@ class modalProcessScanBox extends React.Component {
 
   refreshRawPath() {
     this.props.db.all(
-      "SELECT * \
-      FROM camv_meta \
-      WHERE key=?",
+      `SELECT *
+      FROM camv_meta
+      WHERE key=?`,
       [
         "raw_path",
       ],
