@@ -203,9 +203,9 @@ class ViewBox extends React.Component {
     if (this.state.selectedScan == null) { return }
 
     return this.wrapSQLGet(
-      "SELECT scan_data.data_blob, scan_data.scan_id \
-      FROM scan_data \
-      WHERE scan_data.scan_id=? AND scan_data.data_type=?",
+      `SELECT scan_data.data_blob, scan_data.scan_id
+      FROM scan_data
+      WHERE scan_data.scan_id=? AND scan_data.data_type=?`,
       [
         this.state.selectedScan,
         "ms2",
@@ -231,20 +231,20 @@ class ViewBox extends React.Component {
 
     /* Update peak assignments for the new PTM */
     return this.wrapSQLAll(
-      "SELECT \
-      fragments.fragment_id, \
-      fragments.peak_id, \
-      fragments.display_name, \
-      fragments.mz, \
-      fragments.ion_type, \
-      fragments.ion_pos, \
-      scan_ptms.scan_id, \
-      scan_ptms.ptm_id \
-      \
-      FROM fragments inner JOIN scan_ptms \
-      ON fragments.scan_ptm_id=scan_ptms.scan_ptm_id \
-      \
-      WHERE scan_ptms.scan_id=? AND scan_ptms.ptm_id=? AND fragments.best=1",
+      `SELECT
+      fragments.fragment_id,
+      fragments.peak_id,
+      fragments.display_name,
+      fragments.mz,
+      fragments.ion_type,
+      fragments.ion_pos,
+      scan_ptms.scan_id,
+      scan_ptms.ptm_id
+
+      FROM fragments inner JOIN scan_ptms
+      ON fragments.scan_ptm_id=scan_ptms.scan_ptm_id
+
+      WHERE scan_ptms.scan_id=? AND scan_ptms.ptm_id=? AND fragments.best=1`,
       [
         this.state.selectedScan,
         this.state.selectedPTM,
@@ -429,18 +429,18 @@ class ViewBox extends React.Component {
     })
 
     return this.wrapSQLAll(
-      "SELECT \
-      fragments.fragment_id, \
-      fragments.mz, \
-      fragments.display_name AS name \
-      \
-      FROM scan_ptms \
-      INNER JOIN fragments \
-      ON fragments.scan_ptm_id=scan_ptms.scan_ptm_id \
-      \
-      WHERE scan_ptms.scan_id=? AND \
-      scan_ptms.ptm_id=? AND \
-      fragments.peak_id=?",
+      `SELECT
+      fragments.fragment_id,
+      fragments.mz,
+      fragments.display_name AS name
+
+      FROM scan_ptms
+      INNER JOIN fragments
+      ON fragments.scan_ptm_id=scan_ptms.scan_ptm_id
+
+      WHERE scan_ptms.scan_id=? AND
+      scan_ptms.ptm_id=? AND
+      fragments.peak_id=?`,
       [
         this.state.selectedScan,
         this.state.selectedPTM,
@@ -522,9 +522,9 @@ class ViewBox extends React.Component {
 
     return this.unsetFragmentLabel(peak, false).then(() => {
       return this.wrapSQLRun(
-        "UPDATE fragments \
-        SET best=1 \
-        WHERE fragments.fragment_id=?",
+        `UPDATE fragments
+        SET best=1
+        WHERE fragments.fragment_id=?`,
         [
           fragId,
         ],
@@ -546,24 +546,24 @@ class ViewBox extends React.Component {
 
     return this.unsetFragmentLabel(peak, false).then(() => {
       return this.wrapSQLGet(
-        "SELECT scan_ptms.scan_ptm_id \
-        FROM scan_ptms \
-        WHERE scan_ptms.scan_id=? AND scan_ptms.ptm_id=?",
+        `SELECT scan_ptms.scan_ptm_id
+        FROM scan_ptms
+        WHERE scan_ptms.scan_id=? AND scan_ptms.ptm_id=?`,
         [
           this.state.selectedScan,
           this.state.selectedPTM,
         ],
         (resolve_a, reject_a, row) => {
           this.wrapSQLRun(
-            "INSERT INTO fragments ( \
-              scan_ptm_id, \
-              peak_id, \
-              name, \
-              display_name, \
-              mz, \
-              intensity, \
-              best \
-            ) VALUES (?, ?, ?, ?, ?, ?, ?)",
+            `INSERT INTO fragments (
+              scan_ptm_id,
+              peak_id,
+              name,
+              display_name,
+              mz,
+              intensity,
+              best
+            ) VALUES (?, ?, ?, ?, ?, ?, ?)`,
             [
               row.scan_ptm_id,
               peak.peak_id,
@@ -596,13 +596,13 @@ class ViewBox extends React.Component {
     }
 
     return this.wrapSQLRun(
-      "UPDATE fragments \
-      SET best=0 \
-      WHERE fragments.peak_id=? AND scan_ptm_id IN ( \
-        SELECT scan_ptms.scan_ptm_id \
-        FROM scan_ptms \
-        WHERE scan_ptms.scan_id=? AND scan_ptms.ptm_id=? \
-      )",
+      `UPDATE fragments
+      SET best=0
+      WHERE fragments.peak_id=? AND scan_ptm_id IN (
+        SELECT scan_ptms.scan_ptm_id
+        FROM scan_ptms
+        WHERE scan_ptms.scan_id=? AND scan_ptms.ptm_id=?
+      )`,
       [
         peak.peak_id,
         this.state.selectedScan,
@@ -653,39 +653,39 @@ class ViewBox extends React.Component {
     return new Promise(
       (final_resolve, final_reject) => {
         this.state.db.all(
-          `SELECT \
-          protein_sets.protein_set_id, protein_sets.protein_set_name, \
-          protein_sets.protein_set_accession, protein_sets.protein_set_uniprot, \
-          peptides.peptide_id, peptides.peptide_seq, \
-          peptides.protein_set_offsets, \
-          mod_states.mod_state_id, mod_states.mod_desc, \
-          scans.scan_id, scans.scan_num, \
-          scan_ptms.ptm_id, scan_ptms.choice, scan_ptms.mascot_score, \
-          ptms.name \
-          \
-          FROM scan_ptms \
-          \
-          INNER JOIN scans \
-          ON scan_ptms.scan_id=scans.scan_id \
-          \
-          JOIN ptms \
-          ON scan_ptms.ptm_id=ptms.ptm_id \
-          \
-          JOIN mod_states \
-          ON ptms.mod_state_id=mod_states.mod_state_id \
-          \
-          JOIN peptides \
-          ON mod_states.peptide_id=peptides.peptide_id \
-          \
-          INNER JOIN protein_sets \
-          ON protein_sets.protein_set_id=peptides.protein_set_id \
-          \
-          WHERE \
-          scan_ptms.choice IN (${params.map(i => '?').join(', ')}) \
-          ${export_spectras[3] ? 'OR scan_ptms.choice IS NULL': ''} \
-          \
-          ORDER BY \
-          protein_sets.protein_set_name, peptides.peptide_seq, \
+          `SELECT
+          protein_sets.protein_set_id, protein_sets.protein_set_name,
+          protein_sets.protein_set_accession, protein_sets.protein_set_uniprot,
+          peptides.peptide_id, peptides.peptide_seq,
+          peptides.protein_set_offsets,
+          mod_states.mod_state_id, mod_states.mod_desc,
+          scans.scan_id, scans.scan_num,
+          scan_ptms.ptm_id, scan_ptms.choice, scan_ptms.mascot_score,
+          ptms.name
+
+          FROM scan_ptms
+
+          INNER JOIN scans
+          ON scan_ptms.scan_id=scans.scan_id
+
+          JOIN ptms
+          ON scan_ptms.ptm_id=ptms.ptm_id
+
+          JOIN mod_states
+          ON ptms.mod_state_id=mod_states.mod_state_id
+
+          JOIN peptides
+          ON mod_states.peptide_id=peptides.peptide_id
+
+          INNER JOIN protein_sets
+          ON protein_sets.protein_set_id=peptides.protein_set_id
+
+          WHERE
+          scan_ptms.choice IN (${params.map(i => '?').join(', ')})
+          ${export_spectras[3] ? 'OR scan_ptms.choice IS NULL': ''}
+
+          ORDER BY
+          protein_sets.protein_set_name, peptides.peptide_seq,
           mod_states.mod_desc, ptms.name`,
           params,
           async function(err, rows) {
@@ -746,11 +746,11 @@ class ViewBox extends React.Component {
     if (proteinMatch.length > 0) {
       promises.push(
         this.wrapSQLAll(
-          "SELECT protein_sets.protein_set_id \
-          \
-          FROM protein_sets \
-          WHERE protein_sets.protein_set_name LIKE ? COLLATE NOCASE OR \
-          protein_sets.protein_set_accession LIKE ? COLLATE NOCASE",
+          `SELECT protein_sets.protein_set_id
+
+          FROM protein_sets
+          WHERE protein_sets.protein_set_name LIKE ? COLLATE NOCASE OR
+          protein_sets.protein_set_accession LIKE ? COLLATE NOCASE`,
           [
             `%${proteinMatch}%`,
             `%${proteinMatch}%`,
@@ -772,19 +772,19 @@ class ViewBox extends React.Component {
       promises.push(
         this.wrapSQLAll(
           //
-          "SELECT protein_sets.protein_set_id, \
-          peptides.peptide_id, \
-          mod_states.mod_state_id \
-          \
-          FROM mod_states \
-          \
-          JOIN peptides \
-          ON mod_states.peptide_id=peptides.peptide_id \
-          \
-          INNER JOIN protein_sets \
-          ON protein_sets.protein_set_id=peptides.protein_set_id \
-          \
-          WHERE peptides.peptide_seq LIKE ? COLLATE NOCASE",
+          `SELECT protein_sets.protein_set_id,
+          peptides.peptide_id,
+          mod_states.mod_state_id
+
+          FROM mod_states
+
+          JOIN peptides
+          ON mod_states.peptide_id=peptides.peptide_id
+
+          INNER JOIN protein_sets
+          ON protein_sets.protein_set_id=peptides.protein_set_id
+
+          WHERE peptides.peptide_seq LIKE ? COLLATE NOCASE`,
           [
             `%${peptideMatch}%`,
           ],
@@ -804,29 +804,29 @@ class ViewBox extends React.Component {
     if (scanMatch.length > 0) {
       promises.push(
         this.wrapSQLAll(
-          "SELECT protein_sets.protein_set_id, \
-          peptides.peptide_id, \
-          mod_states.mod_state_id, \
-          scans.scan_id \
-          \
-          FROM scan_ptms \
-          \
-          INNER JOIN scans \
-          ON scan_ptms.scan_id=scans.scan_id \
-          \
-          JOIN ptms \
-          ON scan_ptms.ptm_id=ptms.ptm_id \
-          \
-          JOIN mod_states \
-          ON ptms.mod_state_id=mod_states.mod_state_id \
-          \
-          JOIN peptides \
-          ON mod_states.peptide_id=peptides.peptide_id \
-          \
-          INNER JOIN protein_sets \
-          ON protein_sets.protein_set_id=peptides.protein_set_id \
-          \
-          WHERE scans.scan_num LIKE ? COLLATE NOCASE",
+          `SELECT protein_sets.protein_set_id,
+          peptides.peptide_id,
+          mod_states.mod_state_id,
+          scans.scan_id
+
+          FROM scan_ptms
+
+          INNER JOIN scans
+          ON scan_ptms.scan_id=scans.scan_id
+
+          JOIN ptms
+          ON scan_ptms.ptm_id=ptms.ptm_id
+
+          JOIN mod_states
+          ON ptms.mod_state_id=mod_states.mod_state_id
+
+          JOIN peptides
+          ON mod_states.peptide_id=peptides.peptide_id
+
+          INNER JOIN protein_sets
+          ON protein_sets.protein_set_id=peptides.protein_set_id
+
+          WHERE scans.scan_num LIKE ? COLLATE NOCASE`,
           [
             `%${scanMatch}%`,
           ],
@@ -859,9 +859,9 @@ class ViewBox extends React.Component {
     ) { return }
 
     return this.wrapSQLRun(
-      "UPDATE scan_ptms \
-      SET choice=? \
-      WHERE scan_id=? AND ptm_id=?",
+      `UPDATE scan_ptms
+      SET choice=?
+      WHERE scan_id=? AND ptm_id=?`,
       [
         choice,
         this.state.selectedScan,
@@ -934,13 +934,13 @@ class ViewBox extends React.Component {
 
   updateProtein() {
     return this.wrapSQLGet(
-      "SELECT \
-      protein_sets.protein_set_id, \
-      protein_sets.protein_set_name AS proteinName, \
-      protein_sets.protein_set_accession AS accessions \
-      \
-      FROM protein_sets \
-      WHERE protein_sets.protein_set_id=?",
+      `SELECT
+      protein_sets.protein_set_id,
+      protein_sets.protein_set_name AS proteinName,
+      protein_sets.protein_set_accession AS accessions
+
+      FROM protein_sets
+      WHERE protein_sets.protein_set_id=?`,
       [
         this.state.selectedProteins,
       ],
@@ -958,9 +958,9 @@ class ViewBox extends React.Component {
 
   updatePeptide() {
     return this.wrapSQLGet(
-      "SELECT peptides.peptide_id, peptides.peptide_seq \
-      FROM peptides \
-      WHERE peptides.peptide_id=?",
+      `SELECT peptides.peptide_id, peptides.peptide_seq
+      FROM peptides
+      WHERE peptides.peptide_id=?`,
       [
         this.state.selectedPeptide,
       ],
@@ -1050,27 +1050,27 @@ class ViewBox extends React.Component {
 
     promises.push(
       this.wrapSQLGet(
-        "SELECT \
-        scans.scan_id, \
-        scans.scan_num AS scanNumber, \
-        scans.charge AS chargeState, \
-        scans.collision_type AS collisionType, \
-        scans.precursor_mz AS precursorMz, \
-        scans.isolation_window_lower, \
-        scans.isolation_window_upper, \
-        scans.quant_mz_id, \
-        scans.c13_num AS c13Num, \
-        scans.truncated, \
-        scan_ptms.mascot_score AS searchScore, \
-        files.filename AS fileName \
-        \
-        FROM scans INNER JOIN files \
-        ON scans.file_id=files.file_id \
-        \
-        INNER JOIN scan_ptms \
-        ON scan_ptms.scan_id=scans.scan_id \
-        \
-        WHERE scans.scan_id=?",
+        `SELECT
+        scans.scan_id,
+        scans.scan_num AS scanNumber,
+        scans.charge AS chargeState,
+        scans.collision_type AS collisionType,
+        scans.precursor_mz AS precursorMz,
+        scans.isolation_window_lower,
+        scans.isolation_window_upper,
+        scans.quant_mz_id,
+        scans.c13_num AS c13Num,
+        scans.truncated,
+        scan_ptms.mascot_score AS searchScore,
+        files.filename AS fileName
+
+        FROM scans INNER JOIN files
+        ON scans.file_id=files.file_id
+
+        INNER JOIN scan_ptms
+        ON scan_ptms.scan_id=scans.scan_id
+
+        WHERE scans.scan_id=?`,
         [
           this.state.selectedScan,
         ],
@@ -1089,9 +1089,9 @@ class ViewBox extends React.Component {
         },
       ).then(() => {
         return this.wrapSQLGet(
-          "SELECT scan_data.data_blob, scan_data.scan_id \
-          FROM scan_data \
-          WHERE scan_data.data_type=? AND scan_data.scan_id=?",
+          `SELECT scan_data.data_blob, scan_data.scan_id
+          FROM scan_data
+          WHERE scan_data.data_type=? AND scan_data.scan_id=?`,
           [
             "precursor",
             this.state.selectedScan,
@@ -1145,9 +1145,9 @@ class ViewBox extends React.Component {
 
     promises.push(
       this.wrapSQLGet(
-        "SELECT scan_data.data_blob, scan_data.scan_id \
-        FROM scan_data \
-        WHERE scan_data.data_type=? AND scan_data.scan_id=?",
+        `SELECT scan_data.data_blob, scan_data.scan_id
+        FROM scan_data
+        WHERE scan_data.data_type=? AND scan_data.scan_id=?`,
         [
           "quant",
           this.state.selectedScan,
@@ -1163,18 +1163,18 @@ class ViewBox extends React.Component {
         },
       ).then(() => {
         return this.wrapSQLAll(
-          "SELECT \
-          quant_mz_peaks.mz, \
-          quant_mz_peaks.peak_name AS name, \
-          scans.scan_id \
-          \
-          FROM scans \
-          INNER JOIN quant_mz_peaks \
-          ON scans.quant_mz_id=quant_mz_peaks.quant_mz_id \
-          \
-          WHERE scans.scan_id=? \
-          \
-          ORDER BY quant_mz_peaks.mz",
+          `SELECT
+          quant_mz_peaks.mz,
+          quant_mz_peaks.peak_name AS name,
+          scans.scan_id
+
+          FROM scans
+          INNER JOIN quant_mz_peaks
+          ON scans.quant_mz_id=quant_mz_peaks.quant_mz_id
+
+          WHERE scans.scan_id=?
+
+          ORDER BY quant_mz_peaks.mz`,
           [
             this.state.selectedScan,
           ],
@@ -1222,9 +1222,9 @@ class ViewBox extends React.Component {
 
   updatePTM() {
     return this.wrapSQLGet(
-      "SELECT * \
-      FROM ptms \
-      WHERE ptms.ptm_id=?",
+      `SELECT *
+      FROM ptms
+      WHERE ptms.ptm_id=?`,
       [
         this.state.selectedPTM,
       ],

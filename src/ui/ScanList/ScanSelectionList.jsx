@@ -348,22 +348,22 @@ class ScanSelectionList extends React.Component {
 
   getPeptides(treeNode, node, resolve) {
     this.props.db.each(
-      "SELECT \
-      peptides.peptide_id, peptides.peptide_seq, \
-      mod_states.mod_state_id, mod_states.mod_desc \
-      \
-      FROM \
-      mod_states \
-      \
-      JOIN peptides \
-      ON mod_states.peptide_id=peptides.peptide_id \
-      \
-      INNER JOIN protein_sets \
-      ON protein_sets.protein_set_id=peptides.protein_set_id \
-      \
-      WHERE protein_sets.protein_set_id=? \
-      \
-      ORDER BY peptides.peptide_seq, mod_states.mod_desc",
+      `SELECT
+      peptides.peptide_id, peptides.peptide_seq,
+      mod_states.mod_state_id, mod_states.mod_desc
+
+      FROM
+      mod_states
+
+      JOIN peptides
+      ON mod_states.peptide_id=peptides.peptide_id
+
+      INNER JOIN protein_sets
+      ON protein_sets.protein_set_id=peptides.protein_set_id
+
+      WHERE protein_sets.protein_set_id=?
+
+      ORDER BY peptides.peptide_seq, mod_states.mod_desc`,
       [
         node[0][0],
       ],
@@ -402,32 +402,32 @@ class ScanSelectionList extends React.Component {
     let scan_ids = new Set()
 
     this.props.db.each(
-      "SELECT \
-      scans.scan_id, scans.scan_num, scans.truncated \
-      \
-      FROM \
-      scan_ptms \
-      \
-      INNER JOIN scans \
-      ON scan_ptms.scan_id=scans.scan_id \
-      \
-      JOIN ptms \
-      ON scan_ptms.ptm_id=ptms.ptm_id \
-      \
-      JOIN mod_states \
-      ON ptms.mod_state_id=mod_states.mod_state_id \
-      \
-      JOIN peptides \
-      ON mod_states.peptide_id=peptides.peptide_id \
-      \
-      INNER JOIN protein_sets \
-      ON protein_sets.protein_set_id=peptides.protein_set_id \
-      \
-      WHERE mod_states.mod_state_id=? AND \
-      peptides.peptide_id=? AND \
-      protein_sets.protein_set_id=? \
-      \
-      ORDER BY scans.scan_num",
+      `SELECT
+      scans.scan_id, scans.scan_num, scans.truncated
+
+      FROM
+      scan_ptms
+
+      INNER JOIN scans
+      ON scan_ptms.scan_id=scans.scan_id
+
+      JOIN ptms
+      ON scan_ptms.ptm_id=ptms.ptm_id
+
+      JOIN mod_states
+      ON ptms.mod_state_id=mod_states.mod_state_id
+
+      JOIN peptides
+      ON mod_states.peptide_id=peptides.peptide_id
+
+      INNER JOIN protein_sets
+      ON protein_sets.protein_set_id=peptides.protein_set_id
+
+      WHERE mod_states.mod_state_id=? AND
+      peptides.peptide_id=? AND
+      protein_sets.protein_set_id=?
+
+      ORDER BY scans.scan_num`,
       [
         node[1][1],
         node[1][0],
@@ -470,34 +470,34 @@ class ScanSelectionList extends React.Component {
 
   getPtms(treeNode, node, resolve) {
     this.props.db.each(
-      "SELECT \
-      ptms.ptm_id, ptms.name, \
-      scan_ptms.choice \
-      \
-      FROM \
-      scan_ptms \
-      \
-      INNER JOIN scans \
-      ON scan_ptms.scan_id=scans.scan_id \
-      \
-      JOIN ptms \
-      ON scan_ptms.ptm_id=ptms.ptm_id \
-      \
-      JOIN mod_states \
-      ON ptms.mod_state_id=mod_states.mod_state_id \
-      \
-      JOIN peptides \
-      ON mod_states.peptide_id=peptides.peptide_id \
-      \
-      INNER JOIN protein_sets \
-      ON protein_sets.protein_set_id=peptides.protein_set_id \
-      \
-      WHERE scans.scan_id=? AND \
-      mod_states.mod_state_id=? AND \
-      peptides.peptide_id=? AND \
-      protein_sets.protein_set_id=? \
-      \
-      ORDER BY ptms.name",
+      `SELECT
+      ptms.ptm_id, ptms.name,
+      scan_ptms.choice
+
+      FROM
+      scan_ptms
+
+      INNER JOIN scans
+      ON scan_ptms.scan_id=scans.scan_id
+
+      JOIN ptms
+      ON scan_ptms.ptm_id=ptms.ptm_id
+
+      JOIN mod_states
+      ON ptms.mod_state_id=mod_states.mod_state_id
+
+      JOIN peptides
+      ON mod_states.peptide_id=peptides.peptide_id
+
+      INNER JOIN protein_sets
+      ON protein_sets.protein_set_id=peptides.protein_set_id
+
+      WHERE scans.scan_id=? AND
+      mod_states.mod_state_id=? AND
+      peptides.peptide_id=? AND
+      protein_sets.protein_set_id=?
+
+      ORDER BY ptms.name`,
       [
         node[2][0],
         node[1][1],
@@ -599,12 +599,12 @@ class ScanSelectionList extends React.Component {
 
   buildNodeTree() {
     return this.props.db.all(
-      "SELECT \
-      protein_sets.protein_set_id, protein_sets.protein_set_accession \
-      \
-      FROM protein_sets \
-      \
-      ORDER BY protein_sets.protein_set_accession",
+      `SELECT
+      protein_sets.protein_set_id, protein_sets.protein_set_accession
+
+      FROM protein_sets
+
+      ORDER BY protein_sets.protein_set_accession`,
       [],
       (err, rows) => {
         if (err != null || rows == null) {
@@ -616,7 +616,9 @@ class ScanSelectionList extends React.Component {
           tree: rows.map(
             row => {
               let name = Array.from(
-                new Set(row.protein_set_accession.split(' / ').map(i => i.split("_")[0]))
+                new Set(
+                  row.protein_set_accession.split(' / ').map(i => i.split("_")[0])
+                )
               ).sort().join(" / ")
 
               return {
