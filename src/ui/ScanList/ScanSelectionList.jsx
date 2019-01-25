@@ -346,7 +346,24 @@ class ScanSelectionList extends React.Component {
     this.selectNode(node)
   }
 
+  getTargetNode(tree, node) {
+    let target_node = tree
+    let children = tree
+
+    for (let i = 0; i < node.length; i++) {
+      target_node = children.filter(
+        n => cmp(n.nodeId, node[i].join(","))
+      )[0]
+      children = target_node.children
+    }
+
+    return target_node
+  }
+
   getPeptides(treeNode, node, resolve) {
+    let new_tree = [...this.state.tree]
+    let target_node = this.getTargetNode(new_tree, node)
+
     this.props.db.each(
       `SELECT
       peptides.peptide_id, peptides.peptide_seq,
@@ -379,27 +396,36 @@ class ScanSelectionList extends React.Component {
           return
         }
 
-        treeNode.props.children.push(
-          this.renderNode(
-            key,
-            `${row.peptide_seq} ${row.mod_desc}`,
-            null,
-            false,
-          )
-        )
+        console.log(key)
+
+        let new_leaf = {
+          name: `${row.peptide_seq} ${row.mod_desc}`,
+          nodeId: `${row.peptide_id},${row.mod_state_id}`,
+        }
+
+        if (target_node.children) {
+          target_node.children.push(new_leaf)
+        } else {
+          target_node.children = [new_leaf]
+        }
       },
       (err, count) => {
         if (err != null) {
           console.error(err)
           return
         }
-        if (resolve != null) { resolve() }
+
+        this.setState({
+          tree: new_tree
+        }, resolve)
       }
     )
   }
 
   getScans(treeNode, node, resolve) {
     let scan_ids = new Set()
+    let new_tree = [...this.state.tree]
+    let target_node = this.getTargetNode(new_tree, node)
 
     this.props.db.each(
       `SELECT
@@ -448,14 +474,17 @@ class ScanSelectionList extends React.Component {
           return
         }
 
-        treeNode.props.children.push(
-          this.renderNode(
-            key,
-            `Scan: ${row.scan_num}`,
-            null,
-            row.truncated,
-          )
-        )
+        let new_leaf = {
+          name: `Scan: ${row.scan_num}`,
+          nodeId: `${row.scan_id}`,
+          truncated: row.truncated
+        }
+
+        if (target_node.children) {
+          target_node.children.push(new_leaf)
+        } else {
+          target_node.children = [new_leaf]
+        }
 
         scan_ids.add(row.scan_id)
       },
@@ -463,12 +492,18 @@ class ScanSelectionList extends React.Component {
         if (err != null) {
           console.error(err)
         }
-        if (resolve != null) { resolve() }
+
+        this.setState({
+          tree: new_tree
+        }, resolve)
       }
     )
   }
 
   getPtms(treeNode, node, resolve) {
+    let new_tree = [...this.state.tree]
+    let target_node = this.getTargetNode(new_tree, node)
+
     this.props.db.each(
       `SELECT
       ptms.ptm_id, ptms.name,
@@ -515,20 +550,37 @@ class ScanSelectionList extends React.Component {
           return
         }
 
-        treeNode.props.children.push(
-          this.renderNode(
-            key,
-            row.name,
-            row.choice,
-            false,
-          )
-        )
+        // treeNode.props.children.push(
+        //   this.renderNode(
+        //     key,
+        //     row.name,
+        //     row.choice,
+        //     false,
+        //   )
+        // )
+
+        console.log(key)
+
+        let new_leaf = {
+          name: `${row.name}`,
+          nodeId: `${row.ptm_id}`,
+          choice: row.choice
+        }
+
+        if (target_node.children) {
+          target_node.children.push(new_leaf)
+        } else {
+          target_node.children = [new_leaf]
+        }
       },
       (err, count) => {
         if (err != null) {
           console.error(err)
         }
-        if (resolve != null) { resolve() }
+
+        this.setState({
+          tree: new_tree
+        }, resolve)
       }
     )
   }
@@ -623,7 +675,7 @@ class ScanSelectionList extends React.Component {
 
               return {
                 name: name,
-                nodeId: [row.protein_set_id]
+                nodeId: [`${row.protein_set_id}`]
               }
             }
           )
@@ -634,25 +686,10 @@ class ScanSelectionList extends React.Component {
 
   render() {
     const loop = (data, base) => {
+      if (data == null) {
+        return []
+      }
       return data.map((item) => {
-        if (item.children) {
-          return (
-            <TreeNode
-              key={base + item.nodeId}
-              title={item.name}
-              className={
-                item.choice != null ?
-                item.choice : (
-                  item.truncated != null && item.truncated ?
-                  'truncated' : 'undecided'
-                )
-              }
-              isLeaf={base.split('-').length > 3}
-            >
-              {loop(item.children, base + item.nodeId + "-")}
-            </TreeNode>
-          )
-        }
         return (
           <TreeNode
             key={base + item.nodeId}
@@ -666,13 +703,16 @@ class ScanSelectionList extends React.Component {
             }
             isLeaf={base.split('-').length > 3}
           >
-            {[]}
+            { loop(item.children, base + item.nodeId + "-") }
           </TreeNode>
         )
       })
     }
 
     let tree = this.state.tree
+    // console.log(tree)
+    let leaves = loop(tree, "")
+    // console.log(leaves)
 
     if (this.treeNodes == null || !this.notReRender) {
       this.treeNodes = (
@@ -683,7 +723,7 @@ class ScanSelectionList extends React.Component {
           loadData={this.loadData.bind(this)}
           ref="tree"
         >
-          { loop(tree, "") }
+          { leaves }
         </Tree>
       )
     }
