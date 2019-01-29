@@ -1,5 +1,13 @@
 # Change Log
 
+## 0.17.0 (2019-01-28)
+
+Features
+
+  - Updated to latest PyCAMVerter version.
+  - Use npm only to package, fixing various build issues.
+  - Updated to latest Electron and Bootstrap UI.
+
 ## 0.16.5 (2019-01-23)
 
 Bug fixes
