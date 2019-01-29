@@ -224,6 +224,7 @@ class modalProcessScanBox extends React.Component {
       <Modal
         onHide={this.close.bind(this)}
         show={this.props.showModal}
+        centered={true}
       >
         <Modal.Header>
           <Modal.Title>
@@ -264,18 +265,22 @@ class modalProcessScanBox extends React.Component {
                 {this.state.search_path}
               </div>
             </div>
-            <div>
-              <Button
-                id="fileSelect"
-                onClick={this.updatePycamverterPath.bind(this)}
-                disabled={this.state.processing}
-              >
-                Pycamverter Path
-              </Button>
+
+            {
+              process.env.NODE_ENV === 'development' &&
               <div>
-                {this.state.pycamverterPath}
+                <Button
+                  id="fileSelect"
+                  onClick={this.updatePycamverterPath.bind(this)}
+                  disabled={this.state.processing}
+                >
+                  Pycamverter Path
+                </Button>
+                <div>
+                  {this.state.pycamverterPath}
+                </div>
               </div>
-            </div>
+            }
           </Modal.Body>
         }
         <Modal.Footer>

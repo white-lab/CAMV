@@ -96,6 +96,7 @@ class ModalExportBox extends React.Component {
       <Modal
         onHide={this.close.bind(this)}
         show={this.props.showModal}
+        centered={true}
       >
         <Modal.Header>
           <Modal.Title>

@@ -4,9 +4,16 @@
 
 Features
 
-  - Updated to latest PyCAMVerter version.
+  - Updated to latest PyCAMVerter version, changing:
+
+    - Don't error on unlabeled PD 2.2 runs.
+    - Fixed calculating a/b/c ion mass for unlabeled peptides.
+    - Show output of msconvert.exe on error.
+
   - Use npm only to package, fixing various build issues.
   - Updated to latest Electron and Bootstrap UI.
+  - Added filtering for minimum ion score.
+  - Improved modal window displays.
 
 ## 0.16.5 (2019-01-23)
 

@@ -20,6 +20,7 @@ class ModalBYBox extends React.Component {
       <Modal
         show={this.props.showModal}
         onHide={this.close.bind(this)}
+        centered={true}
       >
         <Modal.Header>
           <Modal.Title>

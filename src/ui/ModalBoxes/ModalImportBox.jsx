@@ -24,6 +24,7 @@ class ModalImportBox extends React.Component {
       scan_lists: [],
       mat_paths: [],
       search_path: null,
+      score: '',
       cpus: os.cpus().length,
       stdout: [],
       stderr: [],
@@ -147,6 +148,12 @@ class ModalImportBox extends React.Component {
     )
   }
 
+  changeIonScore(e) {
+    if (e.target.value == parseInt(e.target.value) || e.target.value == "") {
+      this.setState({score: e.target.value})
+    }
+  }
+
   changeCPUCount(e) {
     this.setState({cpus: e.target.value})
   }
@@ -180,6 +187,10 @@ class ModalImportBox extends React.Component {
 
     if (this.state.mat_paths.length > 0) {
       args = args.concat(["--mat-sessions"]).concat(this.state.mat_paths)
+    }
+
+    if (this.state.score == parseInt(this.state.score)) {
+      args = args.concat(["--score"]).concat(this.state.score)
     }
 
     if (this.state.cpus != null) {
@@ -341,6 +352,8 @@ class ModalImportBox extends React.Component {
         onHide={this.closeCallback.bind(this)}
         show={this.props.showModal}
         dialogClassName="importModal"
+        size='lg'
+        centered={true}
       >
         <Modal.Header>
           <Modal.Title>
@@ -439,7 +452,7 @@ class ModalImportBox extends React.Component {
                     this.state.opening
                   }
                 >
-                  CAMV-Matlab Session(s) (.mat)
+                  CAMV-Matlab Sessions (.mat)
                 </Button>
                 <div>
                   {
@@ -472,6 +485,21 @@ class ModalImportBox extends React.Component {
                   </div>
                 </Form.Group>
               }
+              <Form.Group
+                controlId="formBasicText"
+              >
+                <Form.Label>
+                  Minimum Ion Score
+                </Form.Label>
+                <Form.Control
+                  value={this.state.score}
+                  onChange={this.changeIonScore.bind(this)}
+                  disabled={
+                    this.state.opening
+                  }
+                />
+              </Form.Group>
+
               <Form.Group
                 controlId="formControlsSelect"
               >

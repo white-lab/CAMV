@@ -62,6 +62,7 @@ class ModalSearchBox extends React.Component {
       <Modal
         onHide={this.closeCallback.bind(this)}
         show={this.props.showModal}
+        centered={true}
       >
         <HotKeys handlers={this.handlers}>
           <Modal.Header>
