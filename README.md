@@ -12,13 +12,16 @@ page and select the version appropriate for your system.
 
 CAMV can either directly process ProteomeDiscoverer or MASCOT search data on
 Windows, or open previously-processed data sets on non-Windows computers.
-[This platform restriction is due to proprietary vendor libraries](http://proteowizard.sourceforge.net/formats/index.html))
+[This platform restriction is due to proprietary vendor libraries](http://proteowizard.sourceforge.net/formats/index.html)
 as we depend on those libraries to read the raw mass spectrometry data.
 
 After opening your processed CAMV file, you should see a list of proteins with
 individual spectra that can be accepted or rejected:
 
 ![CAMV - pY](https://i.imgur.com/5Bsj995.png)
+
+If you encounter an error during conversion of raw data to mzML format, you may
+need to install [Visual C++ Redistributable for Visual Studio 2012 Update 4](https://www.microsoft.com/en-us/download/details.aspx?id=30679).
 
 ### Shortcuts
 
