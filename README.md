@@ -44,7 +44,7 @@ Control-F: Search proteins / peptides / scans
 
 ### Dependencies
 
-You will first need to [install Node.js v8](https://nodejs.org/en/).
+You will first need to [install Node.js v10](https://nodejs.org/en/).
 
 Once that is installed, run:
 
