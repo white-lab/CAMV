@@ -17,7 +17,7 @@
     "prop-types": "^15.7.2",
     "rc-tree": "1.7.9",
     "react": "^16.8.6",
-    "react-bootstrap": "^1.0.0-beta.8",
+    "react-bootstrap": "^1.0.0-beta.9",
     "react-dom": "^16.8.6",
     "react-hotkeys": "^1.1.4",
     "react-native-fs": "^2.13.3",
@@ -31,10 +31,10 @@
     "electron-prebuilt-compile": "4.0.0",
     "eslint": "^5.16.0",
     "eslint-formatter-pretty": "^2.1.1",
-    "eslint-plugin-import": "^2.17.2",
+    "eslint-plugin-import": "^2.17.3",
     "eslint-plugin-promise": "^4.1.1",
     "eslint-plugin-react": "^7.13.0",
-    "react-hot-loader": "^4.8.5"
+    "react-hot-loader": "^4.9.0"
   },
   "resolutions": {
     "**/debug": "^3.2.6",
