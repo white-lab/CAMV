@@ -25,16 +25,16 @@
     "terminate": "^2.1.2"
   },
   "devDependencies": {
-    "babel-eslint": "^10.0.2",
-    "cross-env": "^5.2.0",
+    "babel-eslint": "^10.0.3",
+    "cross-env": "^5.2.1",
     "electron-forge": "^5.2.4",
     "electron-prebuilt-compile": "4.0.0",
-    "eslint": "^6.2.1",
+    "eslint": "^6.3.0",
     "eslint-formatter-pretty": "^2.1.1",
     "eslint-plugin-import": "^2.18.2",
     "eslint-plugin-promise": "^4.2.1",
     "eslint-plugin-react": "^7.14.3",
-    "react-hot-loader": "^4.12.11"
+    "react-hot-loader": "^4.12.12"
   },
   "resolutions": {
     "**/debug": "^3.2.6",
