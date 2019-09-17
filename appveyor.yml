@@ -28,12 +28,12 @@ build_script:
     - "ls -lh out/make/"
 
 artifacts:
-    - path: "out/make/CAMV-win32-x64-*.zip"
+    - path: "out/make/CAMV-win32-x64-*.exe"
 
 deploy:
     - provider: GitHub
       description: "Computer Assisted Manual Validation for Mass Spectrometry Proteomics"
-      artifact: /CAMV-.*\.zip/
+      artifact: /CAMV-.*\.exe/
       draft: false
       prerelease: false
       force_update: true

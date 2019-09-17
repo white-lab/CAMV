@@ -1,18 +1,13 @@
 {
   "name": "camv",
   "version": "0.17.0",
-  "main": "src/main.js",
-  "productName": "CAMV",
+  "main": "src/index.js",
   "dependencies": {
-    "babel-plugin-transform-react-jsx-source": "^6.22.0",
-    "babel-plugin-transform-runtime": "^6.23.0",
-    "babel-preset-es2017-node7": "^0.5.2",
-    "babel-preset-react": "^6.24.1",
     "bootstrap": "^4.3.1",
     "d3": "^5.12.0",
     "dom-to-image": "github:naderm/dom-to-image",
     "electron-compile": "^6.4.4",
-    "electron-compilers": "^5.9.0",
+    "electron-squirrel-startup": "^1.0.0",
     "jquery": "^3.4.1",
     "prop-types": "^15.7.2",
     "rc-tree": "1.7.9",
@@ -25,28 +20,16 @@
     "terminate": "^2.1.2"
   },
   "devDependencies": {
-    "babel-eslint": "^10.0.3",
+    "@babel/core": "^7.6.0",
+    "@babel/plugin-transform-async-to-generator": "^7.5.0",
+    "@babel/preset-env": "^7.6.0",
+    "@babel/preset-react": "^7.0.0",
     "cross-env": "^5.2.1",
     "electron-forge": "^5.2.4",
-    "electron-prebuilt-compile": "4.0.0",
-    "eslint": "^6.4.0",
-    "eslint-formatter-pretty": "^2.1.1",
-    "eslint-plugin-import": "^2.18.2",
-    "eslint-plugin-promise": "^4.2.1",
-    "eslint-plugin-react": "^7.14.3",
-    "react-hot-loader": "^4.12.13"
+    "electron-prebuilt-compile": "4.0.0"
   },
-  "resolutions": {
-    "**/debug": "^3.2.6",
-    "**/mime": "^2.4.0",
-    "**/node-abi": "latest",
-    "**/semver": "^5.6.0",
-    "**/tough-cookie": "^2.5.0",
-    "**/uglify-js": "^3.4.9"
-  },
+  "productName": "CAMV",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "lint": "eslint --cache --format=node_modules/eslint-formatter-pretty --ext .jsx,.js src/",
     "start": "electron-forge start",
     "start-dev": "cross-env NODE_ENV=development electron-forge start",
     "package": "electron-forge package",
@@ -54,7 +37,8 @@
     "make-win": "electron-forge make --targets=win32",
     "make-linux": "electron-forge make --targets=linux",
     "make-osx": "electron-forge make --targets=darwin",
-    "make": "electron-forge make"
+    "make": "electron-forge make",
+    "publish": "electron-forge publish"
   },
   "files": [
     ".babelrc",
@@ -64,7 +48,7 @@
     "package.json"
   ],
   "devEngines": {
-    "node": ">=10.x",
+    "node": ">=12.x",
     "npm": ">=6.x"
   },
   "author": {
@@ -79,7 +63,7 @@
     "forge": {
       "make_targets": {
         "win32": [
-          "zip"
+          "squirrel"
         ],
         "darwin": [
           "zip"
