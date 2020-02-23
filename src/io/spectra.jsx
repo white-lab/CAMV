@@ -49,7 +49,7 @@ exports.spectraToImage = async function(vb, dirName, export_spectras, width, hei
       let dataUrl = await domtoimage.toPng(
         document.getElementById('viewBox'),
         {
-          width: width - 30,
+          width: width - 20,
           height: height - 50,
           bgcolor: 'white',
           dpi: 600,
