@@ -725,7 +725,13 @@ class ViewBox extends React.Component {
       return
     }
 
-    spectraToImage(this, dirName, export_spectras)
+    spectraToImage(
+      this, 
+      dirName, 
+      export_spectras, 
+      this.refs['modalExportBox'].state.exportWidth,
+      this.refs['modalExportBox'].state.exportHeight,
+    )
   }
 
   async getBase(node) {

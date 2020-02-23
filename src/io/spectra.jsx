@@ -21,14 +21,13 @@ function decodeBase64Image(dataString) {
 }
 
 
-exports.spectraToImage = async function(vb, dirName, export_spectras) {
+exports.spectraToImage = async function(vb, dirName, export_spectras, width, height) {
   vb.setState({exporting: true})
   var win = remote.getCurrentWindow()
   var sizes = win.getBounds()
   var maximized = win.isMaximized()
 
-  // win.setSize(800, 650)
-  win.setSize(1188, 840)
+  win.setSize(width, height)
   win.setResizable(false)
   win.closeDevTools()
 
@@ -50,8 +49,8 @@ exports.spectraToImage = async function(vb, dirName, export_spectras) {
       let dataUrl = await domtoimage.toPng(
         document.getElementById('viewBox'),
         {
-          width: 1157,
-          height: 783,
+          width: width - 30,
+          height: height - 50,
           bgcolor: 'white',
           dpi: 600,
         },

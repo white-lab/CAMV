@@ -19,9 +19,23 @@ class ModalExportBox extends React.Component {
       exportMaybeSpectra: false,
       exportRejectSpectra: false,
       exportTables: true,
+      exportWidth: 1200,
+      exportHeight: 710,
 
       processing: false,
     }
+  }
+
+  widthChange(e) {
+    this.setState({
+      exportWidth: e.target.value,
+    })
+  }
+
+  heightChange(e) {
+    this.setState({
+      exportHeight: e.target.value,
+    })
   }
 
   updateDir() {
@@ -43,7 +57,6 @@ class ModalExportBox extends React.Component {
       }
     )
   }
-
   close() {
     this.props.closeCallback();
   }
@@ -158,6 +171,20 @@ class ModalExportBox extends React.Component {
                   })
                 }}
               label="Export CSV Table"
+            />
+            <Form.Control
+              type="text"
+              placeholder="Width"
+              value={this.state.exportWidth}
+              onChange={this.widthChange.bind(this)}
+              label="Width"
+            />
+            <Form.Control
+              type="text"
+              placeholder="Height"
+              value={this.state.exportHeight}
+              onChange={this.heightChange.bind(this)}
+              label="Height"
             />
           </div>
         </Modal.Body>
