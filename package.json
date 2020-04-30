@@ -8,7 +8,7 @@
     "dom-to-image": "github:naderm/dom-to-image",
     "electron-compile": "^6.4.4",
     "electron-squirrel-startup": "^1.0.0",
-    "jquery": "^3.4.1",
+    "jquery": "^3.5.0",
     "prop-types": "^15.7.2",
     "rc-tree": "1.7.9",
     "react": "^16.12.0",
