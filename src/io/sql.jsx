@@ -13,14 +13,14 @@ exports.loadSQL = function(fileName, cb) {
       {
         'readonly': false,
         'fileMustExist': true,
-        'verbose': console.log,
+        // 'verbose': console.log,
       },
     )
+    cb(db)
   } catch (err) {
     remote.dialog.showErrorBox(
       "Database Error",
       err.message,
     )
   }
-  cb(db)
 }
