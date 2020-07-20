@@ -5,7 +5,6 @@ import { Button } from 'react-bootstrap'
 
 import fs from 'fs'
 import path from 'path'
-import sqlite3 from 'sqlite3'
 
 import { remote, dialog } from 'electron'
 
@@ -212,7 +211,7 @@ class ViewBox extends React.Component {
       ],
       (resolve, reject, row) => {
         if (row.scan_id != this.state.selectedScan) {
-          reject({errno: sqlite3.INTERRUPT})
+          reject()
           return
         }
 
@@ -265,7 +264,7 @@ class ViewBox extends React.Component {
             row.scan_id != this.state.selectedScan ||
             row.ptm_id != this.state.selectedPTM
           ) {
-            reject({errno: sqlite3.INTERRUPT})
+            reject()
             return
           }
 
@@ -291,7 +290,6 @@ class ViewBox extends React.Component {
   updateAll(nodes) {
     nodes = nodes.slice()
 
-    this.state.db.interrupt()
     let prev_nodes = this.getSelectedNode()
 
     while (nodes.length < 4) { nodes.push([null, null]) }
@@ -352,7 +350,7 @@ class ViewBox extends React.Component {
 
       return Promise.all(promises)
     }).catch((err) => {
-      if (err != null && err.errno != sqlite3.INTERRUPT) {
+      if (err != null) {
         console.error(err)
       }
     }).then(() => {
@@ -370,7 +368,7 @@ class ViewBox extends React.Component {
 
       return Promise.all(promises)
     }).catch((err) => {
-      if (err != null && err.errno != sqlite3.INTERRUPT) {
+      if (err != null) {
         console.error(err)
       }
     })
@@ -407,9 +405,6 @@ class ViewBox extends React.Component {
   handleSQLError(error) {
     if (error == null) {
       return
-    } else if (error.errno == sqlite3.INTERRUPT) {
-      console.log("interrupted")
-      // this.state.db.interrupt()
     } else {
       console.error(error)
     }
@@ -651,8 +646,8 @@ class ViewBox extends React.Component {
     if (export_spectras[2]) { params.push("reject") }
 
     return new Promise(
-      (final_resolve, final_reject) => {
-        this.state.db.all(
+      async function (final_resolve, final_reject) {
+        const rows = this.state.db.prepare(
           `SELECT
           protein_sets.protein_set_id, protein_sets.protein_set_name,
           protein_sets.protein_set_accession, protein_sets.protein_set_uniprot,
@@ -687,31 +682,22 @@ class ViewBox extends React.Component {
           ORDER BY
           protein_sets.protein_set_name, peptides.peptide_seq,
           mod_states.mod_desc, ptms.name`,
-          params,
-          async function(err, rows) {
-            if (err != null || rows == null) {
-              console.error(err)
-              final_reject()
-              return
-            }
+        ).iterate(params)
+        for (const row of rows) {
+          let nodes = [
+            [row.protein_set_id],
+            [row.peptide_id, row.mod_state_id],
+            [row.scan_id],
+            [row.ptm_id],
+          ]
 
-            for (let row of rows) {
-              let nodes = [
-                [row.protein_set_id],
-                [row.peptide_id, row.mod_state_id],
-                [row.scan_id],
-                [row.ptm_id],
-              ]
+          row.protein_set_offsets = row.protein_set_offsets.split(";")
+            .map(i => parseInt(i))
 
-              row.protein_set_offsets = row.protein_set_offsets.split(";")
-                .map(i => parseInt(i))
+          await new Promise(resolve => cb(nodes, row, resolve))
+        }
 
-              await new Promise(resolve => cb(nodes, row, resolve))
-            }
-
-            final_resolve()
-          },
-        )
+        final_resolve()
       },
     )
   }
@@ -952,7 +938,7 @@ class ViewBox extends React.Component {
       ],
       (resolve, reject, row) => {
         if (row.protein_set_id != this.state.selectedProteins) {
-          reject({errno: sqlite3.INTERRUPT})
+          reject()
           return
         }
         this.setState({
@@ -972,7 +958,7 @@ class ViewBox extends React.Component {
       ],
       (resolve, reject, row) => {
         if (row.peptide_id != this.state.selectedPeptide) {
-          reject({errno: sqlite3.INTERRUPT})
+          reject()
           return
         }
         this.setState({
@@ -984,70 +970,36 @@ class ViewBox extends React.Component {
 
   wrapSQLGet(query, params, cb) {
     return new Promise((resolve, reject) => {
-      this.state.db.get(
-        query,
-        params,
-        (err, ret) => {
-          if (err != null || ret == null) {
-            this.handleSQLError(err)
-            this.state.db.interrupt()
-            reject()
-            return
-          }
-
-          if (cb != null) {
-            cb(resolve, reject, ret)
-          } else {
-            resolve()
-          }
-        }
-      )
+      const row = this.state.db.prepare(query).get(params)
+      if (cb != null) {
+        cb(resolve, reject, row)
+      } else {
+        resolve()
+      }
     })
   }
 
   wrapSQLRun(query, params, cb) {
     return new Promise((resolve, reject) => {
-      this.state.db.run(
-        query,
-        params,
-        (err) => {
-          if (err != null) {
-            this.handleSQLError(err)
-            this.state.db.interrupt()
-            reject()
-            return
-          }
+      this.state.db.prepare(query).run(params);
 
-          if (cb != null) {
-            cb(resolve, reject)
-          } else {
-            resolve()
-          }
-        }
-      )
+      if (cb != null) {
+        cb(resolve, reject)
+      } else {
+        resolve()
+      }
     })
   }
 
   wrapSQLAll(query, params, cb) {
     return new Promise((resolve, reject) => {
-      this.state.db.all(
-        query,
-        params,
-        (err, ret) => {
-          if (err != null || ret == null) {
-            this.handleSQLError(err)
-            this.state.db.interrupt()
-            reject()
-            return
-          }
+      const rows = this.state.db.prepare(query).all(params)
 
-          if (cb != null) {
-            cb(resolve, reject, ret)
-          } else {
-            resolve()
-          }
-        }
-      )
+      if (cb != null) {
+        cb(resolve, reject, rows)
+      } else {
+        resolve()
+      }
     })
   }
 
@@ -1082,7 +1034,7 @@ class ViewBox extends React.Component {
         ],
         (resolve, reject, row) => {
           if (row.scan_id != this.state.selectedScan) {
-            reject({errno: sqlite3.INTERRUPT})
+            reject()
             return
           }
           row.precursorIsolationWindow = [
@@ -1104,7 +1056,7 @@ class ViewBox extends React.Component {
           ],
           (resolve, reject, row) => {
             if (row.scan_id != this.state.selectedScan) {
-              reject({errno: sqlite3.INTERRUPT})
+              reject()
               return
             }
 
@@ -1160,7 +1112,7 @@ class ViewBox extends React.Component {
         ],
         (resolve, reject, row) => {
           if (row.scan_id != this.state.selectedScan) {
-            reject({errno: sqlite3.INTERRUPT})
+            reject()
             return
           }
           this.setState({
@@ -1189,7 +1141,7 @@ class ViewBox extends React.Component {
 
             rows.forEach((row) => {
               if (row.scan_id != this.state.selectedScan) {
-                reject({errno: sqlite3.INTERRUPT})
+                reject()
                 return
               }
 
@@ -1236,7 +1188,7 @@ class ViewBox extends React.Component {
       ],
       (resolve, reject, row) => {
         if (row.ptm_id != this.state.selectedPTM) {
-          reject({errno: sqlite3.INTERRUPT})
+          reject()
           return
         }
         this.setState({

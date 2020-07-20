@@ -1,5 +1,16 @@
 # Change Log
 
+## 0.18.0 (2020-07-**)
+
+Features
+
+  - Added the ability to set the exact size of export images.
+  - Switch from `sqlite3` to `better-sqlite3` for better performance.
+
+Bug fixes
+
+  - Updated node packages to latest versions.
+
 ## 0.17.0 (2019-01-28)
 
 Features

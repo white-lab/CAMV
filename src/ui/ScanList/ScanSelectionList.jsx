@@ -347,7 +347,7 @@ class ScanSelectionList extends React.Component {
   }
 
   getPeptides(treeNode, node, resolve) {
-    this.props.db.each(
+    const rows = this.props.db.prepare(
       `SELECT
       peptides.peptide_id, peptides.peptide_seq,
       mod_states.mod_state_id, mod_states.mod_desc
@@ -364,44 +364,32 @@ class ScanSelectionList extends React.Component {
       WHERE protein_sets.protein_set_id=?
 
       ORDER BY peptides.peptide_seq, mod_states.mod_desc`,
-      [
-        node[0][0],
-      ],
-      (err, row) => {
-        if (err != null || row == null) {
-          console.error(err, row)
-          return
-        }
+    ).iterate([
+      node[0][0],
+    ]);
+    for (const row of rows) {
+      let key = `${treeNode.props.eventKey || treeNode.key}-${row.peptide_id},${row.mod_state_id}`
 
-        let key = `${treeNode.props.eventKey || treeNode.key}-${row.peptide_id},${row.mod_state_id}`
-
-        if (treeNode.props.children.map(i => i.props.eventKey || i.key).indexOf(key) >= 0) {
-          return
-        }
-
-        treeNode.props.children.push(
-          this.renderNode(
-            key,
-            `${row.peptide_seq} ${row.mod_desc}`,
-            null,
-            false,
-          )
-        )
-      },
-      (err, count) => {
-        if (err != null) {
-          console.error(err)
-          return
-        }
-        if (resolve != null) { resolve() }
+      if (treeNode.props.children.map(i => i.props.eventKey || i.key).indexOf(key) >= 0) {
+        return
       }
-    )
+
+      treeNode.props.children.push(
+        this.renderNode(
+          key,
+          `${row.peptide_seq} ${row.mod_desc}`,
+          null,
+          false,
+        )
+      )
+    }
+    resolve();
   }
 
   getScans(treeNode, node, resolve) {
     let scan_ids = new Set()
 
-    this.props.db.each(
+    const rows = this.props.db.prepare(
       `SELECT
       scans.scan_id, scans.scan_num, scans.truncated
 
@@ -428,48 +416,39 @@ class ScanSelectionList extends React.Component {
       protein_sets.protein_set_id=?
 
       ORDER BY scans.scan_num`,
-      [
-        node[1][1],
-        node[1][0],
-        node[0][0],
-      ],
-      (err, row) => {
-        if (err != null || row == null) {
-          console.error(err, row)
-        }
+    ).iterate([
+      node[1][1],
+      node[1][0],
+      node[0][0],
+    ]);
 
-        if (scan_ids.has(row.scan_id)) {
-          return
-        }
-
-        let key = `${treeNode.props.eventKey || treeNode.key}-${row.scan_id}`
-
-        if (treeNode.props.children.map(i => i.props.eventKey || i.key).indexOf(key) >= 0) {
-          return
-        }
-
-        treeNode.props.children.push(
-          this.renderNode(
-            key,
-            `Scan: ${row.scan_num}`,
-            null,
-            row.truncated,
-          )
-        )
-
-        scan_ids.add(row.scan_id)
-      },
-      (err, count) => {
-        if (err != null) {
-          console.error(err)
-        }
-        if (resolve != null) { resolve() }
+    for (const row of rows) {
+      if (scan_ids.has(row.scan_id)) {
+        return
       }
-    )
+
+      let key = `${treeNode.props.eventKey || treeNode.key}-${row.scan_id}`
+
+      if (treeNode.props.children.map(i => i.props.eventKey || i.key).indexOf(key) >= 0) {
+        return
+      }
+
+      treeNode.props.children.push(
+        this.renderNode(
+          key,
+          `Scan: ${row.scan_num}`,
+          null,
+          row.truncated,
+        )
+      )
+
+      scan_ids.add(row.scan_id)
+    }
+    resolve();
   }
 
   getPtms(treeNode, node, resolve) {
-    this.props.db.each(
+    const rows = this.props.db.prepare(
       `SELECT
       ptms.ptm_id, ptms.name,
       scan_ptms.choice
@@ -498,39 +477,29 @@ class ScanSelectionList extends React.Component {
       protein_sets.protein_set_id=?
 
       ORDER BY ptms.name`,
-      [
-        node[2][0],
-        node[1][1],
-        node[1][0],
-        node[0][0],
-      ],
-      (err, row) => {
-        if (err != null || row == null) {
-          console.error(err, row)
-        }
+    ).iterate([
+      node[2][0],
+      node[1][1],
+      node[1][0],
+      node[0][0],
+    ]);
+    for (const row of rows) {
+      let key = `${treeNode.props.eventKey || treeNode.key}-${row.ptm_id}`
 
-        let key = `${treeNode.props.eventKey || treeNode.key}-${row.ptm_id}`
-
-        if (treeNode.props.children.map(i => i.props.eventKey || i.key).indexOf(key) >= 0) {
-          return
-        }
-
-        treeNode.props.children.push(
-          this.renderNode(
-            key,
-            row.name,
-            row.choice,
-            false,
-          )
-        )
-      },
-      (err, count) => {
-        if (err != null) {
-          console.error(err)
-        }
-        if (resolve != null) { resolve() }
+      if (treeNode.props.children.map(i => i.props.eventKey || i.key).indexOf(key) >= 0) {
+        return
       }
-    )
+
+      treeNode.props.children.push(
+        this.renderNode(
+          key,
+          row.name,
+          row.choice,
+          false,
+        )
+      )
+    }
+    resolve();
   }
 
   getChildren(treeNode, resolve) {
@@ -598,38 +567,31 @@ class ScanSelectionList extends React.Component {
   }
 
   buildNodeTree() {
-    return this.props.db.all(
+    const rows = this.props.db.prepare(
       `SELECT
       protein_sets.protein_set_id, protein_sets.protein_set_accession
 
       FROM protein_sets
 
       ORDER BY protein_sets.protein_set_accession`,
-      [],
-      (err, rows) => {
-        if (err != null || rows == null) {
-          console.error(err)
-          return
+    ).all();
+
+    this.setState({
+      tree: rows.map(
+        row => {
+          let name = Array.from(
+            new Set(
+              row.protein_set_accession.split(' / ').map(i => i.split("_")[0])
+            )
+          ).sort().join(" / ")
+
+          return {
+            name: name,
+            nodeId: [row.protein_set_id]
+          }
         }
-
-        this.setState({
-          tree: rows.map(
-            row => {
-              let name = Array.from(
-                new Set(
-                  row.protein_set_accession.split(' / ').map(i => i.split("_")[0])
-                )
-              ).sort().join(" / ")
-
-              return {
-                name: name,
-                nodeId: [row.protein_set_id]
-              }
-            }
-          )
-        })
-      }
-    )
+      )
+    })
   }
 
   render() {
