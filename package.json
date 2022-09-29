@@ -5,7 +5,7 @@
   "dependencies": {
     "better-sqlite3": "^7.1.0",
     "bootstrap": "^4.5.0",
-    "d3": "^5.16.0",
+    "d3": "^7.6.1",
     "dom-to-image": "github:naderm/dom-to-image",
     "electron-compile": "^6.4.4",
     "electron-squirrel-startup": "^1.0.0",
